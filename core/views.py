@@ -1,12 +1,12 @@
-import base64
-
-from django.shortcuts import render, get_object_or_404
-
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
 from config.models import Conversa
-from core.forms import CadastroForm
-from core.models import Carona, Caroneiro, Motorista
-from core.utils import generate_pdf, obter_qr_code_pix
+from core.forms import CadastroForm, CaroneiroForm, MotoristaForm
+from core.models import Carona, Caroneiro, Motorista, Temporario
+from core.utils import generate_pdf
+from core.patcher import registrar_deslocamentos
 from django.http import HttpResponse
+from django.contrib.auth.models import User
 
 
 def generate_contrato(request, tipo):
@@ -43,22 +43,94 @@ def register_view(request):
             nome = form.cleaned_data["nome"]
             email = form.cleaned_data["email"]
             senha = form.cleaned_data["senha"]
-            data_nascimento = form.cleaned_data["data_nascimento"]
+            matricula = form.cleaned_data["matricula"]
+            curso = form.cleaned_data["curso"]
+            tipo = form.cleaned_data["tipo"]
 
-            print(nome, email, senha, data_nascimento)
+            user = User.objects.filter(email=email, username=matricula)
 
-            return render(request, "cadastro.html")
+            if not user.exists():
+
+                user = User.objects.create_user(
+                    username=matricula,
+                    first_name=nome,
+                    email=email,
+                    password=senha,
+                )
+
+                user = authenticate(
+                    request, username=user.username, password=user.password
+                )
+
+                comprovante = request.FILES["comprovante"]
+
+                Temporario.objects.create(
+                    comprovante=comprovante,
+                    nome=nome,
+                    matricula=matricula,
+                    curso=curso,
+                    from_username=matricula,
+                )
+
+                login(request, user)
+
+            return redirect(register_type_view, tipo)
     else:
         form = CadastroForm()
 
     return render(request, "cadastro.html", {"form": form})
 
 
+def register_type_view(request, tipo):
+
+    if request.method == "POST":
+        print(request.POST)
+        print(request.FILES)
+        if tipo == "motorista":
+            form = MotoristaForm(request.POST)
+            if form.is_valid():
+                print(form.cleaned_data)
+
+                registrar_deslocamentos(
+                    request.POST, Motorista.objects.get(user=request.user)
+                )
+        elif tipo == "caroneiro":
+            form = CaroneiroForm(request.POST)
+
+            if form.is_valid():
+
+                matricula = form.cleaned_data["matricula"]
+                print(matricula)
+                temp = Temporario.objects.filter(
+                    matricula=matricula,
+                ).first()
+
+                Caroneiro.objects.create(
+                    nome=temp.nome,
+                    matricula=temp.matricula,
+                    comprovante=temp.comprovante,
+                    curso=temp.curso,
+                    user=request.user,
+                )
+
+                temp.delete()
+
+                return render(request, "cadastro_caroneiro.html")
+        else:
+            pass
+    else:
+        if tipo == "motorista":
+            form = MotoristaForm()
+        else:
+            form = CaroneiroForm()
+
+    return render(request, f"cadastro_{tipo}.html", {"form": form})
+
+
 def home_view(request):
 
-    qr_code_img = obter_qr_code_pix("diogo antonio", "01074526007", "5")
-    qr_code_base64 = base64.b64encode(qr_code_img.getvalue()).decode("utf-8")
-
+    carona = Carona.objects.first()
+    qr_code_base64 = carona.generate_pix(Caroneiro.objects.first())
     return render(request, "inicio.html", {"qr_code_base64": qr_code_base64})
 
 
@@ -81,7 +153,6 @@ def find_caroneiro(request):
     )
 
     caroneiros_disponiveis = []
-
 
     for caroneiro in caroneiros:
         if not Carona.objects.filter(

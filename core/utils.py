@@ -7,7 +7,6 @@ from django.http import HttpResponse
 from config.models import Config
 from core.data.templates.contrato import get_template_contrato
 
-
 def generate_pdf(carona, caroneiro, tipo):
 
     template_contrato = get_template_contrato(carona, caroneiro, tipo)
@@ -27,12 +26,10 @@ def verificar_matricula_valida(comprovante, aluno):
     texto = pagina.extract_text()
 
     if aluno.matricula in texto and aluno.nome.upper() in texto:
-        print("nome")
         regex_ano_atual_semestre = r"Período: (\d{4}) - (\d{1})"
         match = re.search(regex_ano_atual_semestre, texto)
 
         if match:
-            print("match")
             ano_matricula = match.group(1)
             semestre_matricula = match.group(2)
 
@@ -43,19 +40,16 @@ def verificar_matricula_valida(comprovante, aluno):
                     int(ano_matricula) == config.ano
                     and int(semestre_matricula) == config.semestre
                 ):
-                    print("ano e semestre")
                     regex_codigo_cadeira = r"\b[A-Za-z]{3}\d{4}\b"
 
                     cadeiras_matriculadas = re.findall(regex_codigo_cadeira, texto)
 
                     if len(cadeiras_matriculadas) > 0:
-                        print("tem cadeiras")
                         regex_codigo_autenticacao_hash = r"Autenticação: (\w{4}\.\w{4}\.\w{4}\.\w{4}\.\w{4}\.\w{4}\.\w{4}\.\w{4})"
 
                         resultado = re.search(regex_codigo_autenticacao_hash, texto)
 
                         if resultado:
-                            print("tem hash")
                             codigo_autenticacao_hash = resultado.group(1)
 
                             url_download_arquivo = f"https://www.ufsm.br/autenticacao/index.html?hash={codigo_autenticacao_hash}"
@@ -66,7 +60,6 @@ def verificar_matricula_valida(comprovante, aluno):
                                 response.status_code == 200
                                 and "Content-Disposition" in response.headers
                             ):
-                                print("hash valido")
                                 return True
     return False
 

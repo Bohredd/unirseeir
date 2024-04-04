@@ -27,12 +27,14 @@ from core.views import (
     home_view,
     login_view,
     register_view,
+    register_type_view,
 )
 
 urlpatterns = [
     path("", home_view, name="home"),
     path("acessar/", login_view, name="login"),
     path("cadastro/", register_view, name="register"),
+    path("cadastro/<str:tipo>", register_type_view, name="registerType"),
     path("gerar/<int:tipo>", generate_contrato, name="gerarContrato"),
     path("find/carona/", find_carona, name="findCarona"),
     path("find/caroneiro/", find_caroneiro, name="findCaroneiro"),

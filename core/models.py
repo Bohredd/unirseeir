@@ -4,6 +4,13 @@ from core.utils import verificar_matricula_valida, obter_qr_code_pix
 from django.contrib.auth.models import User
 
 
+def get_upload_path(instance, filename):
+    if isinstance(instance, Caroneiro) or isinstance(instance, Motorista):
+        return f"files/carona/{instance.user.username}/comprovantes/{filename}"
+
+    return f"files/carona/{instance.matricula}/comprovantes/{filename}"
+
+
 class Automovel(TextChoices):
     carro = ("carro", "Carro")
     moto = ("moto", "Moto")
@@ -32,10 +39,6 @@ class Avaliacao(models.Model):
     descricao = models.CharField(max_length=200)
 
 
-def get_upload_path(instance, filename):
-    return f"files/carona/{instance.user.username}/comprovantes/{filename}"
-
-
 class Ponto(models.Model):
     nome = models.CharField(max_length=150, verbose_name="Ponto de Encontro")
     x = models.CharField(
@@ -56,31 +59,63 @@ class Metodos(TextChoices):
 
 class MetodoPagamento(models.Model):
 
-    nome = models.CharField(choices=Metodos.choices, max_length=20, null=True, blank=True)
+    nome = models.CharField(
+        choices=Metodos.choices, max_length=20, null=True, blank=True
+    )
     chave = models.CharField(max_length=100, null=True, blank=True)
+
+
+class Deslocamento(models.Model):
+
+    dia_semana = models.IntegerField()
+    hora_ida = models.TimeField()
+    hora_volta = models.TimeField()
+    ponto_saida = models.ForeignKey(
+        Ponto,
+        on_delete=models.CASCADE,
+        related_name="deslocamentos_saida",
+        null=True,
+        blank=True,
+    )
+    ponto_destino = models.ForeignKey(
+        Ponto,
+        on_delete=models.CASCADE,
+        related_name="deslocamentos_destino",
+        null=True,
+        blank=True,
+    )
+
+
+class Temporario(models.Model):
+
+    nome = models.CharField(max_length=200)
+    matricula = models.CharField(max_length=20)
+    comprovante = models.FileField(upload_to=get_upload_path)
+    curso = models.CharField(max_length=100)
+    from_username = models.CharField(max_length=100)
 
 
 class Motorista(models.Model):
     nome = models.CharField(max_length=200)
-    matricula = models.CharField(max_length=20)
+    matricula = models.CharField(max_length=20, unique=True)
     comprovante = models.FileField(upload_to=get_upload_path)
-    ponto_saida = models.ForeignKey(Ponto, on_delete=models.CASCADE)
+
     curso = models.CharField(max_length=100)
+
     automovel = models.CharField(
         max_length=200, verbose_name="Qual o automóvel dirigido:"
     )
     carona_paga = models.BooleanField(
         verbose_name="Precisa pagar pela carona?", default=True
     )
-
-    pagamento = models.ForeignKey(MetodoPagamento, on_delete=models.CASCADE, null=True, blank=True)
-
-    custo = models.FloatField(verbose_name="Custo pela carona", default=0.0)
-    horario_saida = models.CharField(
-        max_length=10, verbose_name="Horário de Saída para o Destino"
+    pagamento = models.ForeignKey(
+        MetodoPagamento, on_delete=models.CASCADE, null=True, blank=True
     )
-    horario_volta = models.CharField(
-        max_length=10, verbose_name="Horário de Volta para o Ponto de Saída"
+    custo = models.FloatField(
+        verbose_name="Custo pela carona ida e volta/dia", default=0.0
+    )
+    deslocamentos = models.ManyToManyField(
+        Deslocamento,
     )
     matricula_valida = models.BooleanField(default=True)
 
@@ -95,9 +130,8 @@ class Motorista(models.Model):
 
 class Caroneiro(models.Model):
     nome = models.CharField(max_length=200)
-    matricula = models.CharField(max_length=20)
+    matricula = models.CharField(max_length=20, unique=True)
     comprovante = models.FileField(upload_to=get_upload_path)
-    ponto_encontro = models.ForeignKey(Ponto, on_delete=models.CASCADE)
     curso = models.CharField(max_length=100)
     matricula_valida = models.BooleanField(default=True)
 
@@ -108,6 +142,15 @@ class Caroneiro(models.Model):
         self.matricula_valida = verificar_matricula_valida(self.comprovante, self)
         print("Resultado do self.matricula_valida = ", self.matricula_valida)
         super().save(*args, **kwargs)
+
+
+class Combinado(models.Model):
+
+    caroneiro = models.ForeignKey(Caroneiro, on_delete=models.CASCADE)
+    ida = models.BooleanField(default=False)
+    volta = models.BooleanField(default=False)
+
+    dia_semana = models.IntegerField()
 
 
 class Carona(models.Model):
@@ -123,6 +166,10 @@ class Carona(models.Model):
     caroneiros = models.ManyToManyField(
         Caroneiro, verbose_name="Alunos que estão pegando carona"
     )
+    combinados = models.ManyToManyField(
+        Combinado,
+        verbose_name="Dias e horarios de idas conjuntas dos motoristas e caroneiros",
+    )
     ativa = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
@@ -133,10 +180,24 @@ class Carona(models.Model):
     def update_vagas(self, *args, **kwargs):
         return self.limite_vagas - self.caroneiros.count()
 
-    def generate_pix(self, *args, **kwargs):
-        print("Gerando contratos: ", *args, **kwargs)
+    def generate_pix(self, caroneiro):
 
-        return obter_qr_code_pix()
+        combinados = self.combinados.all().filter(
+            caroneiro=caroneiro,
+        )
+
+        custo_total = 0
+        for combinado in combinados:
+            custo_total += (
+                self.motorista.custo
+                if combinado.ida and combinado.volta
+                else self.motorista.custo / 2
+            ) * 4
+        print(custo_total)
+
+        return obter_qr_code_pix(
+            self.motorista.nome, self.motorista.pagamento.chave, custo_total
+        )
 
     def get_caroneiros_nomes(self, template=False):
 
