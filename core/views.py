@@ -80,14 +80,17 @@ def find_caroneiro(request):
         )
     )
 
-    for caroneiro in caroneiros:
-        if Carona.objects.filter(
-            ativa=True,
-            caroneiros__nome=caroneiro.nome_remetente,
-        ).exists():
-            caroneiros.remove(caroneiro)
+    caroneiros_disponiveis = []
 
-    print(caroneiros)
+
+    for caroneiro in caroneiros:
+        if not Carona.objects.filter(
+            ativa=True,
+            caroneiros__id=caroneiro.id,
+        ).exists():
+            caroneiros_disponiveis.append(caroneiro)
+
+    print(caroneiros_disponiveis)
 
 
 def bate_papo_view_list(request):

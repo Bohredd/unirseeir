@@ -33,7 +33,7 @@ class Avaliacao(models.Model):
 
 
 def get_upload_path(instance, filename):
-    return f"files/carona/{instance.nome_remetente}/comprovantes/{filename}"
+    return f"files/carona/{instance.user.username}/comprovantes/{filename}"
 
 
 class Ponto(models.Model):
@@ -56,8 +56,8 @@ class Metodos(TextChoices):
 
 class MetodoPagamento(models.Model):
 
-    nome = models.CharField(choices=Metodos.choices, max_length=20)
-    chave = models.CharField(max_length=100)
+    nome = models.CharField(choices=Metodos.choices, max_length=20, null=True, blank=True)
+    chave = models.CharField(max_length=100, null=True, blank=True)
 
 
 class Motorista(models.Model):
@@ -73,7 +73,7 @@ class Motorista(models.Model):
         verbose_name="Precisa pagar pela carona?", default=True
     )
 
-    pagamento = models.ForeignKey(MetodoPagamento, on_delete=models.CASCADE)
+    pagamento = models.ForeignKey(MetodoPagamento, on_delete=models.CASCADE, null=True, blank=True)
 
     custo = models.FloatField(verbose_name="Custo pela carona", default=0.0)
     horario_saida = models.CharField(
@@ -128,13 +128,10 @@ class Carona(models.Model):
     def save(self, *args, **kwargs):
         if self.tipo in quantia_vagas_total:
             self.limite_vagas = quantia_vagas_total[self.tipo]
-            self.ativa = True
-            self.update_vagas()
         super().save(*args, **kwargs)
 
     def update_vagas(self, *args, **kwargs):
-        self.vagas = self.limite_vagas - self.caroneiros.count()
-        super().save(*args, **kwargs)
+        return self.limite_vagas - self.caroneiros.count()
 
     def generate_pix(self, *args, **kwargs):
         print("Gerando contratos: ", *args, **kwargs)

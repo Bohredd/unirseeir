@@ -26,7 +26,7 @@ def verificar_matricula_valida(comprovante, aluno):
     pagina = arquivo.pages[0]
     texto = pagina.extract_text()
 
-    if aluno.matricula in texto and aluno.nome_remetente.upper() in texto:
+    if aluno.matricula in texto and aluno.nome.upper() in texto:
         print("nome")
         regex_ano_atual_semestre = r"Período: (\d{4}) - (\d{1})"
         match = re.search(regex_ano_atual_semestre, texto)
