@@ -1,75 +1,89 @@
-import datetime
+import io
 import re
 import requests
 import PyPDF2
-from weasyprint import HTML
-from jinja2 import Environment, FileSystemLoader
-
-import os
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "unirseir.settings")
-import django
-
-django.setup()
-from core.models import Carona
+from xhtml2pdf import pisa
+from django.http import HttpResponse
+from config.models import Config
+from core.data.templates.contrato import get_template_contrato
 
 
-def generate_pdf(carona: Carona):
+def generate_pdf(carona, caroneiro, tipo):
 
-    hoje = datetime.datetime.now().date().strftime("%d de %B de %Y")
+    template_contrato = get_template_contrato(carona, caroneiro, tipo)
+    pdf_file = io.BytesIO()
+    pisa.CreatePDF(template_contrato, dest=pdf_file)
 
-    print("hoje é ", hoje)
+    response = HttpResponse(pdf_file.getvalue(), content_type="application/pdf")
+    response["Content-Disposition"] = 'attachment; filename="contrato.pdf"'
 
-    env = Environment(loader=FileSystemLoader("data/templates"))
-    template = env.get_template("contrato.html")
-    rendered_html = template.render(carona=carona, hoje_str=hoje)
-
-    output_pdf = "output.pdf"
-    HTML(string=rendered_html).write_pdf(output_pdf)
+    return response
 
 
-def verificar_matricula_valida(comprovante, matricula):
+def verificar_matricula_valida(comprovante, aluno):
 
     arquivo = PyPDF2.PdfReader(comprovante)
     pagina = arquivo.pages[0]
     texto = pagina.extract_text()
 
-    if matricula in texto:
-
-        ano_atual = datetime.datetime.now().date().strftime("%Y")
-        regex_ano_atual_semestre = r'Período: (\d{4}) - (\d{1})'
+    if aluno.matricula in texto and aluno.nome_remetente.upper() in texto:
+        print("nome")
+        regex_ano_atual_semestre = r"Período: (\d{4}) - (\d{1})"
         match = re.search(regex_ano_atual_semestre, texto)
 
         if match:
+            print("match")
             ano_matricula = match.group(1)
             semestre_matricula = match.group(2)
 
-            if str(ano_matricula) == ano_atual:
+            config = Config.objects.first()
 
-                regex_codigo_cadeira = r"\b[A-Za-z]{3}\d{4}\b"
+            if config is not None:
+                if (
+                    int(ano_matricula) == config.ano
+                    and int(semestre_matricula) == config.semestre
+                ):
+                    print("ano e semestre")
+                    regex_codigo_cadeira = r"\b[A-Za-z]{3}\d{4}\b"
 
-                cadeiras_matriculadas = re.findall(regex_codigo_cadeira, texto)
+                    cadeiras_matriculadas = re.findall(regex_codigo_cadeira, texto)
 
-                if len(cadeiras_matriculadas) > 0:
+                    if len(cadeiras_matriculadas) > 0:
+                        print("tem cadeiras")
+                        regex_codigo_autenticacao_hash = r"Autenticação: (\w{4}\.\w{4}\.\w{4}\.\w{4}\.\w{4}\.\w{4}\.\w{4}\.\w{4})"
 
-                    regex_codigo_autenticacao_hash = r"Autenticação: (\w{4}\.\w{4}\.\w{4}\.\w{4}\.\w{4}\.\w{4}\.\w{4}\.\w{4})"
+                        resultado = re.search(regex_codigo_autenticacao_hash, texto)
 
-                    resultado = re.search(regex_codigo_autenticacao_hash, texto)
+                        if resultado:
+                            print("tem hash")
+                            codigo_autenticacao_hash = resultado.group(1)
 
-                    if resultado:
-                        codigo_autenticacao_hash = resultado.group(1)
+                            url_download_arquivo = f"https://www.ufsm.br/autenticacao/index.html?hash={codigo_autenticacao_hash}"
 
-                        url_download_arquivo = f"https://www.ufsm.br/autenticacao/index.html?hash={codigo_autenticacao_hash}"
+                            response = requests.get(url_download_arquivo)
 
-                        response = requests.get(url_download_arquivo)
-
-                        if response.status_code == 200 and 'Content-Disposition' in response.headers:
-                            return True
+                            if (
+                                response.status_code == 200
+                                and "Content-Disposition" in response.headers
+                            ):
+                                print("hash valido")
+                                return True
     return False
 
 
-print(verificar_matricula_valida(
-    "/home/dev/Downloads/Comprovante de Matrcula.pdf", "202220628"
-))
+def obter_qr_code_pix(
+    nome_remetente,
+    chave_remetente,
+    custo,
+    cidade="Santa Maria, RS",
+    razao="Ajuda de Custos UNIr-se e Ir",
+):
 
-# generate_pdf(Carona.objects.first())
+    from core.pix import GerarPix
+
+    qr = GerarPix(
+        nome_remetente, chave_remetente, str(float(custo) * 1.1), cidade, razao
+    )
+    qrcode = qr.gerarPayload()
+
+    return qrcode

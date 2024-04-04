@@ -1,0 +1,31 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Selecionar Categoria e Tipo de Item</title>
+</head>
+<body>
+    <h1>Selecione uma Categoria e Tipo de Item</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Cadastrar">
+    </form>
+</body>
+    <script>
+
+        function mostrar_campo(valor) {
+            if (valor === 'motorista') {
+                document.getElementById('id_motorista').style.display = 'block';
+                document.getElementById('id_caroneiro').style.display = 'none';
+            } else if (valor === 'caroneiro') {
+                document.getElementById('id_motorista').style.display = 'none';
+                document.getElementById('id_caroneiro').style.display = 'block';
+            } else {
+                document.getElementById('id_motorista').style.display = 'none';
+                document.getElementById('id_caroneiro').style.display = 'none';
+            }
+        }
+
+    </script>
+</html>
