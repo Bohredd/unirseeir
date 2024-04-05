@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import TextChoices
+from django.shortcuts import redirect, reverse
 from core.utils import verificar_matricula_valida, obter_qr_code_pix
 from django.contrib.auth.models import User
 
@@ -243,6 +244,18 @@ User.add_to_class(
     verificar_solicitacoes,
 )
 
+User.add_to_class(
+    'tipo_ativo',
+    models.CharField(
+        TipoUsuario.choices,
+        max_length=50,
+    )
+)
+
+User.add_to_class(
+    "foto",
+    models.FileField(upload_to=get_upload_path),
+)
 
 class Solicitacao(models.Model):
 
@@ -301,6 +314,10 @@ class Solicitacao(models.Model):
                     caroneiro,
                 )
                 carona.save()
+            else:
+                return redirect(
+                    reverse("core:home")
+                )
         else:
             print("caroneiro")
 
@@ -323,6 +340,8 @@ class Solicitacao(models.Model):
                     caroneiro,
                 )
                 carona.save()
+            else:
+                return redirect(reverse("core:home"))
 
         self.respondida = True
         self.visualizada = True

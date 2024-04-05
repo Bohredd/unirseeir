@@ -50,3 +50,17 @@ class MotoristaForm(forms.Form):
     automovel = forms.CharField(label='Automóvel')
 
     deslocamentos = DeslocamentoFormSet()
+
+class LoginForm(forms.Form):
+
+    matricula = forms.CharField()
+    senha = forms.CharField(widget=forms.PasswordInput)
+
+    tipo = forms.ChoiceField(
+        choices=[
+            ("", "Tipo de Conta"),
+            ("motorista", "Motorista"),
+            ("caroneiro", "Caroneiro"),
+        ],
+        widget=forms.Select(),
+    )

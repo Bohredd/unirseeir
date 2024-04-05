@@ -1,14 +1,17 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from config.models import Conversa
-from core.forms import CadastroForm, CaroneiroForm, MotoristaForm
+from core.decorator import is_tipo, is_conta_do_requester
+from core.forms import CadastroForm, CaroneiroForm, MotoristaForm, LoginForm
 from core.models import Carona, Caroneiro, Motorista, Temporario
-from core.utils import generate_pdf
+from core.utils import generate_pdf, get_user
 from core.patcher import registrar_deslocamentos
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 
 
+@login_required
 def generate_contrato(request, tipo):
 
     if tipo == 0:
@@ -32,7 +35,29 @@ def generate_contrato(request, tipo):
 
 
 def login_view(request):
-    pass
+
+    if request.method == "POST":
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            print(form.cleaned_data)
+
+            usuario = get_user(form.cleaned_data)
+
+            if usuario is not None:
+
+                user = authenticate(
+                    username=usuario.username, password=form.cleaned_data["senha"]
+                )
+
+                if user:
+                    login(request, user)
+
+                    usuario.tipo_ativo = form.cleaned_data["tipo"]
+                    usuario.save()
+    else:
+        form = LoginForm()
+
+    return render(request, "login.html", {"form": form})
 
 
 def register_view(request):
@@ -125,6 +150,7 @@ def register_type_view(request, tipo):
     return render(request, f"cadastro_{tipo}.html", {"form": form})
 
 
+@login_required
 def home_view(request):
 
     carona = Carona.objects.first()
@@ -132,6 +158,8 @@ def home_view(request):
     return render(request, "inicio.html", {"qr_code_base64": qr_code_base64})
 
 
+@login_required
+@is_tipo("caroneiro")
 def find_carona(request):
 
     carona = Carona.objects.filter(
@@ -144,6 +172,8 @@ def find_carona(request):
     return HttpResponse(carona)
 
 
+@login_required
+@is_tipo("motorista")
 def find_caroneiro(request):
 
     caroneiros = list(
@@ -166,6 +196,7 @@ def find_caroneiro(request):
     return HttpResponse(caroneiros_disponiveis)
 
 
+@login_required
 def bate_papo_view_list(request):
 
     conversa = Conversa.objects.filter(
@@ -187,3 +218,9 @@ def bate_papo_grupo_view(request, carona_id):
 
 def gerar_caminho_view(request, carona_id):
     pass
+
+
+@login_required
+@is_conta_do_requester()
+def minha_conta(request, user_id):
+    print("minha conta view acessada")

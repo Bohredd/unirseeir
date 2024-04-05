@@ -6,7 +6,7 @@ from xhtml2pdf import pisa
 from django.http import HttpResponse
 from config.models import Config
 from core.data.templates.contrato import get_template_contrato
-
+from django.contrib.auth.models import User
 
 def generate_pdf(carona, caroneiro, tipo):
 
@@ -76,8 +76,18 @@ def obter_qr_code_pix(
     from core.pix import GerarPix
 
     qr = GerarPix(
-        nome_remetente, chave_remetente, str(float(custo) * 1.1), cidade, razao
+        nome_remetente, chave_remetente, str(float(custo) * 1.05), cidade, razao
     )
     qrcode = qr.gerarPayload()
 
     return qrcode
+
+def get_user(cleaned_data):
+
+    matricula = cleaned_data['matricula']
+    senha = cleaned_data['senha']
+    tipo = cleaned_data['tipo']
+
+    return User.objects.filter(
+        username=matricula,
+    ).first()

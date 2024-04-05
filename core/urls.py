@@ -28,6 +28,7 @@ from core.views import (
     login_view,
     register_view,
     register_type_view,
+    minha_conta,
 )
 
 urlpatterns = [
@@ -48,4 +49,5 @@ urlpatterns = [
     path(
         "carona/gerar_caminho/<int:carona_id>", gerar_caminho_view, name="gerarCaminho"
     ),
+    path("account/<int:id>", minha_conta, name="minhaConta"),
 ]

@@ -73,3 +73,4 @@ class GerarPix:
         img_byte_arr.seek(0)
 
         return base64.b64encode(img_byte_arr.getvalue()).decode("utf-8")
+
