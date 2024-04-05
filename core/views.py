@@ -21,7 +21,7 @@ from core.models import (
 )
 from core.utils import generate_pdf, get_user
 from core.patcher import registrar_deslocamentos
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 from django.contrib.auth.models import User
 
 
@@ -53,8 +53,6 @@ def login_view(request):
     if request.method == "POST":
         form = LoginForm(request.POST)
         if form.is_valid():
-            print(form.cleaned_data)
-
             usuario = get_user(form.cleaned_data)
 
             if usuario is not None:
@@ -68,8 +66,6 @@ def login_view(request):
 
                     usuario.tipo_ativo = form.cleaned_data["tipo"]
                     usuario.save()
-                    print("authenticado")
-                    print(usuario.tipo_ativo)
                     return redirect(
                         home_view,
                     )
@@ -147,9 +143,6 @@ def metodo_pagamento_view(request):
 
             motorista.pagamento = metodo_pagamento
             motorista.save()
-
-            print(tipo_pagamento, chave, custo)
-            print(request.user.id)
             return redirect("minhaConta", id=request.user.id)
     else:
         form = MetodoPagamentoForm()
@@ -178,7 +171,7 @@ def register_type_view(request, tipo):
 
                 if temp is not None:
 
-                    motorista = Motorista.objects.create(
+                    Motorista.objects.create(
                         nome=temp.nome,
                         matricula=temp.matricula,
                         comprovante=temp.comprovante,
@@ -187,6 +180,8 @@ def register_type_view(request, tipo):
                         carona_paga=carona_paga,
                         automovel=automovel,
                     )
+
+                    temp.delete()
 
                     if carona_paga:
                         return redirect(
@@ -243,8 +238,6 @@ def find_carona(request):
         vagas__gt=0,
     )
 
-    print(carona)
-
     return render(request, "find_carona.html", {"caronas": carona})
 
 
@@ -266,8 +259,6 @@ def find_caroneiro(request):
             caroneiros__id=caroneiro.id,
         ).exists():
             caroneiros_disponiveis.append(caroneiro)
-
-    print(caroneiros_disponiveis)
 
     return render(
         request,
@@ -321,8 +312,6 @@ def criar_solicitacao_popup(request, tipo, id):
 
         if form.is_valid():
 
-            print(form.cleaned_data)
-
             if tipo == 1:
                 carona = get_object_or_404(Carona, pk=id)
 
@@ -336,11 +325,16 @@ def criar_solicitacao_popup(request, tipo, id):
 
                 caroneiro = get_object_or_404(Caroneiro, pk=id)
 
-                solicitacao = Solicitacao.objects.create(
+                carona = Carona.objects.get(
+                    motorista__user_id=request.user.id,
+                )
+
+                Solicitacao.objects.create(
+                    carona=carona,
                     mensagem=form.cleaned_data["mensagem"],
-                    para=caroneiro.user,
-                    de=request.user,
-                    de_tipo=request.user.tipo_ativo,
+                    enviado_para=caroneiro.user,
+                    enviado_por=request.user,
+                    enviado_por_tipo=request.user.tipo_ativo,
                 )
 
             return HttpResponse("<script>window.close();</script>")
