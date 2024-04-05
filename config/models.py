@@ -1,10 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 class Config(models.Model):
 
     semestre = models.PositiveSmallIntegerField()
     ano = models.PositiveSmallIntegerField()
+
 
 class Mensagem(models.Model):
 
@@ -30,29 +32,31 @@ class Mensagem(models.Model):
                 )
 
 
-
 class Conexao(models.Model):
 
     ativa = models.BooleanField(default=True)
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
 
+
 class Conversa(models.Model):
 
     mensagens = models.ManyToManyField(
-        Mensagem, blank=True,
+        Mensagem,
+        blank=True,
     )
 
-    membros = models.ManyToManyField(
-        User
-    )
+    membros = models.ManyToManyField(User)
 
     conexoes = models.ManyToManyField(
-        Conexao, blank=True,
+        Conexao,
+        blank=True,
     )
 
     def get_conversa_formatada(self):
 
-        mensagens = list(self.mensagens.order_by('enviado_em').values_list('conteudo', 'enviado_por'))
+        mensagens = list(
+            self.mensagens.order_by("enviado_em").values_list("conteudo", "enviado_por")
+        )
 
         print(mensagens)
 

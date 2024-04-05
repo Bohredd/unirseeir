@@ -1,5 +1,6 @@
 from core.models import Deslocamento, Ponto
 
+
 def get_dia_semana_num(dia_semana):
 
     dias = {
@@ -13,6 +14,7 @@ def get_dia_semana_num(dia_semana):
         return dias[dia_semana.split("-")[0].lower()]
 
     return dias[dia_semana.split(" ")[0].lower()]
+
 
 def registrar_deslocamentos(query_dict, motorista):
 

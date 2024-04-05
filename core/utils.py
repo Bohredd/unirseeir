@@ -7,6 +7,7 @@ from django.http import HttpResponse
 from config.models import Config
 from core.data.templates.contrato import get_template_contrato
 
+
 def generate_pdf(carona, caroneiro, tipo):
 
     template_contrato = get_template_contrato(carona, caroneiro, tipo)

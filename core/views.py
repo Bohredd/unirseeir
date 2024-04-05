@@ -84,23 +84,21 @@ def register_view(request):
 def register_type_view(request, tipo):
 
     if request.method == "POST":
-        print(request.POST)
-        print(request.FILES)
         if tipo == "motorista":
             form = MotoristaForm(request.POST)
             if form.is_valid():
-                print(form.cleaned_data)
 
                 registrar_deslocamentos(
                     request.POST, Motorista.objects.get(user=request.user)
                 )
+
         elif tipo == "caroneiro":
             form = CaroneiroForm(request.POST)
 
             if form.is_valid():
 
                 matricula = form.cleaned_data["matricula"]
-                print(matricula)
+
                 temp = Temporario.objects.filter(
                     matricula=matricula,
                 ).first()
@@ -143,6 +141,8 @@ def find_carona(request):
 
     print(carona)
 
+    return HttpResponse(carona)
+
 
 def find_caroneiro(request):
 
@@ -163,6 +163,8 @@ def find_caroneiro(request):
 
     print(caroneiros_disponiveis)
 
+    return HttpResponse(caroneiros_disponiveis)
+
 
 def bate_papo_view_list(request):
 
@@ -171,6 +173,8 @@ def bate_papo_view_list(request):
     )
 
     print(conversa)
+
+    return HttpResponse(conversa)
 
 
 def bate_papo_view(request, conexao_id, conversa_id):

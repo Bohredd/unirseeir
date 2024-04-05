@@ -16,6 +16,12 @@ class Automovel(TextChoices):
     moto = ("moto", "Moto")
 
 
+class TipoUsuario(TextChoices):
+
+    caroneiro = ("caroneiro", "Caroneiro")
+    motorista = ("motorista", "Motorista")
+
+
 quantia_vagas_total = {
     "carro": 4,
     "moto": 1,
@@ -164,21 +170,18 @@ class Carona(models.Model):
     vagas = models.IntegerField(default=0)
     limite_vagas = models.IntegerField(default=0)
     caroneiros = models.ManyToManyField(
-        Caroneiro, verbose_name="Alunos que estão pegando carona"
+        Caroneiro,
+        verbose_name="Alunos que estão pegando carona",
+        blank=True,
+        null=True,
     )
     combinados = models.ManyToManyField(
         Combinado,
         verbose_name="Dias e horarios de idas conjuntas dos motoristas e caroneiros",
+        blank=True,
+        null=True,
     )
     ativa = models.BooleanField(default=True)
-
-    def save(self, *args, **kwargs):
-        if self.tipo in quantia_vagas_total:
-            self.limite_vagas = quantia_vagas_total[self.tipo]
-        super().save(*args, **kwargs)
-
-    def update_vagas(self, *args, **kwargs):
-        return self.limite_vagas - self.caroneiros.count()
 
     def generate_pix(self, caroneiro):
 
@@ -220,3 +223,110 @@ class Carona(models.Model):
             return "o caroneiro ".join(caroneiros) + "."
         else:
             return caroneiros
+
+
+def verificar_solicitacoes(self):
+
+    solicitacoes = (
+        Solicitacao.objects.filter(
+            models.Q(enviado_por=self) | models.Q(enviado_para=self)
+        )
+        .distinct()
+        .order_by("enviado_em")
+    )
+
+    return solicitacoes
+
+
+User.add_to_class(
+    "verificar_solicitacoes",
+    verificar_solicitacoes,
+)
+
+
+class Solicitacao(models.Model):
+
+    mensagem = models.TextField()
+    carona = models.ForeignKey(Carona, on_delete=models.CASCADE)
+
+    enviado_por = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="enviado_por"
+    )
+    enviado_por_tipo = models.CharField(
+        choices=TipoUsuario.choices,
+        max_length=100,
+    )
+
+    enviado_para = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="enviado_para"
+    )
+    enviado_para_tipo = models.CharField(
+        choices=TipoUsuario.choices,
+        max_length=100,
+    )
+
+    respondida = models.BooleanField(default=False)
+    visualizada = models.BooleanField(default=False)
+    aceitar = models.BooleanField(null=True, blank=True)
+
+    enviado_em = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    def aceitar_solicitacao(self):
+        self.aceitar = True
+
+        print(self.enviado_por)
+        print(self.enviado_por_tipo)
+        print(self.enviado_para)
+        print(self.enviado_para_tipo)
+        if self.enviado_por_tipo == "motorista":
+            print("motorista")
+            caroneiro = Caroneiro.objects.get(
+                user=self.enviado_para,
+            )
+
+            motorista = Motorista.objects.get(
+                user=self.enviado_por,
+            )
+
+            carona = Carona.objects.get(
+                motorista=motorista,
+            )
+
+            ## TODO: Aviso se deu certo a criação ou não
+
+            if carona.vagas != 0:
+                carona.caroneiros.add(
+                    caroneiro,
+                )
+                carona.save()
+        else:
+            print("caroneiro")
+
+            caroneiro = Caroneiro.objects.get(
+                user=self.enviado_por,
+            )
+
+            motorista = Motorista.objects.get(
+                user=self.enviado_para,
+            )
+
+            carona = Carona.objects.get(
+                motorista=motorista,
+            )
+
+            ## TODO: Aviso se deu certo a criação ou não
+
+            if carona.vagas != 0:
+                carona.caroneiros.add(
+                    caroneiro,
+                )
+                carona.save()
+
+        self.respondida = True
+        self.visualizada = True
+        self.save()
+
+    def negar_solicitacao(self):
+        pass
