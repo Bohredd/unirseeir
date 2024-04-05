@@ -34,5 +34,9 @@ urlpatterns = [
     path("carona/gerar_caminho/<int:carona>/", gerar_caminho_view, name="gerarCaminho"),
     path("account/<int:id>/", minha_conta_view, name="minhaConta"),
     path("cadastro/pagamento/", metodo_pagamento_view, name="metodoPagamento"),
-    path("solicitacao/criar/<int:id>/", criar_solicitacao_popup, name="criarSolicitacao"),
+    path(
+        "solicitacao/criar/<int:tipo>/<int:id>/",
+        criar_solicitacao_popup,
+        name="criarSolicitacao",
+    ),
 ]

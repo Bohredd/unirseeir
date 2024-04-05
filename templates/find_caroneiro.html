@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Caroneiro</title>
+    <style>
+        .avaliacoes {
+            border: #4ac1f7;
+            border-style: dashed;
+            margin: 5px;
+            padding: 25px;
+        }
+
+        .caroneiro {
+            border: #5b80b2;
+            border-style: dashed;
+            margin: 10px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+{% for caroneiro in caroneiros_disponiveis %}
+    <div class="caroneiro">
+        <h2 style="color: #4ac1f7"> Caroneiro </h2>
+        <p> Nome: {{ caroneiro.nome }} </p>
+        <p> Curso: {{ caroneiro.curso }} </p>
+        {% if caroneiro.get_nota_avaliacoes %}
+            <p> Nota: {{ caroneiro.get_nota_avaliacoes }} </p>
+        {% endif %}
+        {% if caroneiro.get_avaliacoes %}
+            <div class="avaliacoes">
+                {% for avaliacao in caroneiro.get_avaliacoes %}
+                    <p> {{ avaliacao.nota }} {{ avaliacao.descricao }} </p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <p> Deseja enviar uma solicitação para esse(a) Caroneiro(a)?
+            <button onclick="openCriarSolicitacao({{ caroneiro.id }})">QUERO!</button>
+        </p>
+    </div>
+{% endfor %}
+</body>
+</html>
+<script>
+    function openCriarSolicitacao(divId) {
+        console.log(divId);
+        var url = '/solicitacao/criar/2/' + divId;
+
+        console.log(url);
+
+        var width = 400;
+        var height = 600;
+        var left = (screen.width - width) / 2;
+        var top = (screen.height - height) / 2;
+
+        window.open(url, 'Popup', 'width=' + width + ', height=' + height + ', left=' + left + ', top=' + top);
+    }
+</script>

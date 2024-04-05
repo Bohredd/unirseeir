@@ -5,24 +5,28 @@
     <title>Criando Carona</title>
 </head>
 <body>
+{% if carona %}
     <p> Carona {{ carona.id }}</p>
-    <form id="solicitacao-form" method="post" onsubmit="enviarSolicitacao(event)">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Enviar solicitação">
-    </form>
-    <script>
-        function fecharPopup() {
-            window.close();
-        }
+{% else %}
+    <p> Caroneiro {{ caroneiro_objeto.nome }}</p>
+{% endif %}
+<form id="solicitacao-form" method="post" onsubmit="enviarSolicitacao(event)">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Enviar solicitação">
+</form>
+<script>
+    function fecharPopup() {
+        window.close();
+    }
 
-        function enviarSolicitacao(event) {
-            event.preventDefault();
+    function enviarSolicitacao(event) {
+        event.preventDefault();
 
-            document.getElementById('solicitacao-form').submit();
-            
-            alert("OK!");
-        }
-    </script>
+        document.getElementById('solicitacao-form').submit();
+
+        alert("OK!");
+    }
+</script>
 </body>
 </html>

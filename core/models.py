@@ -132,7 +132,9 @@ class Motorista(models.Model):
 
     def save(self, *args, **kwargs):
 
-        self.matricula_valida = True #verificar_matricula_valida(self.comprovante, self)
+        self.matricula_valida = (
+            True  # verificar_matricula_valida(self.comprovante, self)
+        )
         print("Resultado do self.matricula_valida = ", self.matricula_valida)
         super().save(*args, **kwargs)
 
@@ -142,6 +144,15 @@ class Motorista(models.Model):
             tipo_avaliacao=AvaliacaoTipos.motorista,
             avaliado=self.id,
         )
+
+    def get_nota_avaliacoes(self):
+        avaliacoes = Avaliacao.objects.filter(
+            tipo_avaliacao=AvaliacaoTipos.motorista,
+            avaliado=self.id,
+        )
+
+        return sum(avaliacoes.values_list("nota", flat=True)) / len(avaliacoes)
+
 
 class Caroneiro(models.Model):
     nome = models.CharField(max_length=200)
@@ -154,7 +165,9 @@ class Caroneiro(models.Model):
 
     def save(self, *args, **kwargs):
 
-        self.matricula_valida = True #verificar_matricula_valida(self.comprovante, self)
+        self.matricula_valida = (
+            True  # verificar_matricula_valida(self.comprovante, self)
+        )
         print("Resultado do self.matricula_valida = ", self.matricula_valida)
         super().save(*args, **kwargs)
 
@@ -164,6 +177,18 @@ class Caroneiro(models.Model):
             tipo_avaliacao=AvaliacaoTipos.caroneiro,
             avaliado=self.id,
         )
+
+    def get_nota_avaliacoes(self):
+        avaliacoes = Avaliacao.objects.filter(
+            tipo_avaliacao=AvaliacaoTipos.caroneiro,
+            avaliado=self.id,
+        )
+
+        if avaliacoes:
+            return sum(avaliacoes.values_list("nota", flat=True)) / len(avaliacoes)
+
+        return 0
+
 
 class Combinado(models.Model):
 
@@ -248,7 +273,7 @@ class Carona(models.Model):
         print(de)
         print(de_tipo)
 
-        para_tipo = 'caroneiro' if de_tipo == 'caroneiro' else 'motorista'
+        para_tipo = "caroneiro" if de_tipo == "caroneiro" else "motorista"
 
         solicitacao = Solicitacao.objects.create(
             mensagem=mensagem,
@@ -279,17 +304,18 @@ User.add_to_class(
 )
 
 User.add_to_class(
-    'tipo_ativo',
+    "tipo_ativo",
     models.CharField(
         TipoUsuario.choices,
         max_length=50,
-    )
+    ),
 )
 
 User.add_to_class(
     "foto",
     models.FileField(upload_to=get_upload_path),
 )
+
 
 class Solicitacao(models.Model):
 
@@ -329,17 +355,23 @@ class Solicitacao(models.Model):
         self.aceitar = True
 
         print(self.enviado_por)
+        print(self.enviado_por.id)
+        print(type(self.enviado_por))
         print(self.enviado_por_tipo)
+        print(type(self.enviado_por_tipo))
         print(self.enviado_para)
+        print(self.enviado_para.id)
+        print(type(self.enviado_para))
         print(self.enviado_para_tipo)
+        print(type(self.enviado_para_tipo))
         if self.enviado_por_tipo == "motorista":
             print("motorista")
             caroneiro = Caroneiro.objects.get(
-                user=self.enviado_para,
+                user_id=self.enviado_para.id,
             )
 
             motorista = Motorista.objects.get(
-                user=self.enviado_por,
+                user_id=self.enviado_por.id,
             )
 
             carona = Carona.objects.get(
@@ -354,18 +386,18 @@ class Solicitacao(models.Model):
                 )
                 carona.save()
             else:
-                return redirect(
-                    reverse("core:home")
-                )
+                return redirect(reverse("core:home"))
         else:
             print("caroneiro")
 
+            print(Caroneiro.objects.all().values("id", "matricula", "user"))
+
             caroneiro = Caroneiro.objects.get(
-                user=self.enviado_por,
+                user_id=self.enviado_por.id,
             )
 
             motorista = Motorista.objects.get(
-                user=self.enviado_para,
+                user_id=self.enviado_para.id,
             )
 
             carona = Carona.objects.get(

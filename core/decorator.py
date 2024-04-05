@@ -21,8 +21,6 @@ def is_conta_do_requester():
         @wraps(view_func)
         def wrapped_view(request, *args, **kwargs):
             user_id = kwargs.get("id")
-            print("passado:", user_id)
-            print("requester: ", request.user.id)
             if request.user.is_authenticated:
                 if str(request.user.id) == str(user_id):
                     return view_func(request, *args, **kwargs)

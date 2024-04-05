@@ -12,28 +12,44 @@
             padding: 10px;
         }
 
+        .avaliacoes, .caroneiros {
+            border: #4ac1f7;
+            border-style: dashed;
+            margin: 5px;
+            padding: 25px;
+        }
+
     </style>
 </head>
 <body>
 {% for carona in caronas %}
     <div class="carona" id="{{ carona.id }}">
-        <h2> Carona {{ carona.id }}</h2>
+        <h2 style="color: #4ac1f7"> Carona {{ carona.id }}</h2>
         {% if carona.get_caroneiros_nomes %}
-            {% for caroneiro in carona.get_caroneiros_nomes %}
-                <p> Caroneiro: {{ caroneiro }}</p>
-            {% endfor %}
+            <div class="caroneiros">
+                {% for caroneiro in carona.get_caroneiros_nomes %}
+                    <p> Caroneiro: {{ caroneiro }}</p>
+                {% endfor %}
+            </div>
         {% else %}
             <p> Ainda não há caroneiros participando dessa carona. </p>
         {% endif %}
-        <p> {{ carona.motorista.nome }}</p>
-        <p> {{ carona.motorista.automovel }}</p>
-        <p> {{ carona.motorista.curso }} </p>
-        <p> {{ carona.motorista.custo }}</p>
-        {% for avaliacao in carona.motorista.get_avaliacoes %}
-            <p>{{ avaliacao.nota }} {{ avaliacao.descricao }}</p>
-        {% endfor %}
+        <p> Nome: {{ carona.motorista.nome }}</p>
+        <p> Automóvel: {{ carona.motorista.automovel }}</p>
+        <p> Curso: {{ carona.motorista.curso }} </p>
+        <p> Custo: {{ carona.motorista.custo }}</p>
+        {% if carona.motorista.get_nota_avaliacoes %}
+            <p> Nota: {{ carona.motorista.get_nota_avaliacoes }} ⭐</p>
+        {% endif %}
+        <div class="avaliacoes">
+            {% for avaliacao in carona.motorista.get_avaliacoes %}
+                <p>{{ avaliacao.nota }} {{ avaliacao.descricao }}</p>
+            {% endfor %}
+        </div>
 
-        <p> Deseja enviar uma solicitação para essa carona? <button onclick="openCriarSolicitacao({{ carona.id }})">QUERO!</button></p>
+        <p> Deseja enviar uma solicitação para essa carona?
+            <button onclick="openCriarSolicitacao({{ carona.id }})">QUERO!</button>
+        </p>
     </div>
 {% endfor %}
 </body>
@@ -42,7 +58,7 @@
 <script>
     function openCriarSolicitacao(divId) {
         console.log(divId);
-        var url = '/solicitacao/criar/' + divId;
+        var url = '/solicitacao/criar/1/' + divId;
 
         var width = 400;
         var height = 600;

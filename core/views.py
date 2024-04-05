@@ -11,7 +11,14 @@ from core.forms import (
     MetodoPagamentoForm,
     SolicitacaoForm,
 )
-from core.models import Carona, Caroneiro, Motorista, Temporario, MetodoPagamento
+from core.models import (
+    Carona,
+    Caroneiro,
+    Motorista,
+    Temporario,
+    MetodoPagamento,
+    Solicitacao,
+)
 from core.utils import generate_pdf, get_user
 from core.patcher import registrar_deslocamentos
 from django.http import HttpResponse, JsonResponse
@@ -62,6 +69,7 @@ def login_view(request):
                     usuario.tipo_ativo = form.cleaned_data["tipo"]
                     usuario.save()
                     print("authenticado")
+                    print(usuario.tipo_ativo)
                     return redirect(
                         home_view,
                     )
@@ -261,7 +269,11 @@ def find_caroneiro(request):
 
     print(caroneiros_disponiveis)
 
-    return HttpResponse(caroneiros_disponiveis)
+    return render(
+        request,
+        "find_caroneiro.html",
+        {"caroneiros_disponiveis": caroneiros_disponiveis},
+    )
 
 
 @login_required
@@ -296,9 +308,12 @@ def minha_conta_view(request, id):
     return HttpResponse("minha conta")
 
 
-def criar_solicitacao_popup(request, id):
+def criar_solicitacao_popup(request, tipo, id):
+    # tipo 1 = carona
+    # tipo 2 = caroneiro
 
-    carona = get_object_or_404(Carona, pk=id)
+    carona = None
+    caroneiro = None
 
     if request.method == "POST":
 
@@ -308,15 +323,38 @@ def criar_solicitacao_popup(request, id):
 
             print(form.cleaned_data)
 
-            carona.enviar_solicitacao(
-                mensagem=form.cleaned_data['mensagem'],
-                para=carona.motorista.user,
-                de=request.user,
-                de_tipo=request.user.tipo_ativo,
-            )
+            if tipo == 1:
+                carona = get_object_or_404(Carona, pk=id)
+
+                carona.enviar_solicitacao(
+                    mensagem=form.cleaned_data["mensagem"],
+                    para=carona.motorista.user,
+                    de=request.user,
+                    de_tipo=request.user.tipo_ativo,
+                )
+            else:
+
+                caroneiro = get_object_or_404(Caroneiro, pk=id)
+
+                solicitacao = Solicitacao.objects.create(
+                    mensagem=form.cleaned_data["mensagem"],
+                    para=caroneiro.user,
+                    de=request.user,
+                    de_tipo=request.user.tipo_ativo,
+                )
 
             return HttpResponse("<script>window.close();</script>")
+
     else:
         form = SolicitacaoForm()
 
-    return render(request, "create_solicitacao.html", {"form": form, "carona": carona})
+        if tipo == 1:
+            carona = get_object_or_404(Carona, pk=id)
+        else:
+            caroneiro = get_object_or_404(Caroneiro, pk=id)
+
+    return render(
+        request,
+        "create_solicitacao.html",
+        {"form": form, "carona": carona, "caroneiro_objeto": caroneiro},
+    )
