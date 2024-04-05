@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Carona</title>
+
+    <style>
+        .carona {
+            border: #5b80b2;
+            border-style: dashed;
+            margin: 10px;
+            padding: 10px;
+        }
+
+    </style>
+</head>
+<body>
+{% for carona in caronas %}
+    <div class="carona" id="{{ carona.id }}">
+        <h2> Carona {{ carona.id }}</h2>
+        {% if carona.get_caroneiros_nomes %}
+            {% for caroneiro in carona.get_caroneiros_nomes %}
+                <p> Caroneiro: {{ caroneiro }}</p>
+            {% endfor %}
+        {% else %}
+            <p> Ainda não há caroneiros participando dessa carona. </p>
+        {% endif %}
+        <p> {{ carona.motorista.nome }}</p>
+        <p> {{ carona.motorista.automovel }}</p>
+        <p> {{ carona.motorista.curso }} </p>
+        <p> {{ carona.motorista.custo }}</p>
+        {% for avaliacao in carona.motorista.get_avaliacoes %}
+            <p>{{ avaliacao.nota }} {{ avaliacao.descricao }}</p>
+        {% endfor %}
+
+        <p> Deseja enviar uma solicitação para essa carona? <button onclick="openCriarSolicitacao({{ carona.id }})">QUERO!</button></p>
+    </div>
+{% endfor %}
+</body>
+</html>
+
+<script>
+    function openCriarSolicitacao(divId) {
+        console.log(divId);
+        var url = '/solicitacao/criar/' + divId;
+
+        var width = 400;
+        var height = 600;
+        var left = (screen.width - width) / 2;
+        var top = (screen.height - height) / 2;
+
+        window.open(url, 'Popup', 'width=' + width + ', height=' + height + ', left=' + left + ', top=' + top);
+    }
+</script>

@@ -1,13 +1,20 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.auth import authenticate, login
 from config.models import Conversa
 from core.decorator import is_tipo, is_conta_do_requester
-from core.forms import CadastroForm, CaroneiroForm, MotoristaForm, LoginForm
-from core.models import Carona, Caroneiro, Motorista, Temporario
+from core.forms import (
+    CadastroForm,
+    CaroneiroForm,
+    MotoristaForm,
+    LoginForm,
+    MetodoPagamentoForm,
+    SolicitacaoForm,
+)
+from core.models import Carona, Caroneiro, Motorista, Temporario, MetodoPagamento
 from core.utils import generate_pdf, get_user
 from core.patcher import registrar_deslocamentos
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.models import User
 
 
@@ -54,6 +61,10 @@ def login_view(request):
 
                     usuario.tipo_ativo = form.cleaned_data["tipo"]
                     usuario.save()
+                    print("authenticado")
+                    return redirect(
+                        home_view,
+                    )
     else:
         form = LoginForm()
 
@@ -106,6 +117,38 @@ def register_view(request):
     return render(request, "cadastro.html", {"form": form})
 
 
+def metodo_pagamento_view(request):
+    if request.method == "POST":
+        form = MetodoPagamentoForm(request.POST)
+        if form.is_valid():
+            tipo_pagamento = form.cleaned_data["tipo_pagamento"]
+            chave = form.cleaned_data["chave"]
+            custo = form.cleaned_data["custo"]
+
+            motorista = Motorista.objects.get(
+                user=request.user,
+            )
+
+            motorista.custo = custo
+            motorista.save()
+
+            metodo_pagamento = MetodoPagamento.objects.create(
+                nome=tipo_pagamento,
+                chave=chave,
+            )
+
+            motorista.pagamento = metodo_pagamento
+            motorista.save()
+
+            print(tipo_pagamento, chave, custo)
+            print(request.user.id)
+            return redirect("minhaConta", id=request.user.id)
+    else:
+        form = MetodoPagamentoForm()
+
+    return render(request, "metodo_pagamento.html", {"form": form})
+
+
 def register_type_view(request, tipo):
 
     if request.method == "POST":
@@ -116,6 +159,31 @@ def register_type_view(request, tipo):
                 registrar_deslocamentos(
                     request.POST, Motorista.objects.get(user=request.user)
                 )
+
+                matricula = form.cleaned_data["matricula"]
+                automovel = form.cleaned_data["automovel"]
+                carona_paga = form.cleaned_data["carona_paga"]
+
+                temp = Temporario.objects.filter(
+                    from_username=matricula,
+                ).last()
+
+                if temp is not None:
+
+                    motorista = Motorista.objects.create(
+                        nome=temp.nome,
+                        matricula=temp.matricula,
+                        comprovante=temp.comprovante,
+                        curso=temp.curso,
+                        user=request.user,
+                        carona_paga=carona_paga,
+                        automovel=automovel,
+                    )
+
+                    if carona_paga:
+                        return redirect(
+                            "metodoPagamento",
+                        )
 
         elif tipo == "caroneiro":
             form = CaroneiroForm(request.POST)
@@ -155,7 +223,7 @@ def home_view(request):
 
     carona = Carona.objects.first()
     qr_code_base64 = carona.generate_pix(Caroneiro.objects.first())
-    return render(request, "inicio.html", {"qr_code_base64": qr_code_base64})
+    return render(request, "pix.html", {"qr_code_base64": qr_code_base64})
 
 
 @login_required
@@ -169,7 +237,7 @@ def find_carona(request):
 
     print(carona)
 
-    return HttpResponse(carona)
+    return render(request, "find_carona.html", {"caronas": carona})
 
 
 @login_required
@@ -222,5 +290,33 @@ def gerar_caminho_view(request, carona_id):
 
 @login_required
 @is_conta_do_requester()
-def minha_conta(request, user_id):
+def minha_conta_view(request, id):
     print("minha conta view acessada")
+
+    return HttpResponse("minha conta")
+
+
+def criar_solicitacao_popup(request, id):
+
+    carona = get_object_or_404(Carona, pk=id)
+
+    if request.method == "POST":
+
+        form = SolicitacaoForm(request.POST)
+
+        if form.is_valid():
+
+            print(form.cleaned_data)
+
+            carona.enviar_solicitacao(
+                mensagem=form.cleaned_data['mensagem'],
+                para=carona.motorista.user,
+                de=request.user,
+                de_tipo=request.user.tipo_ativo,
+            )
+
+            return HttpResponse("<script>window.close();</script>")
+    else:
+        form = SolicitacaoForm()
+
+    return render(request, "create_solicitacao.html", {"form": form, "carona": carona})

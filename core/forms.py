@@ -49,6 +49,8 @@ class MotoristaForm(forms.Form):
     matricula = forms.CharField(label='Matrícula')
     automovel = forms.CharField(label='Automóvel')
 
+    carona_paga = forms.BooleanField()
+
     deslocamentos = DeslocamentoFormSet()
 
 class LoginForm(forms.Form):
@@ -64,3 +66,22 @@ class LoginForm(forms.Form):
         ],
         widget=forms.Select(),
     )
+
+class MetodoPagamentoForm(forms.Form):
+
+    tipo_pagamento = forms.ChoiceField(
+        choices=[
+            ("", "Tipo de Pagamento"),
+            ("pix", "PIX"),
+        ]
+    )
+
+    chave = forms.CharField(
+
+    )
+
+    custo = forms.DecimalField()
+
+class SolicitacaoForm(forms.Form):
+
+    mensagem = forms.CharField(label='Mensagem', widget=forms.Textarea())

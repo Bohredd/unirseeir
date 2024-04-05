@@ -42,7 +42,9 @@ class Avaliacao(models.Model):
     tipo_avaliacao = models.CharField(
         choices=AvaliacaoTipos.choices,
         max_length=30,
+        verbose_name="Quem foi avaliado é o que:",
     )
+    avaliado = models.IntegerField(verbose_name="ID de quem foi Avaliado")
     descricao = models.CharField(max_length=200)
 
 
@@ -130,10 +132,16 @@ class Motorista(models.Model):
 
     def save(self, *args, **kwargs):
 
-        self.matricula_valida = verificar_matricula_valida(self.comprovante, self)
+        self.matricula_valida = True #verificar_matricula_valida(self.comprovante, self)
         print("Resultado do self.matricula_valida = ", self.matricula_valida)
         super().save(*args, **kwargs)
 
+    def get_avaliacoes(self):
+
+        return Avaliacao.objects.filter(
+            tipo_avaliacao=AvaliacaoTipos.motorista,
+            avaliado=self.id,
+        )
 
 class Caroneiro(models.Model):
     nome = models.CharField(max_length=200)
@@ -146,10 +154,16 @@ class Caroneiro(models.Model):
 
     def save(self, *args, **kwargs):
 
-        self.matricula_valida = verificar_matricula_valida(self.comprovante, self)
+        self.matricula_valida = True #verificar_matricula_valida(self.comprovante, self)
         print("Resultado do self.matricula_valida = ", self.matricula_valida)
         super().save(*args, **kwargs)
 
+    def get_avaliacoes(self):
+
+        return Avaliacao.objects.filter(
+            tipo_avaliacao=AvaliacaoTipos.caroneiro,
+            avaliado=self.id,
+        )
 
 class Combinado(models.Model):
 
@@ -225,6 +239,26 @@ class Carona(models.Model):
         else:
             return caroneiros
 
+    def enviar_solicitacao(self, mensagem, para, de, de_tipo):
+
+        print("criando solicitacao da carona ", self.id)
+
+        print(mensagem)
+        print(para)
+        print(de)
+        print(de_tipo)
+
+        para_tipo = 'caroneiro' if de_tipo == 'caroneiro' else 'motorista'
+
+        solicitacao = Solicitacao.objects.create(
+            mensagem=mensagem,
+            carona=self,
+            enviado_para=para,
+            enviado_para_tipo=para_tipo,
+            enviado_por=de,
+            enviado_por_tipo=de_tipo,
+        )
+
 
 def verificar_solicitacoes(self):
 
@@ -284,6 +318,11 @@ class Solicitacao(models.Model):
 
     enviado_em = models.DateTimeField(
         auto_now_add=True,
+    )
+
+    resposta = models.TextField(
+        null=True,
+        blank=True,
     )
 
     def aceitar_solicitacao(self):
@@ -348,4 +387,7 @@ class Solicitacao(models.Model):
         self.save()
 
     def negar_solicitacao(self):
-        pass
+
+        self.resposta = "neguei mano se fode ai"
+        self.aceitar = False
+        self.save()
