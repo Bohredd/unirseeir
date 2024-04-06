@@ -49,7 +49,6 @@ def generate_contrato(request, tipo):
         response["Content-Disposition"] = 'attachment; filename="contrato.pdf"'
     return response
 
-
 def login_view(request):
 
     if request.method == "POST":
@@ -75,7 +74,6 @@ def login_view(request):
         form = LoginForm()
 
     return render(request, "login.html", {"form": form})
-
 
 def register_view(request):
 
@@ -122,7 +120,6 @@ def register_view(request):
 
     return render(request, "cadastro.html", {"form": form})
 
-
 def metodo_pagamento_view(request):
     if request.method == "POST":
         form = MetodoPagamentoForm(request.POST)
@@ -150,7 +147,6 @@ def metodo_pagamento_view(request):
         form = MetodoPagamentoForm()
 
     return render(request, "metodo_pagamento.html", {"form": form})
-
 
 def register_type_view(request, tipo):
 
@@ -222,14 +218,13 @@ def register_type_view(request, tipo):
 
     return render(request, f"cadastro_{tipo}.html", {"form": form})
 
-
 @login_required
 def home_view(request):
     # carona = Carona.objects.first()
     # qr_code_base64 = carona.generate_pix(Caroneiro.objects.first())
     # return render(request, "pix.html", {"qr_code_base64": qr_code_base64})
 
-    if request.user.tipo_ativo == 'motorista':
+    if request.user.tipo_ativo == "motorista":
         print("motorista")
         caronas_ativas_do_usuario = Carona.objects.filter(
             motorista__user=request.user,
@@ -242,8 +237,10 @@ def home_view(request):
             caroneiros=Caroneiro.objects.get(user=request.user),
         )
 
-    for carona in caronas_ativas_do_usuario:
-        print(carona.motorista.nome, carona.get_caroneiros_nomes())
+        print()
+
+    #for carona in caronas_ativas_do_usuario:
+    #    print(carona.motorista.nome, carona.get_caroneiros_nomes())
 
     solicitacoes = request.user.verificar_solicitacoes()
 
@@ -253,6 +250,8 @@ def home_view(request):
 
     print(conversas)
 
+    #print(conversas.first().membros)
+
     print(solicitacoes)
 
     return render(
@@ -261,10 +260,18 @@ def home_view(request):
         {
             "conversas": conversas,
             "solicitacoes": solicitacoes,
-            "carona": carona,
+            "carona": caronas_ativas_do_usuario,
         },
     )
 
+def carona_view(request):
+    pass
+
+def solicitacao_view(request):
+    pass
+
+def conversa_view(request):
+    pass
 
 @login_required
 @is_tipo("caroneiro")
@@ -276,7 +283,6 @@ def find_carona(request):
     )
 
     return render(request, "find_carona.html", {"caronas": carona})
-
 
 @login_required
 @is_tipo("motorista")
@@ -303,7 +309,6 @@ def find_caroneiro(request):
         {"caroneiros_disponiveis": caroneiros_disponiveis},
     )
 
-
 @login_required
 def bate_papo_view_list(request):
 
@@ -315,18 +320,8 @@ def bate_papo_view_list(request):
 
     return HttpResponse(conversa)
 
-
-def bate_papo_view(request, conexao_id, conversa_id):
-    pass
-
-
-def bate_papo_grupo_view(request, carona_id):
-    pass
-
-
 def gerar_caminho_view(request, carona_id):
     pass
-
 
 @login_required
 @is_conta_do_requester()
@@ -334,7 +329,6 @@ def minha_conta_view(request, id):
     print("minha conta view acessada")
 
     return HttpResponse("minha conta")
-
 
 def criar_solicitacao_popup(request, tipo, id):
     # tipo 1 = carona
@@ -388,4 +382,11 @@ def criar_solicitacao_popup(request, tipo, id):
         request,
         "create_solicitacao.html",
         {"form": form, "carona": carona, "caroneiro_objeto": caroneiro},
+    )
+
+def BASEEDIT(request):
+
+    return render(
+        request,
+        "header.html"
     )

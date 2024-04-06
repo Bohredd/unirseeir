@@ -4,8 +4,9 @@ from core.views import (
     find_carona,
     find_caroneiro,
     bate_papo_view_list,
-    bate_papo_view,
-    bate_papo_grupo_view,
+    carona_view,
+    solicitacao_view,
+    conversa_view,
     gerar_caminho_view,
     home_view,
     login_view,
@@ -14,6 +15,7 @@ from core.views import (
     minha_conta_view,
     metodo_pagamento_view,
     criar_solicitacao_popup,
+    BASEEDIT,
 )
 
 urlpatterns = [
@@ -25,12 +27,6 @@ urlpatterns = [
     path("find/carona/", find_carona, name="findCarona"),
     path("find/caroneiro/", find_caroneiro, name="findCaroneiro"),
     path("conversa/list/", bate_papo_view_list, name="conversaList"),
-    path(
-        "conversa/dm/<int:conexao>/<int:conversa>",
-        bate_papo_view,
-        name="conversaDM",
-    ),
-    path("conversa/group/<int:carona>/", bate_papo_grupo_view, name="batePapoGroup"),
     path("carona/gerar_caminho/<int:carona>/", gerar_caminho_view, name="gerarCaminho"),
     path("account/<int:id>/", minha_conta_view, name="minhaConta"),
     path("cadastro/pagamento/", metodo_pagamento_view, name="metodoPagamento"),
@@ -39,4 +35,5 @@ urlpatterns = [
         criar_solicitacao_popup,
         name="criarSolicitacao",
     ),
+    path("BASEEDIT", BASEEDIT, name="BASEEDIT"),
 ]

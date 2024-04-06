@@ -6,8 +6,6 @@ from .models import Carona, Caroneiro
 @receiver(m2m_changed, sender=Carona.caroneiros.through)
 def update_vagas(sender, instance, action, **kwargs):
     if action in ["post_add", "post_remove"]:
-        print("add ou removendo")
-        print(action)
         if instance.vagas != 0:
             instance.vagas = instance.limite_vagas - instance.caroneiros.count()
             instance.save(update_fields=["vagas"])
