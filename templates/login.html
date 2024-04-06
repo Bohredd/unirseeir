@@ -1,15 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Login View</title>
-</head>
-<body>
-    Login
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Acessar">
-    </form>
-</body>
-</html>
+{% include 'base.html' %}
+
+<!-- index.html -->
+{% block content %}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Login View</title>
+    </head>
+    <body>
+        Login
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Acessar">
+        </form>
+    </body>
+    </html>
+{% endblock %}

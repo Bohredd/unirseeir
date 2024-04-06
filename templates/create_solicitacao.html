@@ -1,35 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Criando Carona</title>
-</head>
-<body>
-{% if carona %}
-    <p> Carona {{ carona.id }}</p>
-    <p> Motorista: {{ carona.motorista.nome }} </p>
-    <p> Curso: {{ carona.motorista.curso }}</p>
-    <p> Automóvel: {{ carona.motorista.automovel }} </p>
-    <p> Custo: R$ {{ carona.motorista.custo }} </p>
-{% else %}
-    <p> Caroneiro {{ caroneiro_objeto.nome }} </p>
-    <p> Curso: {{ caroneiro_objeto.curso }} </p>
-{% endif %}
-<form id="solicitacao-form" method="post" onsubmit="enviarSolicitacao(event)">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Enviar solicitação">
-</form>
-<script>
-    function fecharPopup() {
-        window.close();
-    }
+{% include 'base.html' %}
 
-    function enviarSolicitacao(event) {
-        event.preventDefault();
-        document.getElementById('solicitacao-form').submit();
-        alert("OK!");
-    }
-</script>
-</body>
-</html>
+<!-- index.html -->
+{% block content %}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Criando Carona</title>
+    </head>
+    <body>
+    {% if carona %}
+        <p> Carona {{ carona.id }}</p>
+        <p> Motorista: {{ carona.motorista.nome }} </p>
+        <p> Curso: {{ carona.motorista.curso }}</p>
+        <p> Automóvel: {{ carona.motorista.automovel }} </p>
+        <p> Custo: R$ {{ carona.motorista.custo }} </p>
+    {% else %}
+        <p> Caroneiro {{ caroneiro_objeto.nome }} </p>
+        <p> Curso: {{ caroneiro_objeto.curso }} </p>
+    {% endif %}
+    <form id="solicitacao-form" method="post" onsubmit="enviarSolicitacao(event)">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Enviar solicitação">
+    </form>
+    <script>
+        function fecharPopup() {
+            window.close();
+        }
+    
+        function enviarSolicitacao(event) {
+            event.preventDefault();
+            document.getElementById('solicitacao-form').submit();
+            alert("OK!");
+        }
+    </script>
+    </body>
+    </html>
+{% endblock %}

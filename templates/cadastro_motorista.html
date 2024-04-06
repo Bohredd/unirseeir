@@ -1,52 +1,55 @@
-<!-- index.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Cadastro Motorista</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
-    <h1>Cadastro Motorista</h1>
-    <form method="post" enctype="multipart/form-data" id="motorista-form">
-        {% csrf_token %}
-        {{ form.as_p }}
+{% include 'base.html' %}
 
-        <!-- Deslocamentos -->
-        <h2>Deslocamentos</h2>
-        <div id="deslocamentos-container">
-            <div class="deslocamento">
-                <label for="id_deslocamentos-0-dia_semana">Dia da Semana:</label>
-                <input type="text" id="id_deslocamentos-0-dia_semana" name="deslocamentos-0-dia_semana">
-                <label for="id_deslocamentos-0-hora_ida">Hora de Ida:</label>
-                <input type="time" id="id_deslocamentos-0-hora_ida" name="deslocamentos-0-hora_ida">
-                <label for="id_deslocamentos-0-hora_volta">Hora de Volta:</label>
-                <input type="time" id="id_deslocamentos-0-hora_volta" name="deslocamentos-0-hora_volta">
+{% block content %}
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Cadastro Motorista</title>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
+    <body>
+        <h1>Cadastro Motorista</h1>
+        <form method="post" enctype="multipart/form-data" id="motorista-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+    
+            <!-- Deslocamentos -->
+            <h2>Deslocamentos</h2>
+            <div id="deslocamentos-container">
+                <div class="deslocamento">
+                    <label for="id_deslocamentos-0-dia_semana">Dia da Semana:</label>
+                    <input type="text" id="id_deslocamentos-0-dia_semana" name="deslocamentos-0-dia_semana">
+                    <label for="id_deslocamentos-0-hora_ida">Hora de Ida:</label>
+                    <input type="time" id="id_deslocamentos-0-hora_ida" name="deslocamentos-0-hora_ida">
+                    <label for="id_deslocamentos-0-hora_volta">Hora de Volta:</label>
+                    <input type="time" id="id_deslocamentos-0-hora_volta" name="deslocamentos-0-hora_volta">
+                </div>
             </div>
-        </div>
-        <button type="button" id="adicionar-deslocamento">Adicionar Deslocamento</button>
-
-        <input type="submit" value="Cadastrar">
-    </form>
-
-    <script>
-        $(document).ready(function() {
-            let deslocamentoCount = 1;
-
-            $('#adicionar-deslocamento').click(function() {
-                const novoDeslocamento = `
-                    <div class="deslocamento">
-                        <label for="id_deslocamentos-${deslocamentoCount}-dia_semana">Dia da Semana:</label>
-                        <input type="text" id="id_deslocamentos-${deslocamentoCount}-dia_semana" name="deslocamentos-${deslocamentoCount}-dia_semana">
-                        <label for="id_deslocamentos-${deslocamentoCount}-hora_ida">Hora de Ida:</label>
-                        <input type="time" id="id_deslocamentos-${deslocamentoCount}-hora_ida" name="deslocamentos-${deslocamentoCount}-hora_ida">
-                        <label for="id_deslocamentos-${deslocamentoCount}-hora_volta">Hora de Volta:</label>
-                        <input type="time" id="id_deslocamentos-${deslocamentoCount}-hora_volta" name="deslocamentos-${deslocamentoCount}-hora_volta">
-                    </div>
-                `;
-                $('#deslocamentos-container').append(novoDeslocamento);
-                deslocamentoCount++;
+            <button type="button" id="adicionar-deslocamento">Adicionar Deslocamento</button>
+    
+            <input type="submit" value="Cadastrar">
+        </form>
+    
+        <script>
+            $(document).ready(function() {
+                let deslocamentoCount = 1;
+    
+                $('#adicionar-deslocamento').click(function() {
+                    const novoDeslocamento = `
+                        <div class="deslocamento">
+                            <label for="id_deslocamentos-${deslocamentoCount}-dia_semana">Dia da Semana:</label>
+                            <input type="text" id="id_deslocamentos-${deslocamentoCount}-dia_semana" name="deslocamentos-${deslocamentoCount}-dia_semana">
+                            <label for="id_deslocamentos-${deslocamentoCount}-hora_ida">Hora de Ida:</label>
+                            <input type="time" id="id_deslocamentos-${deslocamentoCount}-hora_ida" name="deslocamentos-${deslocamentoCount}-hora_ida">
+                            <label for="id_deslocamentos-${deslocamentoCount}-hora_volta">Hora de Volta:</label>
+                            <input type="time" id="id_deslocamentos-${deslocamentoCount}-hora_volta" name="deslocamentos-${deslocamentoCount}-hora_volta">
+                        </div>
+                    `;
+                    $('#deslocamentos-container').append(novoDeslocamento);
+                    deslocamentoCount++;
+                });
             });
-        });
-    </script>
-</body>
-</html>
+        </script>
+    </body>
+    </html>
+{% endblock %}

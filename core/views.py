@@ -23,6 +23,8 @@ from core.utils import generate_pdf, get_user
 from core.patcher import registrar_deslocamentos
 from django.http import HttpResponse
 from django.contrib.auth.models import User
+from django.contrib import messages
+from django.db import models
 
 
 @login_required
@@ -223,10 +225,45 @@ def register_type_view(request, tipo):
 
 @login_required
 def home_view(request):
+    # carona = Carona.objects.first()
+    # qr_code_base64 = carona.generate_pix(Caroneiro.objects.first())
+    # return render(request, "pix.html", {"qr_code_base64": qr_code_base64})
 
-    carona = Carona.objects.first()
-    qr_code_base64 = carona.generate_pix(Caroneiro.objects.first())
-    return render(request, "pix.html", {"qr_code_base64": qr_code_base64})
+    if request.user.tipo_ativo == 'motorista':
+        print("motorista")
+        caronas_ativas_do_usuario = Carona.objects.filter(
+            motorista__user=request.user,
+            ativa=True,
+        )
+    else:
+        print("caroneiro")
+        caronas_ativas_do_usuario = Carona.objects.filter(
+            ativa=True,
+            caroneiros=Caroneiro.objects.get(user=request.user),
+        )
+
+    for carona in caronas_ativas_do_usuario:
+        print(carona.motorista.nome, carona.get_caroneiros_nomes())
+
+    solicitacoes = request.user.verificar_solicitacoes()
+
+    conversas = Conversa.objects.filter(
+        membros=request.user,
+    )
+
+    print(conversas)
+
+    print(solicitacoes)
+
+    return render(
+        request,
+        "home.html",
+        {
+            "conversas": conversas,
+            "solicitacoes": solicitacoes,
+            "carona": carona,
+        },
+    )
 
 
 @login_required

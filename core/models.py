@@ -3,7 +3,7 @@ from django.db.models import TextChoices
 from django.shortcuts import redirect, reverse
 from core.utils import verificar_matricula_valida, obter_qr_code_pix
 from django.contrib.auth.models import User
-
+from django.contrib import messages
 
 def get_upload_path(instance, filename):
     if isinstance(instance, Caroneiro) or isinstance(instance, Motorista):
@@ -351,7 +351,7 @@ class Solicitacao(models.Model):
         blank=True,
     )
 
-    def aceitar_solicitacao(self):
+    def aceitar_solicitacao(self, request):
         self.aceitar = True
 
         print(self.enviado_por)
@@ -378,14 +378,16 @@ class Solicitacao(models.Model):
                 motorista=motorista,
             )
 
-            ## TODO: Aviso se deu certo a criação ou não
-
             if carona.vagas != 0:
                 carona.caroneiros.add(
                     caroneiro,
                 )
                 carona.save()
             else:
+                messages.error(
+                    request,
+                    f"A carona {self.carona.id} do motorista {self.carona.motorista.nome} está com as vagas cheias! Procure outra.",
+                )
                 return redirect(reverse("core:home"))
         else:
             print("caroneiro")
@@ -404,14 +406,16 @@ class Solicitacao(models.Model):
                 motorista=motorista,
             )
 
-            ## TODO: Aviso se deu certo a criação ou não
-
             if carona.vagas != 0:
                 carona.caroneiros.add(
                     caroneiro,
                 )
                 carona.save()
             else:
+                messages.error(
+                    request,
+                    f"A carona {self.carona.id} do motorista {self.carona.motorista.nome} está com as vagas cheias! Procure outra.",
+                )
                 return redirect(reverse("core:home"))
 
         self.respondida = True

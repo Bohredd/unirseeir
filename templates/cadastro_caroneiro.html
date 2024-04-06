@@ -1,15 +1,19 @@
+{% include 'base.html' %}
+
 <!-- index.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Cadastro Caroneiro</title>
-</head>
-<body>
-    <h1>Cadastro Caroneiro</h1>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Cadastrar">
-    </form>
-</body>
-</html>
+{% block content %}
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Cadastro Caroneiro</title>
+    </head>
+    <body>
+        <h1>Cadastro Caroneiro</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Cadastrar">
+        </form>
+    </body>
+    </html>
+{% endblock %}
