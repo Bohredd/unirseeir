@@ -13,19 +13,15 @@
                 <ul class="nav nav-pills flex-sm-column flex-row flex-nowrap flex-shrink-1 flex-sm-grow-0 flex-grow-1 mb-sm-auto mb-0 justify-content-center align-items-center align-items-sm-start"
                     id="menu">
                     <li class="nav-item">
-                        <a href="#" class="nav-link px-sm-0 px-2">
+                        <a href="{% url 'home' %}" class="nav-link px-sm-0 px-2">
                             <i class="fs-5 bi-house"></i><span class="ms-1 d-none d-sm-inline">Home</span>
                         </a>
                     </li>
                     <li>
                         {% if request.user.tipo_ativo == 'motorista' %}
-                            {% with url="/find/caroneiro" %}
-                                <a href="{{ url }}" data-bs-toggle="collapse" class="nav-link px-sm-0 px-2">
-                            {% endwith %}
+                            <a href="{% url 'findCaroneiro' %}" class="nav-link px-sm-0 px-2">
                         {% else %}
-                            {% with url="find/carona" %}
-                                <a href="{{ url }}" data-bs-toggle="collapse" class="nav-link px-sm-0 px-2">
-                            {% endwith %}
+                            <a href="{% url 'findCarona' %}" class="nav-link px-sm-0 px-2">
                         {% endif %}
                         <i class="fs-5
                                 {% if request.user.tipo_ativo == 'motorista' %}
@@ -87,8 +83,9 @@
                     Developed by: Diogo Antonio
                 </div>
                 <div class="col d-flex justify-content-end">
-                    <a href="https://www.github.com/Bohredd/" style="text-decoration: none" target="_blank"> <i class="bi bi-github"
-                                                                                                    style="margin-right: 5px"> </i></a>
+                    <a href="https://www.github.com/Bohredd/" style="text-decoration: none" target="_blank"> <i
+                            class="bi bi-github"
+                            style="margin-right: 5px"> </i></a>
                     <a href="https://www.instagram.com/ehodiogo" style="text-decoration: none" target="_blank"><i
                             class="bi bi-instagram"></i> </a>
                 </div>
