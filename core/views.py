@@ -260,7 +260,7 @@ def home_view(request):
         {
             "conversas": conversas,
             "solicitacoes": solicitacoes,
-            "carona": caronas_ativas_do_usuario,
+            "caronas": caronas_ativas_do_usuario,
         },
     )
 

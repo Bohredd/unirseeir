@@ -5,7 +5,7 @@ import PyPDF2
 from xhtml2pdf import pisa
 from django.http import HttpResponse
 from config.models import Config
-from core.data.templates.contrato import get_template_contrato
+from core.contrato import get_template_contrato
 from django.contrib.auth.models import User
 
 def generate_pdf(carona, caroneiro, tipo):

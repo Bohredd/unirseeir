@@ -1,13 +1,6 @@
-{% include 'base.html' %}
+{% extends 'header.html' %}
 
-<!-- index.html -->
 {% block content %}
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Carona</title>
-
         <style>
             .carona {
                 border: #5b80b2;
@@ -24,8 +17,6 @@
             }
 
         </style>
-    </head>
-    <body>
     {% for carona in caronas %}
         <div class="carona" id="{{ carona.id }}">
             <h2 style="color: #4ac1f7"> Carona {{ carona.id }}</h2>
@@ -56,8 +47,6 @@
             </p>
         </div>
     {% endfor %}
-    </body>
-    </html>
 
     <script>
         function openCriarSolicitacao(divId) {
