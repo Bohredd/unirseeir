@@ -10,12 +10,14 @@ from core.views import (
     gerar_caminho_view,
     home_view,
     login_view,
+    logout_view,
     register_view,
     register_type_view,
     minha_conta_view,
     metodo_pagamento_view,
     criar_solicitacao_popup,
     BASEEDIT,
+    comercial_view,
 )
 
 urlpatterns = [
@@ -36,4 +38,6 @@ urlpatterns = [
         name="criarSolicitacao",
     ),
     path("BASEEDIT", BASEEDIT, name="BASEEDIT"),
+    path("logout/", logout_view, name="logout"),
+    path("inicio/", comercial_view, name="comercial"),
 ]

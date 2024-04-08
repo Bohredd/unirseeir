@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, reverse, get_object_or_404
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from config.models import Conversa
 from core.decorator import is_tipo, is_conta_do_requester
 from core.forms import (
@@ -49,6 +49,7 @@ def generate_contrato(request, tipo):
         response["Content-Disposition"] = 'attachment; filename="contrato.pdf"'
     return response
 
+
 def login_view(request):
 
     if request.method == "POST":
@@ -75,6 +76,7 @@ def login_view(request):
 
     return render(request, "login.html", {"form": form})
 
+
 def register_view(request):
 
     if request.method == "POST":
@@ -96,6 +98,7 @@ def register_view(request):
                     first_name=nome,
                     email=email,
                     password=senha,
+                    tipo_ativo=tipo,
                 )
 
                 user = authenticate(
@@ -119,6 +122,7 @@ def register_view(request):
         form = CadastroForm()
 
     return render(request, "cadastro.html", {"form": form})
+
 
 def metodo_pagamento_view(request):
     if request.method == "POST":
@@ -148,16 +152,13 @@ def metodo_pagamento_view(request):
 
     return render(request, "metodo_pagamento.html", {"form": form})
 
+
 def register_type_view(request, tipo):
 
     if request.method == "POST":
         if tipo == "motorista":
             form = MotoristaForm(request.POST)
             if form.is_valid():
-
-                registrar_deslocamentos(
-                    request.POST, Motorista.objects.get(user=request.user)
-                )
 
                 matricula = form.cleaned_data["matricula"]
                 automovel = form.cleaned_data["automovel"]
@@ -177,6 +178,10 @@ def register_type_view(request, tipo):
                         user=request.user,
                         carona_paga=carona_paga,
                         automovel=automovel,
+                    )
+
+                    registrar_deslocamentos(
+                        request.POST, Motorista.objects.get(user=request.user)
                     )
 
                     temp.delete()
@@ -218,6 +223,16 @@ def register_type_view(request, tipo):
 
     return render(request, f"cadastro_{tipo}.html", {"form": form})
 
+
+def comercial_view(request):
+    return HttpResponse("pagina inicial ficticia")
+
+
+def logout_view(request):
+    logout(request)
+    return redirect("comercial")
+
+
 @login_required
 def home_view(request):
     # carona = Carona.objects.first()
@@ -225,34 +240,25 @@ def home_view(request):
     # return render(request, "pix.html", {"qr_code_base64": qr_code_base64})
 
     if request.user.tipo_ativo == "motorista":
-        print("motorista")
         caronas_ativas_do_usuario = Carona.objects.filter(
             motorista__user=request.user,
             ativa=True,
         )
     else:
-        print("caroneiro")
+        voce = Caroneiro.objects.filter(
+            user=request.user,
+        ).first()
+
         caronas_ativas_do_usuario = Carona.objects.filter(
             ativa=True,
-            caroneiros=Caroneiro.objects.get(user=request.user),
+            caroneiros=voce,
         )
-
-        print()
-
-    #for carona in caronas_ativas_do_usuario:
-    #    print(carona.motorista.nome, carona.get_caroneiros_nomes())
 
     solicitacoes = request.user.verificar_solicitacoes()
 
     conversas = Conversa.objects.filter(
         membros=request.user,
     )
-
-    print(conversas)
-
-    #print(conversas.first().membros)
-
-    print(solicitacoes)
 
     return render(
         request,
@@ -264,14 +270,18 @@ def home_view(request):
         },
     )
 
+
 def carona_view(request):
     pass
+
 
 def solicitacao_view(request):
     pass
 
+
 def conversa_view(request):
     pass
+
 
 @login_required
 @is_tipo("caroneiro")
@@ -283,6 +293,7 @@ def find_carona(request):
     )
 
     return render(request, "find_carona.html", {"caronas": carona})
+
 
 @login_required
 @is_tipo("motorista")
@@ -309,6 +320,7 @@ def find_caroneiro(request):
         {"caroneiros_disponiveis": caroneiros_disponiveis},
     )
 
+
 @login_required
 def bate_papo_view_list(request):
 
@@ -316,12 +328,21 @@ def bate_papo_view_list(request):
         membros__in=[request.user],
     )
 
-    print(conversa)
+    # print(conversa)
 
-    return HttpResponse(conversa)
+    return render(
+        request,
+        "conversa_list.html",
+        {
+            "conversas": conversa,
+        },
+    )
+    # return HttpResponse(conversa)
+
 
 def gerar_caminho_view(request, carona_id):
     pass
+
 
 @login_required
 @is_conta_do_requester()
@@ -329,6 +350,7 @@ def minha_conta_view(request, id):
     print("minha conta view acessada")
 
     return HttpResponse("minha conta")
+
 
 def criar_solicitacao_popup(request, tipo, id):
     # tipo 1 = carona
@@ -384,9 +406,7 @@ def criar_solicitacao_popup(request, tipo, id):
         {"form": form, "carona": carona, "caroneiro_objeto": caroneiro},
     )
 
+
 def BASEEDIT(request):
 
-    return render(
-        request,
-        "header.html"
-    )
+    return render(request, "header.html")

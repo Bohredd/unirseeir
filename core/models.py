@@ -150,8 +150,9 @@ class Motorista(models.Model):
             tipo_avaliacao=AvaliacaoTipos.motorista,
             avaliado=self.id,
         )
-
-        return sum(avaliacoes.values_list("nota", flat=True)) / len(avaliacoes)
+        if len(avaliacoes) != 0:
+            return sum(avaliacoes.values_list("nota", flat=True)) / len(avaliacoes)
+        return 0
 
 
 class Caroneiro(models.Model):

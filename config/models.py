@@ -13,6 +13,7 @@ class Mensagem(models.Model):
     enviado_por = models.ForeignKey(User, on_delete=models.CASCADE)
     conteudo = models.TextField()
     enviado_em = models.DateTimeField(auto_now_add=True)
+    visualizado = models.BooleanField(default=False)
 
     def send_message(self, conexao):
         if conexao.ativa:
@@ -61,3 +62,13 @@ class Conversa(models.Model):
         print(mensagens)
 
         return mensagens
+
+    def get_usuarios_conversa(self):
+
+        if self.membros.count() == 2:
+            return " e ".join(self.membros.all().values_list("first_name", flat=True))
+        else:
+            return " e ".join(self.membros.all().values_list("first_name", flat=True))
+
+    def get_membros(self):
+        return list(self.membros.all().values_list("first_name", flat=True))

@@ -1,31 +1,6 @@
 {% extends 'header.html' %}
 {% load static %}
 {% block content %}
-<h2>Suas Caronas</h2>
-<div class="caronas">
-    {% if caronas %}
-        {% for carona in caronas %}
-            <div class="carona">
-                <p> Carona {{ carona.id }}</p>
-                <p> Caroneiros: {{ carona.get_caroneiros_nomes }} </p>
-                <hr>
-            </div>
-        {% endfor %}
-    {% endif %}
-</div>
-
-<h2>Suas Solicitações</h2>
-<div class="solicitacoes">
-    {% for solicitacao in solicitacoes %}
-        <div class="solicitacao">
-            <p>Solicitação {{ solicitacao.id }} de {{ solicitacao.enviado_por }} enviada em {{ solicitacao.enviado_em }}</p>
-            <p>Mensagem: {{ solicitacao.mensagem }}. Visualizada? {{ solicitacao.visualizada }} Respondida? {{ solicitacao.respondida }}</p>
-            <hr>
-        </div>
-    {% endfor %}
-</div>
-
-<h2>Suas Conversas</h2>
     <ol class="list-group">
         {% load conversa_tags %}
         {% for conversa in conversas %}
