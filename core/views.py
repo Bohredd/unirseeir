@@ -262,6 +262,7 @@ def logout_view(request):
 
 @login_required
 def home_view(request):
+    print(request.user)
     # carona = Carona.objects.first()
     # qr_code_base64 = carona.generate_pix(Caroneiro.objects.first())
     # return render(request, "pix.html", {"qr_code_base64": qr_code_base64})

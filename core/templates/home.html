@@ -19,7 +19,7 @@
         {% endif %}
     </div>
 
-    <h2>Suas Solicitações</h2>
+    <h2>Suas Solicitações {% if solicitacoes %} <span class="badge text-bg-success">NOVAS!</span> {% endif %}</h2>
     <div class="solicitacoes">
         {% for solicitacao in solicitacoes %}
             <div class="solicitacao" style="margin-bottom: 10px">
