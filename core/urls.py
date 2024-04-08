@@ -40,4 +40,5 @@ urlpatterns = [
     path("BASEEDIT", BASEEDIT, name="BASEEDIT"),
     path("logout/", logout_view, name="logout"),
     path("inicio/", comercial_view, name="comercial"),
+    path("conversa/ver/<int:id>/", conversa_view, name="conversa"),
 ]

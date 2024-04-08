@@ -1,22 +1,38 @@
 {% extends 'header.html' %}
 {% load static %}
 {% block content %}
+
+    <style>
+        .limpador-href {
+            text-decoration: none;
+            color: #0000EE;
+        }
+
+        .limpador-href:hover {
+            text-decoration: none;
+            color: #FF914D;
+        }
+    </style>
+
     <ol class="list-group">
         {% load conversa_tags %}
         {% for conversa in conversas %}
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-              <img class="img-thumbnail" style="max-height: 60px; max-width: 60px; margin-right: 10px" src="{% static 'diogo.png' %}" alt="" />
-              <div class="ms-3">
-                <p class="fw-bold mb-0">{% conversa_get_mensagem_membro request conversa %}</p>
-                <p class="text-muted mb-0 fs-sm">{% get_ultimo_enviador_mensagem_e_menssagem conversa %}</p>
-              </div>
-            </div>
-                {% conversa_get_mensagens_nao_visualizadas request conversa as count %}
-                {% if count != 0 %}
-                    <span class="badge bg-primary rounded-pill">{% conversa_get_mensagens_nao_visualizadas request conversa %}</span>
-                {% endif %}
-          </li>
+            <a class="limpador-href" href="{% url 'conversa' conversa.id %}">
+                <li class="list-group-item d-flex justify-content-between align-items-center" style="margin-bottom: 5px">
+                    <div class="d-flex align-items-center">
+                        <img class="img-thumbnail" style="max-height: 60px; max-width: 60px; margin-right: 10px"
+                             src="{% static 'diogo.png' %}" alt=""/>
+                        <div class="ms-3">
+                            <p class="fw-bold mb-0">{% conversa_get_mensagem_membro request conversa %}</p>
+                            <p class="text-muted mb-0 fs-sm">{% get_ultimo_enviador_mensagem_e_menssagem conversa %}</p>
+                        </div>
+                    </div>
+                    {% conversa_get_mensagens_nao_visualizadas request conversa as count %}
+                    {% if count != 0 %}
+                        <span class="badge bg-primary rounded-pill">{% conversa_get_mensagens_nao_visualizadas request conversa %}</span>
+                    {% endif %}
+                </li>
+            </a>
         {% endfor %}
     </ol>
 {% endblock %}

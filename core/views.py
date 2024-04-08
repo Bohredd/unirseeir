@@ -279,8 +279,11 @@ def solicitacao_view(request):
     pass
 
 
-def conversa_view(request):
-    pass
+def conversa_view(request, id):
+
+    print("id da conversa", id)
+
+    return HttpResponse(f"id da conversa {id}")
 
 
 @login_required
