@@ -18,6 +18,7 @@ from core.models import (
     Temporario,
     MetodoPagamento,
     Solicitacao,
+    Extrato,
 )
 from core.utils import generate_pdf, get_user
 from core.patcher import registrar_deslocamentos
@@ -298,10 +299,22 @@ def home_view(request):
         },
     )
 
+
 @login_required
 def banco_view(request):
 
-    return HttpResponse("saldo diogo antonio: R$ 189034.5348295 dolares de reais ")
+    extrato = Extrato.objects.filter(
+        usuario=request.user,
+    ).first()
+
+    extrato.atualizar_saldo()
+
+    movimentacoes = extrato.movimentacao.all().order_by('-data_movimentacao')
+
+    print(movimentacoes)
+
+    return HttpResponse(f"Saldo de {extrato.usuario.first_name} de R$ {extrato.saldo}")
+
 
 @login_required
 @user_in_carona()
@@ -313,7 +326,7 @@ def carona_view(request, carona):
         "carona.html",
         {
             "carona": carona,
-        }
+        },
     )
 
 
@@ -335,6 +348,7 @@ def solicitacao_acao(request, situacao, solicitacao):
     return redirect(
         "home",
     )
+
 
 @login_required
 def minhas_caronas(request):

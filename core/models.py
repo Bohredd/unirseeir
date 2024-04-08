@@ -416,3 +416,50 @@ class Solicitacao(models.Model):
         self.resposta = "neguei mano se fode ai"
         self.aceitar = False
         self.save()
+
+class MovimentacaoTipos(TextChoices):
+
+    entrada = ('entrada', "Entrada")
+    saida = ('saida', "Saida")
+
+class Movimentacao(models.Model):
+
+    tipo = models.CharField(
+        choices=MovimentacaoTipos.choices,
+        max_length=50,
+    )
+
+    valor_transacao = models.FloatField(
+        default=0,
+    )
+
+    de = models.ForeignKey(User, on_delete=models.CASCADE, related_name="Pagante")
+    para = models.ForeignKey(User, on_delete=models.CASCADE, related_name="Recebedor")
+    data_movimentacao = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+class Extrato(models.Model):
+
+    movimentacao = models.ManyToManyField(
+        Movimentacao,
+    )
+
+    saldo = models.FloatField(
+        default=0,
+    )
+
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def atualizar_saldo(self):
+
+        movimentacoes = self.movimentacao.all()
+        saldo = 0
+        for movimentacao in movimentacoes:
+            if movimentacao.tipo == "entrada":
+                saldo += movimentacao.valor_transacao
+            else:
+                saldo -= movimentacao.valor_transacao
+
+        self.saldo = saldo
+        self.save()

@@ -10,6 +10,8 @@ from core.models import (
     Deslocamento,
     Solicitacao,
     Temporario,
+    Extrato,
+    Movimentacao,
 )
 
 
@@ -49,3 +51,5 @@ admin.site.register(Combinado)
 admin.site.register(Deslocamento)
 admin.site.register(Solicitacao)
 admin.site.register(Temporario)
+admin.site.register(Extrato)
+admin.site.register(Movimentacao)
