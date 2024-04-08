@@ -1,8 +1,8 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, reverse, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from config.models import Conversa
-from core.decorator import is_tipo, is_conta_do_requester
+from core.decorator import is_tipo, user_in_carona
 from core.forms import (
     CadastroForm,
     CaroneiroForm,
@@ -24,7 +24,7 @@ from core.patcher import registrar_deslocamentos
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.db import models
+from django.contrib.auth.hashers import check_password
 
 
 @login_required
@@ -116,6 +116,32 @@ def register_view(request):
                 )
 
                 login(request, user)
+            else:
+                if (
+                    user.exists()
+                    and user.first().tipo_ativo != tipo
+                    and check_password(senha, user.first().password)
+                ):
+                    user = user.first()
+
+                    user.tipo_ativo = tipo
+                    user.save()
+
+                    user = authenticate(
+                        request, username=user.username, password=user.password
+                    )
+
+                    comprovante = request.FILES["comprovante"]
+
+                    Temporario.objects.create(
+                        comprovante=comprovante,
+                        nome=nome,
+                        matricula=matricula,
+                        curso=curso,
+                        from_username=matricula,
+                    )
+
+                    login(request, user)
 
             return redirect(register_type_view, tipo)
     else:
@@ -200,7 +226,7 @@ def register_type_view(request, tipo):
 
                 temp = Temporario.objects.filter(
                     matricula=matricula,
-                ).first()
+                ).last()
 
                 Caroneiro.objects.create(
                     nome=temp.nome,
@@ -271,14 +297,23 @@ def home_view(request):
     )
 
 
-def carona_view(request):
+@login_required
+@user_in_carona()
+def carona_view(request, carona):
+    return HttpResponse(f"teste --> id carona {carona}")
+
+
+@login_required
+def minhas_caronas(request):
+    return HttpResponse("minhas caronas ativas")
+
+
+@login_required
+def solicitacao_view(request, id):
     pass
 
 
-def solicitacao_view(request):
-    pass
-
-
+@login_required
 def conversa_view(request, id):
 
     print("id da conversa", id)
@@ -348,11 +383,23 @@ def gerar_caminho_view(request, carona_id):
 
 
 @login_required
-@is_conta_do_requester()
-def minha_conta_view(request, id):
+def minha_conta_view(request):
     print("minha conta view acessada")
 
-    return HttpResponse("minha conta")
+    if request.user.tipo_ativo == "motorista":
+
+        motorista = Motorista.objects.filter(
+            user=request.user,
+        ).first()
+
+        return HttpResponse(f"minha conta motorista {motorista.nome}")
+
+    else:
+        caroneiro = Caroneiro.objects.filter(
+            user=request.user,
+        ).first()
+
+        return HttpResponse(f"minha conta caroneiro {caroneiro.nome}")
 
 
 def criar_solicitacao_popup(request, tipo, id):
@@ -413,3 +460,47 @@ def criar_solicitacao_popup(request, tipo, id):
 def BASEEDIT(request):
 
     return render(request, "header.html")
+
+
+def switch_account_view(request):
+
+    if request.user.tipo_ativo == "motorista":
+        caroneiro = Caroneiro.objects.filter(
+            user=request.user,
+        )
+
+        if caroneiro.exists():
+            request.user.tipo_ativo = "caroneiro"
+            request.user.save()
+            messages.success(request, "Agora você está conectado como: Caroneiro!")
+            return redirect(
+                "home",
+            )
+        else:
+            messages.error(
+                request,
+                "Não foi possível trocar o tipo de conta, garanta que você possui a conta inversa",
+            )
+            return redirect(
+                "home",
+            )
+    else:
+        motorista = Motorista.objects.filter(
+            user=request.user,
+        )
+
+        if motorista.exists():
+            request.user.tipo_ativo = "motorista"
+            request.user.save()
+            messages.success(request, "Agora você está conectado como: Motorista!")
+            return redirect(
+                "home",
+            )
+        else:
+            messages.error(
+                request,
+                "Não foi possível trocar o tipo de conta, garanta que você possui a conta inversa",
+            )
+            return redirect(
+                "home",
+            )

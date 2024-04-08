@@ -40,30 +40,44 @@
                             </span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{% url 'minhasCaronas' %}" class="nav-link px-sm-0 px-2">
+                            <i class="fs-5 bi-person-raised-hand"></i><span class="ms-1 d-none d-sm-inline">Minhas Caronas</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{% url 'minhasCaronas' %}" class="nav-link px-sm-0 px-2">
+                            <i class="fs-5 bi-wallet2"></i><span class="ms-1 d-none d-sm-inline">Meu Saldo</span>
+                        </a>
+                    </li>
                 </ul>
                 <div class="dropdown py-sm-4 mt-sm-auto ms-auto ms-sm-0 flex-shrink-1">
                     <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
                        id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="{% static 'diogo.png' %}" alt="hugenerd" width="28" height="28" class="rounded-circle">
+                        <img src="{% static 'diogo.png' %}" alt="hugenerd" width="28" height="28"
+                             class="rounded-circle">
                         <span class="d-none d-sm-inline mx-1">{{ request.user.first_name }}</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                        <li><a class="dropdown-item" href="{% url 'minhaConta' request.user.id %}">Minha Conta</a></li>
-                        <li><a class="dropdown-item" href="#">Modo Noturno/Dia <i class="bi bi-cone-striped"></i></a>
+                        <li><a class="dropdown-item" href="{% url 'minhaConta' %}">Minha Conta <i
+                                class="bi-file-person-fill"> </i></a></li>
+                        <li><a class="dropdown-item" href="#">Modo Noturno/Dia <i class="bi bi-moon"></i></a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="#">Inverter para
+                            <a class="dropdown-item" href="{% url 'switchAccount' %}">Inverter para
                                 {% if request.user.tipo_ativo == 'motorista' %}
-                                    Caroneiro
+                                    Caroneiro <i class="bi bi-toggle2-on"></i>
                                 {% else %}
-                                    Motorista
+                                    Motorista <i class="bi bi-toggle2-off"></i>
                                 {% endif %}
                             </a>
                         </li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="{% url 'logout' %}">Sair <i class="bi bi-box-arrow-left"></i></a></li>
+                        <li><a class="dropdown-item" href="{% url 'logout' %}">Sair <i class="bi bi-box-arrow-left"></i></a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -71,6 +85,17 @@
         <div class="col d-flex flex-column h-sm-100">
             <main class="row overflow-auto">
                 <div class="col pt-4">
+                    {% if messages %}
+                        <ul class="messages">
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} d-flex align-items-center" role="alert">
+                                    <strong>{{ message }}!</strong>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                            aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
                     {% block content %}
 
                     {% endblock %}
