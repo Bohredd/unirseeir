@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.db.models import TextChoices
 from django.shortcuts import redirect, reverse
@@ -417,10 +419,12 @@ class Solicitacao(models.Model):
         self.aceitar = False
         self.save()
 
+
 class MovimentacaoTipos(TextChoices):
 
-    entrada = ('entrada', "Entrada")
-    saida = ('saida', "Saida")
+    entrada = ("entrada", "Entrada")
+    saida = ("saida", "Saida")
+
 
 class Movimentacao(models.Model):
 
@@ -438,6 +442,7 @@ class Movimentacao(models.Model):
     data_movimentacao = models.DateTimeField(
         auto_now_add=True,
     )
+
 
 class Extrato(models.Model):
 
@@ -463,3 +468,35 @@ class Extrato(models.Model):
 
         self.saldo = saldo
         self.save()
+
+    def get_entradas_mes(self):
+        hoje = datetime.datetime.today()
+        mes_atual = hoje.month
+        ano_atual = hoje.year
+
+        entradas_mes = (
+            self.movimentacao.filter(
+                tipo="entrada",
+                data_movimentacao__month=mes_atual,
+                data_movimentacao__year=ano_atual,
+            ).aggregate(total_entradas=models.Sum("valor_transacao"))["total_entradas"]
+            or 0
+        )
+
+        return entradas_mes
+
+    def get_saidas_mes(self):
+        hoje = datetime.datetime.today()
+        mes_atual = hoje.month
+        ano_atual = hoje.year
+
+        saidas_mes = (
+            self.movimentacao.filter(
+                tipo="saida",
+                data_movimentacao__month=mes_atual,
+                data_movimentacao__year=ano_atual,
+            ).aggregate(total_saidas=models.Sum("valor_transacao"))["total_saidas"]
+            or 0
+        )
+
+        return saidas_mes

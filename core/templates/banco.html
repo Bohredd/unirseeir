@@ -1,0 +1,39 @@
+{% extends 'header.html' %}
+
+{% block content %}
+
+    {% if extrato %}
+        <div class="card text-center" style="margin-bottom: 10px">
+            <div class="card-header text-bg-info fw-bold">
+                Conta de {{ extrato.usuario.first_name }}
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item fw-bold">Saldo: <span  {% if extrato.saldo > 0 %}
+                    style="color:green; " {% else %}  style="color: red"{% endif %}>R$ {{ extrato.saldo|floatformat:2 }} </span></li>
+                <li class="list-group-item fw-bold">Saídas do mês: <span style="color:red;">-R$ {{ extrato.get_saidas_mes|floatformat:2 }}</span></li>
+                <li class="list-group-item fw-bold">Entradas do mês: <span style="color: green">+R$ {{ extrato.get_entradas_mes|floatformat:2 }}</span></li>
+            </ul>
+        </div>
+    {% endif %}
+
+    <div class="card text-center">
+        <div class="card-header text-bg-info fw-bold">
+            Transações da Conta
+        </div>
+        {% for movimentacao in movimentacoes %}
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item list-group-item-action list-group-item-{% if movimentacao.tipo == 'saida' %}danger{% else %}success{% endif %} fw-bold">
+                    {% if movimentacao.tipo == 'saida' %}
+                        Você enviou para {{ movimentacao.para.first_name }} o valor de R$ {{ movimentacao.valor_transacao|floatformat:2 }}
+                    {% else %}
+                        {% if movimentacao.de == movimentacao.para %}
+                            Você depositou o valor de R$ {{ movimentacao.valor_transacao|floatformat:2 }}
+                        {% else %}
+                            Você recebeu para {{ movimentacao.de.first_name }} o valor de R$ {{ movimentacao.valor_transacao|floatformat:2 }}
+                        {% endif %}
+                    {% endif %}
+            </ul>
+
+        {% endfor %}
+    </div>
+{% endblock %}

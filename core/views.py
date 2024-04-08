@@ -309,11 +309,17 @@ def banco_view(request):
 
     extrato.atualizar_saldo()
 
-    movimentacoes = extrato.movimentacao.all().order_by('-data_movimentacao')
+    movimentacoes = extrato.movimentacao.all().order_by("-data_movimentacao")[:10]
 
     print(movimentacoes)
-
-    return HttpResponse(f"Saldo de {extrato.usuario.first_name} de R$ {extrato.saldo}")
+    return render(
+        request,
+        "banco.html",
+        {
+            "extrato": extrato,
+            "movimentacoes": movimentacoes,
+        },
+    )
 
 
 @login_required
