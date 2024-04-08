@@ -20,6 +20,8 @@ from core.views import (
     comercial_view,
     switch_account_view,
     minhas_caronas,
+    solicitacao_acao,
+    banco_view,
 )
 
 urlpatterns = [
@@ -46,4 +48,13 @@ urlpatterns = [
     path("switch/account/", switch_account_view, name="switchAccount"),
     path("carona/ver/<int:carona>/", carona_view, name="caronaView"),
     path("carona/ver/minhas/", minhas_caronas, name="minhasCaronas"),
+    path(
+        "solicitacao/ver/<int:solicitacao>/", solicitacao_view, name="solicitacaoView"
+    ),
+    path(
+        "solicitacao/<int:situacao>/<int:solicitacao>/",
+        solicitacao_acao,
+        name="solicitacaoAcao",
+    ),
+    path("banco/", banco_view, name="bancoView"),
 ]

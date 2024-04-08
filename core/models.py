@@ -5,6 +5,7 @@ from core.utils import verificar_matricula_valida, obter_qr_code_pix
 from django.contrib.auth.models import User
 from django.contrib import messages
 
+
 def get_upload_path(instance, filename):
     if isinstance(instance, Caroneiro) or isinstance(instance, Motorista):
         return f"files/carona/{instance.user.username}/comprovantes/{filename}"
@@ -290,7 +291,9 @@ def verificar_solicitacoes(self):
 
     solicitacoes = (
         Solicitacao.objects.filter(
-            models.Q(enviado_por=self) | models.Q(enviado_para=self)
+            models.Q(enviado_por=self) | models.Q(enviado_para=self),
+            respondida=False,
+            visualizada=False,
         )
         .distinct()
         .order_by("enviado_em")
@@ -355,18 +358,7 @@ class Solicitacao(models.Model):
     def aceitar_solicitacao(self, request):
         self.aceitar = True
 
-        print(self.enviado_por)
-        print(self.enviado_por.id)
-        print(type(self.enviado_por))
-        print(self.enviado_por_tipo)
-        print(type(self.enviado_por_tipo))
-        print(self.enviado_para)
-        print(self.enviado_para.id)
-        print(type(self.enviado_para))
-        print(self.enviado_para_tipo)
-        print(type(self.enviado_para_tipo))
         if self.enviado_por_tipo == "motorista":
-            print("motorista")
             caroneiro = Caroneiro.objects.get(
                 user_id=self.enviado_para.id,
             )
@@ -391,10 +383,6 @@ class Solicitacao(models.Model):
                 )
                 return redirect(reverse("core:home"))
         else:
-            print("caroneiro")
-
-            print(Caroneiro.objects.all().values("id", "matricula", "user"))
-
             caroneiro = Caroneiro.objects.get(
                 user_id=self.enviado_por.id,
             )

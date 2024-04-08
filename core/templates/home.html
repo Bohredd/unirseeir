@@ -1,48 +1,71 @@
 {% extends 'header.html' %}
 {% load static %}
 {% block content %}
+    {% load conversa_tags %}
+    <h2>Suas Caronas</h2>
+    <div class="caronas" style="margin-bottom: 10px">
+        {% if caronas %}
+            {% for carona in caronas %}
+                <div class="card">
+                    <h5 class="card-header">Carona {{ carona.id }}</h5>
+                    <div class="card-body">
+                        <h5 class="card-title">Motorista: {% get_carona_motorista request carona %}</h5>
+                        <p class="card-text">Caroneiros: {% get_carona_membros carona %}</p>
+                        <a href="{% url 'caronaView' carona.id %}" class="btn btn-primary">Acessar
+                            Carona {{ carona.id }}</a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
 
-<h2>Suas Caronas</h2>
-<div class="caronas">
-    {% if caronas %}
-        {% for carona in caronas %}
-            <div class="carona">
-                <p> Carona {{ carona.id }}</p>
-                <p> Caroneiros: {{ carona.get_caroneiros_nomes }} </p>
-                <hr>
+    <h2>Suas Solicitações</h2>
+    <div class="solicitacoes">
+        {% for solicitacao in solicitacoes %}
+            <div class="solicitacao" style="margin-bottom: 10px">
+                <div class="card">
+                    <h5 class="card-header">Solicitação de {{ solicitacao.enviado_por.first_name }}</h5>
+                    <div class="card-body">
+                        <h5 class="card-title">Enviado em: {{ solicitacao.enviado_em }}</h5>
+                        <p class="card-text">Mensagem: {{ solicitacao.mensagem }}</p>
+                        <form action="{% url 'solicitacaoAcao' 1 solicitacao.id %}" method="POST" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">Aceitar</button>
+                        </form>
+                        <form action="{% url 'solicitacaoAcao' 0 solicitacao.id %}" method="POST" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Recusar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="solicitacao">
+                <p><a href="#" class="link-info link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Ver todas as suas Solicitações</a></p>
             </div>
         {% endfor %}
-    {% endif %}
-</div>
+    </div>
 
-<h2>Suas Solicitações</h2>
-<div class="solicitacoes">
-    {% for solicitacao in solicitacoes %}
-        <div class="solicitacao">
-            <p>Solicitação {{ solicitacao.id }} de {{ solicitacao.enviado_por }} enviada em {{ solicitacao.enviado_em }}</p>
-            <p>Mensagem: {{ solicitacao.mensagem }}. Visualizada? {{ solicitacao.visualizada }} Respondida? {{ solicitacao.respondida }}</p>
-            <hr>
-        </div>
-    {% endfor %}
-</div>
-
-<h2>Suas Conversas</h2>
+    <h2>Suas Conversas</h2>
     <ol class="list-group">
         {% load conversa_tags %}
         {% for conversa in conversas %}
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-              <img class="img-thumbnail" style="max-height: 60px; max-width: 60px; margin-right: 10px" src="{% static 'diogo.png' %}" alt="" />
-              <div class="ms-3">
-                <p class="fw-bold mb-0">{% conversa_get_mensagem_membro request conversa %}</p>
-                <p class="text-muted mb-0 fs-sm">{% get_ultimo_enviador_mensagem_e_menssagem conversa %}</p>
-              </div>
-            </div>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <img class="img-thumbnail" style="max-height: 60px; max-width: 60px; margin-right: 10px"
+                         src="{% static 'diogo.png' %}" alt=""/>
+                    <div class="ms-3">
+                        <p class="fw-bold mb-0">{% conversa_get_mensagem_membro request conversa %}</p>
+                        <p class="text-muted mb-0 fs-sm">{% get_ultimo_enviador_mensagem_e_menssagem conversa %}</p>
+                    </div>
+                </div>
                 {% conversa_get_mensagens_nao_visualizadas request conversa as count %}
                 {% if count != 0 %}
                     <span class="badge bg-primary rounded-pill">{% conversa_get_mensagens_nao_visualizadas request conversa %}</span>
                 {% endif %}
-          </li>
+            </li>
+        {% empty %}
+            <p><a href="#" class="link-info link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Ver todas as suas Conversas</a></p>
         {% endfor %}
     </ol>
 {% endblock %}

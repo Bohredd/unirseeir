@@ -47,7 +47,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a href="{% url 'minhasCaronas' %}" class="nav-link px-sm-0 px-2">
+                        <a href="{% url 'bancoView' %}" class="nav-link px-sm-0 px-2">
                             <i class="fs-5 bi-wallet2"></i><span class="ms-1 d-none d-sm-inline">Meu Saldo</span>
                         </a>
                     </li>
@@ -57,7 +57,7 @@
                        id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
                         <img src="{% static 'diogo.png' %}" alt="hugenerd" width="28" height="28"
                              class="rounded-circle">
-                        <span class="d-none d-sm-inline mx-1">{{ request.user.first_name }}</span>
+                        <span class="d-none d-sm-inline mx-1">{{ request.user.last_name }}</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
                         <li><a class="dropdown-item" href="{% url 'minhaConta' %}">Minha Conta <i

@@ -96,6 +96,7 @@ def register_view(request):
                 user = User.objects.create_user(
                     username=matricula,
                     first_name=nome,
+                    last_name=nome.split(" ")[0],
                     email=email,
                     password=senha,
                     tipo_ativo=tipo,
@@ -296,12 +297,43 @@ def home_view(request):
         },
     )
 
+@login_required
+def banco_view(request):
+
+    return HttpResponse("saldo diogo antonio: R$ 189034.5348295 dolares de reais ")
 
 @login_required
 @user_in_carona()
 def carona_view(request, carona):
-    return HttpResponse(f"teste --> id carona {carona}")
+    carona = Carona.objects.get(id=carona)
 
+    return render(
+        request,
+        "carona.html",
+        {
+            "carona": carona,
+        }
+    )
+
+
+def solicitacao_acao(request, situacao, solicitacao):
+    # true = aceitar
+    # false = recusar
+
+    print(situacao, solicitacao)
+
+    solicitacao = Solicitacao.objects.get(id=solicitacao)
+
+    if situacao:
+        print("ACEITAR SOLICITACAO")
+        solicitacao.aceitar_solicitacao(request)
+    else:
+        print("RECUSAR SOLICITACAO")
+        solicitacao.negar_solicitacao()
+
+    return redirect(
+        "home",
+    )
 
 @login_required
 def minhas_caronas(request):

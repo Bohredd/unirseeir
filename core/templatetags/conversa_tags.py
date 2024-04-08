@@ -1,6 +1,8 @@
 from django import template
 from django.db.models import Q
+
 register = template.Library()
+
 
 @register.simple_tag
 def conversa_get_mensagem_membro(request, conversa):
@@ -39,9 +41,43 @@ def conversa_get_mensagens_nao_visualizadas(request, conversa):
 
     return len(mensagens)
 
+
 @register.simple_tag
 def get_ultimo_enviador_mensagem_e_menssagem(conversa):
 
     mensagem = conversa.mensagens.all().last()
 
     return f"{mensagem.enviado_por.first_name}: {mensagem.conteudo}"
+
+
+@register.simple_tag
+def get_carona_membros(carona):
+
+    membros = carona.caroneiros.all().values_list("nome", flat=True)
+
+    if len(membros) == 1:
+        return membros[0]
+    else:
+        string_arrumada = ""
+
+        for index, usuario in enumerate(membros):
+
+            if index == len(membros) - 2:
+                string_arrumada += f"{usuario} "
+            elif index != len(membros) - 1:
+                string_arrumada += f"{usuario}, "
+            else:
+                string_arrumada += f"{usuario}."
+
+        return string_arrumada
+
+@register.simple_tag
+def get_carona_motorista(request, carona):
+
+    print(request.user.first_name)
+    print(carona.motorista.nome)
+
+    if carona.motorista.nome == request.user.first_name:
+        return "Você"
+
+    return carona.motorista.nome
