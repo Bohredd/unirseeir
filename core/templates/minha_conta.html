@@ -1,0 +1,10 @@
+{% extends 'header.html' %}
+
+{% block content %}
+
+    dados para edicao vao vir aqui
+    comm um formulario django
+
+    {% csrf_token %}
+    {{ form.as_p }}
+{% endblock %}

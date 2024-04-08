@@ -10,6 +10,8 @@ from core.forms import (
     LoginForm,
     MetodoPagamentoForm,
     SolicitacaoForm,
+    EditMotoristaForm,
+    EditCaroneiroForm,
 )
 from core.models import (
     Carona,
@@ -86,13 +88,14 @@ def register_view(request):
             nome = form.cleaned_data["nome"]
             email = form.cleaned_data["email"]
             senha = form.cleaned_data["senha"]
+            senha_confirmacao = form.cleaned_data["senha_confirmacao"]
             matricula = form.cleaned_data["matricula"]
             curso = form.cleaned_data["curso"]
             tipo = form.cleaned_data["tipo"]
 
             user = User.objects.filter(email=email, username=matricula)
 
-            if not user.exists():
+            if not user.exists() and senha == senha_confirmacao:
 
                 user = User.objects.create_user(
                     username=matricula,
@@ -101,6 +104,10 @@ def register_view(request):
                     email=email,
                     password=senha,
                     tipo_ativo=tipo,
+                )
+
+                Extrato.objects.create(
+                    usuario=user,
                 )
 
                 user = authenticate(
@@ -123,11 +130,16 @@ def register_view(request):
                     user.exists()
                     and user.first().tipo_ativo != tipo
                     and check_password(senha, user.first().password)
+                    and senha == senha_confirmacao
                 ):
                     user = user.first()
 
                     user.tipo_ativo = tipo
                     user.save()
+
+                    Extrato.objects.create(
+                        usuario=user,
+                    )
 
                     user = authenticate(
                         request, username=user.username, password=user.password
@@ -306,20 +318,26 @@ def banco_view(request):
     extrato = Extrato.objects.filter(
         usuario=request.user,
     ).first()
+    if extrato:
+        extrato.atualizar_saldo()
 
-    extrato.atualizar_saldo()
+        movimentacoes = extrato.movimentacao.all().order_by("-data_movimentacao")[:10]
 
-    movimentacoes = extrato.movimentacao.all().order_by("-data_movimentacao")[:10]
+        print(movimentacoes)
+        return render(
+            request,
+            "banco.html",
+            {
+                "extrato": extrato,
+                "movimentacoes": movimentacoes,
+            },
+        )
 
-    print(movimentacoes)
-    return render(
+    messages.error(
         request,
-        "banco.html",
-        {
-            "extrato": extrato,
-            "movimentacoes": movimentacoes,
-        },
+        "Você não tem um extrato! Enviamos uma notificação aos desenvolvedores para que criem",
     )
+    return redirect("home")
 
 
 @login_required
@@ -438,21 +456,50 @@ def gerar_caminho_view(request, carona_id):
 @login_required
 def minha_conta_view(request):
     print("minha conta view acessada")
+    print(request.user.tipo_ativo)
+    print(request.user)
 
     if request.user.tipo_ativo == "motorista":
 
-        motorista = Motorista.objects.filter(
+        objeto = Motorista.objects.filter(
             user=request.user,
         ).first()
 
-        return HttpResponse(f"minha conta motorista {motorista.nome}")
+        print(objeto)
 
+        form = EditMotoristaForm(
+            initial={
+                "nome": objeto.nome,
+                "email": request.user.email,
+                "senha": '*' * len(request.user.password),
+                "senha_confirmacao": '*' * len(request.user.password),
+                "matricula": objeto.matricula,
+                "automovel": objeto.automovel,
+                "carona_paga": objeto.carona_paga,
+            }
+        )
     else:
-        caroneiro = Caroneiro.objects.filter(
+        objeto = Caroneiro.objects.filter(
             user=request.user,
         ).first()
 
-        return HttpResponse(f"minha conta caroneiro {caroneiro.nome}")
+        print(objeto)
+
+        form = EditCaroneiroForm(
+            initial={
+                "nome": objeto.nome,
+                "email": request.user.email,
+                "senha": '*' * len(request.user.password),
+                "senha_confirmacao": '*' * len(request.user.password),
+                "matricula": objeto.matricula,
+            }
+        )
+
+    return render(
+        request,
+        "minha_conta.html",
+        {"form": form},
+    )
 
 
 def criar_solicitacao_popup(request, tipo, id):

@@ -7,13 +7,8 @@ class CadastroForm(forms.Form):
 
     email = forms.EmailField()
 
-    data_nascimento = forms.DateField(
-        widget=forms.DateInput(
-            attrs={"type": "date"},
-        ),
-    )
-
     senha = forms.CharField(widget=forms.PasswordInput)
+    senha_confirmacao = forms.CharField(widget=forms.PasswordInput)
 
     matricula = forms.CharField()
 
@@ -85,3 +80,27 @@ class MetodoPagamentoForm(forms.Form):
 class SolicitacaoForm(forms.Form):
 
     mensagem = forms.CharField(label='Mensagem', widget=forms.Textarea())
+
+class EditCaroneiroForm(forms.Form):
+
+    nome = forms.CharField(max_length=200)
+    email = forms.EmailField()
+
+    senha = forms.CharField(widget=forms.PasswordInput)
+    senha_confirmacao = forms.CharField(widget=forms.PasswordInput)
+
+    matricula = forms.CharField()
+
+class EditMotoristaForm(forms.Form):
+
+    nome = forms.CharField(max_length=200)
+    email = forms.EmailField()
+
+    senha = forms.CharField(widget=forms.PasswordInput)
+    senha_confirmacao = forms.CharField(widget=forms.PasswordInput)
+
+    matricula = forms.CharField()
+
+    automovel = forms.CharField()
+    carona_paga = forms.BooleanField()
+    deslocamentos = DeslocamentoFormSet()
