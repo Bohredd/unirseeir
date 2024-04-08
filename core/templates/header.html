@@ -48,7 +48,7 @@
                         <span class="d-none d-sm-inline mx-1">{{ request.user.first_name }}</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                        <li><a class="dropdown-item" href="#">Minha Conta</a></li>
+                        <li><a class="dropdown-item" href="{% url 'minhaConta' request.user.id %}">Minha Conta</a></li>
                         <li><a class="dropdown-item" href="#">Modo Noturno/Dia <i class="bi bi-cone-striped"></i></a>
                         </li>
                         <li>
