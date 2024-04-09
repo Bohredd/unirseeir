@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.forms import modelformset_factory
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from config.models import Conversa, Mensagem, Conexao
@@ -13,6 +14,7 @@ from core.forms import (
     EditMotoristaForm,
     EditCaroneiroForm,
     MensagemForm,
+    DeslocamentoForm,
 )
 from core.models import (
     Carona,
@@ -116,7 +118,10 @@ def register_view(request):
                     request, username=user.username, password=user.password
                 )
 
-                comprovante = request.FILES["comprovante"]
+                if "comprovante" in request.FILES:
+                    comprovante = request.FILES["comprovante"]
+                else:
+                    comprovante = None
 
                 Temporario.objects.create(
                     comprovante=comprovante,
@@ -202,6 +207,8 @@ def register_type_view(request, tipo):
             form = MotoristaForm(request.POST)
             if form.is_valid():
 
+                print("form valido", form.cleaned_data)
+
                 matricula = form.cleaned_data["matricula"]
                 automovel = form.cleaned_data["automovel"]
                 carona_paga = form.cleaned_data["carona_paga"]
@@ -222,13 +229,14 @@ def register_type_view(request, tipo):
                         automovel=automovel,
                     )
 
-                    registrar_deslocamentos(
-                        request.POST, Motorista.objects.get(user=request.user)
-                    )
+                    # registrar_deslocamentos(
+                    #    request.POST, Motorista.objects.get(user=request.user)
+                    # )
 
                     temp.delete()
 
                     if carona_paga:
+                        print("carona paga true")
                         return redirect(
                             "metodoPagamento",
                         )
@@ -712,12 +720,23 @@ def switch_account_view(request):
 @login_required
 def meus_deslocamentos_view(request):
 
-    deslocamentos = Deslocamento.objects.filter(
-        motorista__user_id=request.user.id,
+    DeslocamentoFormSet = modelformset_factory(
+        Deslocamento, fields=("dia_semana", "hora_ida", "hora_volta"), extra=1
     )
+
+    if request.method == "POST":
+        formset = DeslocamentoFormSet(request.POST)
+
+        print(formset.cleaned_data)
+
+        if formset.is_valid():
+            formset.save()
+    else:
+        deslocamentos = Deslocamento.objects.filter(motorista__user_id=request.user.id)
+        formset = DeslocamentoFormSet(queryset=deslocamentos)
 
     return render(
         request,
         "meus_deslocamentos.html",
-        {"deslocamentos": deslocamentos},
+        {"formset": formset},
     )

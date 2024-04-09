@@ -1,10 +1,33 @@
 {% extends 'header.html' %}
 
 {% block content %}
-
-    {% for deslocamento in deslocamentos %}
-        <p> {{ deslocamento }}</p>
-    {% empty %}
+    {% if formset|length > 0 %}
+         <form method="post">
+            {% csrf_token %}
+            {{ formset.management_form }}
+            {% for form in formset %}
+                <div>
+                    {{ form.as_p }}
+                    {% if form.instance.pk %}
+                        <button type="submit">Editar</button>
+                    {% else %}
+                        <button type="button" onclick="editarDeslocamento({{ form.prefix }})">Salvar</button>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <input type="submit" value="Salvar Tudo" style="margin-top: 5px">
+        </form>
+    {% else %}
         <p> vc n possui deslocamento crie um </p>
-    {% endfor %}
+    {% endif %}
+
+    <script>
+        function editarDeslocamento(prefix) {
+            var form = document.querySelector(`form[id$="${prefix}"]`);
+            form.querySelector('button[type="button"]').style.display = 'none';
+            form.querySelector('button[type="submit"]').style.display = 'inline-block';
+            var inputs = form.querySelectorAll('input, select');
+            inputs.forEach(input => input.removeAttribute('disabled'));
+        }
+    </script>
 {% endblock %}

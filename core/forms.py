@@ -1,4 +1,5 @@
 from django import forms
+from django.db.models import TextChoices
 from django.forms import formset_factory
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
@@ -37,8 +38,16 @@ class CaroneiroForm(forms.Form):
     matricula = forms.CharField()
 
 
+class DiasSemana(TextChoices):
+
+    segunda = ("segunda", "Segunda")
+    terca = ("terça", "Terça")
+    quarta = ("quarta", "Quarta")
+    quinta = ("quinta", "Quinta")
+    sexta = ("sexta", "Sexta")
+
 class DeslocamentoForm(forms.Form):
-    dia_semana = forms.CharField()
+    dia_semana = forms.ChoiceField(choices=DiasSemana, widget=forms.Select(attrs={'class': 'form-control'}))
     hora_ida = forms.TimeField()
     hora_volta = forms.TimeField()
 

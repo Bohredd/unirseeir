@@ -77,9 +77,20 @@ class MetodoPagamento(models.Model):
     chave = models.CharField(max_length=100, null=True, blank=True)
 
 
+class DiasSemana(TextChoices):
+
+    segunda = ("segunda", "Segunda")
+    terca = ("terça", "Terça")
+    quarta = ("quarta", "Quarta")
+    quinta = ("quinta", "Quinta")
+    sexta = ("sexta", "Sexta")
+
 class Deslocamento(models.Model):
 
-    dia_semana = models.IntegerField()
+    dia_semana = models.CharField(
+        choices=DiasSemana.choices,
+        max_length=20,
+    )
     hora_ida = models.TimeField()
     hora_volta = models.TimeField()
     ponto_saida = models.ForeignKey(
