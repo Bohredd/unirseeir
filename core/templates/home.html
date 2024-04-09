@@ -1,6 +1,12 @@
 {% extends 'header.html' %}
 {% load static %}
 {% block content %}
+
+    <style>
+        li.list-group-item:hover {
+            border: 1px solid cornflowerblue; /* Cor e estilo da borda ao passar o mouse */
+        }
+    </style>
     {% load conversa_tags %}
     <h2>Suas Caronas</h2>
     <div class="caronas" style="margin-bottom: 10px">
@@ -28,11 +34,13 @@
                     <div class="card-body">
                         <h5 class="card-title">Enviado em: {{ solicitacao.enviado_em }}</h5>
                         <p class="card-text">Mensagem: {{ solicitacao.mensagem }}</p>
-                        <form action="{% url 'solicitacaoAcao' 1 solicitacao.id %}" method="POST" style="display: inline;">
+                        <form action="{% url 'solicitacaoAcao' 1 solicitacao.id %}" method="POST"
+                              style="display: inline;">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-success">Aceitar</button>
                         </form>
-                        <form action="{% url 'solicitacaoAcao' 0 solicitacao.id %}" method="POST" style="display: inline;">
+                        <form action="{% url 'solicitacaoAcao' 0 solicitacao.id %}" method="POST"
+                              style="display: inline;">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-danger">Recusar</button>
                         </form>
@@ -40,13 +48,15 @@
                 </div>
             </div>
         {% endfor %}
-        <p><a href="#" class="link-info link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Ver todas as suas Solicitações</a></p>
+        <p><a href="#" class="link-info link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Ver
+            todas as suas Solicitações</a></p>
     </div>
 
     <h2>Suas Conversas</h2>
     <ol class="list-group">
         {% load conversa_tags %}
         {% for conversa in conversas %}
+            <a style="text-decoration: none; margin-bottom: 5px" href="{% url 'conversa' conversa.id %}">
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
                     <img class="img-thumbnail" style="max-height: 60px; max-width: 60px; margin-right: 10px"
@@ -61,7 +71,10 @@
                     <span class="badge bg-primary rounded-pill">{% conversa_get_mensagens_nao_visualizadas request conversa %}</span>
                 {% endif %}
             </li>
+            <a href="{% url 'conversa' conversa.id %}">
         {% endfor %}
     </ol>
-    <p><a href="{% url 'conversaList' %}" class="link-info link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Ver todas as suas Conversas</a></p>
+    <p><a href="{% url 'conversaList' %}"
+          class="link-info link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Ver todas as suas
+        Conversas</a></p>
 {% endblock %}
