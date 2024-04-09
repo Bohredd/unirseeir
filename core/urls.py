@@ -22,6 +22,7 @@ from core.views import (
     minhas_caronas,
     solicitacao_acao,
     banco_view,
+meus_deslocamentos_view
 )
 
 urlpatterns = [
@@ -57,4 +58,5 @@ urlpatterns = [
         name="solicitacaoAcao",
     ),
     path("banco/", banco_view, name="bancoView"),
+    path("deslocamentos/meus/", meus_deslocamentos_view, name="meusDeslocamentos"),
 ]

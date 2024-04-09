@@ -18,10 +18,14 @@
                                 Automóvel: {{ carona.motorista.automovel }}</p>
                             {% if carona.get_caroneiros_nomes %}
                                 <div class="">
+                                    <hr>
+                                    <p style="margin-top: 5px" class="card-text"> Caroneiros Participando: </p>
                                     {% for caroneiro in carona.get_caroneiros_nomes %}
-                                        <p class="card-text"><small class="text-body-secondary">Caroneiros
-                                            participando: {{ caroneiro }}</small></p>
+                                        <li><small class="text-body-secondary">
+                                            {{ caroneiro }}</small>
+                                        </li>
                                     {% endfor %}
+                                    <hr>
                                 </div>
                             {% else %}
                                 <p> Ainda não há caroneiros participando dessa carona. Seja o primeiro! </p>

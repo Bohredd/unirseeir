@@ -119,3 +119,7 @@ class EditMotoristaForm(forms.Form):
     automovel = forms.CharField()
     carona_paga = forms.BooleanField()
     deslocamentos = DeslocamentoFormSet()
+
+class MensagemForm(forms.Form):
+
+    conteudo = forms.CharField(widget=forms.Textarea(), label="Digite sua mensagem aqui")

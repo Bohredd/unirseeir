@@ -1,0 +1,10 @@
+{% extends 'header.html' %}
+
+{% block content %}
+
+    {% for deslocamento in deslocamentos %}
+        <p> {{ deslocamento }}</p>
+    {% empty %}
+        <p> vc n possui deslocamento crie um </p>
+    {% endfor %}
+{% endblock %}

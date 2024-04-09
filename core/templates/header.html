@@ -51,6 +51,12 @@
                             <i class="fs-5 bi-wallet2"></i><span class="ms-1 d-none d-sm-inline">Meu Saldo</span>
                         </a>
                     </li>
+
+                    {% if request.user.tipo_ativo == 'motorista' %}
+                        <a href="{% url 'meusDeslocamentos' %}" class="nav-link px-sm-0 px-2">
+                            <i class="fs-5 bi-geo-fill"></i><span class="ms-1 d-none d-sm-inline">Meus Deslocamentos</span>
+                        </a>
+                    {% endif %}
                 </ul>
                 <div class="dropdown py-sm-4 mt-sm-auto ms-auto ms-sm-0 flex-shrink-1">
                     <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"

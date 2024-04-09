@@ -22,6 +22,10 @@ class Mensagem(models.Model):
                 membros=self.enviado_por,
             )
 
+            print(conexao)
+            print(self.enviado_por)
+
+            print("CONVERSA")
             print(conversa)
 
             if conversa.exists():

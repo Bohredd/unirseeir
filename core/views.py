@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from config.models import Conversa
+from config.models import Conversa, Mensagem, Conexao
 from core.decorator import is_tipo, user_in_carona
 from core.forms import (
     CadastroForm,
@@ -12,6 +12,7 @@ from core.forms import (
     SolicitacaoForm,
     EditMotoristaForm,
     EditCaroneiroForm,
+    MensagemForm,
 )
 from core.models import (
     Carona,
@@ -21,6 +22,7 @@ from core.models import (
     MetodoPagamento,
     Solicitacao,
     Extrato,
+    Deslocamento,
 )
 from core.utils import generate_pdf, get_user
 from core.patcher import registrar_deslocamentos
@@ -432,7 +434,39 @@ def solicitacao_view(request, id):
 @login_required
 def conversa_view(request, id):
 
-    print("id da conversa", id)
+    if request.method == "POST":
+        form = MensagemForm(request.POST)
+
+        if form.is_valid():
+            conteudo = form.cleaned_data["conteudo"]
+
+            mensagem = Mensagem.objects.create(
+                enviado_por=request.user,
+                conteudo=conteudo,
+            )
+
+            conexao, _ = Conexao.objects.get_or_create(
+                usuario=request.user,
+            )
+
+            conexao.ativa = True
+            conexao.save()
+
+            mensagem.send_message(
+                conexao,
+            )
+
+            conexao.ativa = False
+            conexao.save()
+
+            return redirect(
+                "conversa",
+                id=id,
+            )
+
+    else:
+
+        form = MensagemForm()
 
     conversa = Conversa.objects.get(
         pk=id,
@@ -440,11 +474,24 @@ def conversa_view(request, id):
 
     mensagens = conversa.mensagens.all()
 
-    return render(
-        request, "conversa_view.html", {"conversa": conversa, "mensagens": mensagens}
+    mensagens.update(
+        visualizado=True,
     )
 
-    return HttpResponse(f"id da conversa {id}")
+    mensagens = mensagens[:10]
+
+    print(mensagens)
+
+    return render(
+        request,
+        "conversa_view.html",
+        {
+            "conversa": conversa,
+            "mensagens": mensagens,
+            "request": request,
+            "form": form,
+        },
+    )
 
 
 @login_required
@@ -659,3 +706,18 @@ def switch_account_view(request):
             return redirect(
                 "home",
             )
+
+
+@is_tipo("motorista")
+@login_required
+def meus_deslocamentos_view(request):
+
+    deslocamentos = Deslocamento.objects.filter(
+        motorista__user_id=request.user.id,
+    )
+
+    return render(
+        request,
+        "meus_deslocamentos.html",
+        {"deslocamentos": deslocamentos},
+    )
