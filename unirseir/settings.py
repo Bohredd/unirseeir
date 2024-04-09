@@ -31,6 +31,11 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+import crispy_forms
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -40,6 +45,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "config",
     "core",
+    "crispy_forms",
+    "crispy_bootstrap5",
 ]
 
 MIDDLEWARE = [
@@ -78,11 +85,11 @@ TEMPLATES = [
 from django.contrib import messages
 
 MESSAGE_TAGS = {
-    messages.DEBUG: 'info',
-    messages.INFO: 'info',
-    messages.SUCCESS: 'success',
-    messages.WARNING: 'warning',
-    messages.ERROR: 'danger',
+    messages.DEBUG: "info",
+    messages.INFO: "info",
+    messages.SUCCESS: "success",
+    messages.WARNING: "warning",
+    messages.ERROR: "danger",
 }
 
 WSGI_APPLICATION = "unirseir.wsgi.application"
@@ -147,5 +154,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-LOGIN_REDIRECT_URL = 'acessar'
-LOGIN_URL = '/acessar/'
+LOGIN_REDIRECT_URL = "acessar"
+LOGIN_URL = "/acessar/"

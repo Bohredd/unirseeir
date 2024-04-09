@@ -1,10 +1,8 @@
 {% extends 'header.html' %}
+{% load crispy_forms_tags %}
 
 {% block content %}
-
-    dados para edicao vao vir aqui
-    comm um formulario django
-
+    <h2> Edite suas informações da conta</h2>
     {% csrf_token %}
-    {{ form.as_p }}
+    {{ form|crispy }}
 {% endblock %}

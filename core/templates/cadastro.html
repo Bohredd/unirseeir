@@ -1,6 +1,6 @@
 {% include 'base.html' %}
 
-<!-- index.html -->
+{% load crispy_forms_tags %}
 {% block content %}
     <!DOCTYPE html>
     <html>
@@ -11,7 +11,7 @@
     <h1>Selecione uma Categoria e Tipo de Item</h1>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p }}
+        {{ form|crispy }}
         <input type="submit" value="Cadastrar">
     </form>
     </body>

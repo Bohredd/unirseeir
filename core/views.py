@@ -376,7 +376,52 @@ def solicitacao_acao(request, situacao, solicitacao):
 
 @login_required
 def minhas_caronas(request):
-    return HttpResponse("minhas caronas ativas")
+
+    if request.user.tipo_ativo == "motorista":
+        caronas_ativas_do_usuario = Carona.objects.filter(
+            motorista__user=request.user,
+            ativa=True,
+        )
+    else:
+        voce = Caroneiro.objects.filter(
+            user=request.user,
+        ).first()
+
+        caronas_ativas_do_usuario = Carona.objects.filter(
+            ativa=True,
+            caroneiros=voce,
+        )
+
+    caronas_disponiveis = Carona.objects.filter(
+        ativa=True,
+        vagas__gt=0,
+    )
+
+    caroneiros = list(
+        Caroneiro.objects.filter(
+            matricula_valida=True,
+        )
+    )
+
+    caroneiros_disponiveis = []
+
+    for caroneiro in caroneiros:
+        if not Carona.objects.filter(
+            ativa=True,
+            caroneiros__id=caroneiro.id,
+        ).exists():
+            caroneiros_disponiveis.append(caroneiro)
+
+    return render(
+        request,
+        "minhas_caronas.html",
+        {
+            "request": request,
+            "caronas": caronas_ativas_do_usuario,
+            "caronas_disponiveis": caronas_disponiveis,
+            "caroneiros_disponiveis": caroneiros_disponiveis,
+        },
+    )
 
 
 @login_required
@@ -388,6 +433,16 @@ def solicitacao_view(request, id):
 def conversa_view(request, id):
 
     print("id da conversa", id)
+
+    conversa = Conversa.objects.get(
+        pk=id,
+    )
+
+    mensagens = conversa.mensagens.all()
+
+    return render(
+        request, "conversa_view.html", {"conversa": conversa, "mensagens": mensagens}
+    )
 
     return HttpResponse(f"id da conversa {id}")
 
@@ -471,8 +526,8 @@ def minha_conta_view(request):
             initial={
                 "nome": objeto.nome,
                 "email": request.user.email,
-                "senha": '*' * len(request.user.password),
-                "senha_confirmacao": '*' * len(request.user.password),
+                "senha": "*" * len(request.user.password),
+                "senha_confirmacao": "*" * len(request.user.password),
                 "matricula": objeto.matricula,
                 "automovel": objeto.automovel,
                 "carona_paga": objeto.carona_paga,
@@ -489,8 +544,8 @@ def minha_conta_view(request):
             initial={
                 "nome": objeto.nome,
                 "email": request.user.email,
-                "senha": '*' * len(request.user.password),
-                "senha_confirmacao": '*' * len(request.user.password),
+                "senha": "*" * len(request.user.password),
+                "senha_confirmacao": "*" * len(request.user.password),
                 "matricula": objeto.matricula,
             }
         )

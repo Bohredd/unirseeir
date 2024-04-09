@@ -1,0 +1,21 @@
+{% extends 'header.html' %}
+{% load conversa_tags %}
+{% block content %}
+    <div class="card">
+        <h5 class="card-header">Conversa com {% conversa_get_mensagem_membro request conversa %} </h5>
+        <div class="card-body">
+            {% for mensagem in mensagens %}
+                <ul class="list-group list-group-horizontal">
+                    <li class="list-group-item">{{ mensagem.enviado_por.last_name }}</li>
+                    <li class="list-group-item">{{ mensagem.conteudo }}</li>
+                    <li class="list-group-item"><p class="fw-light">{{ mensagem.enviado_em }}</p></li>
+                </ul>
+            {% empty %}
+                <ul class="list-group list-group-horizontal">
+                    <li class="list-group-item">Não há mensagens no grupo.</li>
+                    <li class="list-group-item">Envie uma agora :D</li>
+                </ul>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

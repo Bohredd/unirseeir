@@ -1,0 +1,46 @@
+{% extends 'header.html' %}
+
+{% block content %}
+
+    {% load conversa_tags %}
+    <h2>Suas Caronas</h2>
+    <div class="caronas" style="margin-bottom: 10px">
+        {% if caronas %}
+            {% for carona in caronas %}
+                <div class="card">
+                    <h5 class="card-header">Carona {{ carona.id }}</h5>
+                    <div class="card-body">
+                        <h5 class="card-title">Motorista: {% get_carona_motorista request carona %}</h5>
+                        <p class="card-text">Caroneiros: {% get_carona_membros carona %}</p>
+                        <a href="{% url 'caronaView' carona.id %}" class="btn btn-primary">Acessar
+                            Carona {{ carona.id }}</a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="card text-center">
+                  <div class="card-header">
+                    Você não está participando de nenhuma carona no momento.
+                  </div>
+                  <div class="card-body">
+                      {% if request.user.tipo_ativo == 'caroneiro' %}
+                      <h5 class="card-title">Tens interesse de participar?</h5>
+                        <a href="{% url 'findCarona' %}" class="btn btn-primary">Vamos atrás de uma carona!</a>
+                      {% else %}
+                      <h5 class="card-title">Tens interesse de criar uma?</h5>
+                        <a href="{% url 'findCarona' %}" class="btn btn-primary">Vamos criar uma imediatamente!</a>
+                      {% endif %}
+                  </div>
+                {% if request.user.tipo_ativo == 'caroneiro' %}
+                  <div class="card-footer text-muted">
+                      Existem {{ caronas_disponiveis|length }} caronas disponíveis e ativas no momento.
+                  </div>
+                {% else %}
+                    <div class="card-footer text-muted">
+                      Existem {{ caroneiros_disponiveis|length }} caroneiros disponíveis e ativos no momento.
+                  </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

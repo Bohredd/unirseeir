@@ -1,5 +1,8 @@
 from django import forms
 from django.forms import formset_factory
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Submit
+
 
 class CadastroForm(forms.Form):
 
@@ -33,20 +36,24 @@ class CaroneiroForm(forms.Form):
 
     matricula = forms.CharField()
 
+
 class DeslocamentoForm(forms.Form):
     dia_semana = forms.CharField()
     hora_ida = forms.TimeField()
     hora_volta = forms.TimeField()
 
+
 DeslocamentoFormSet = formset_factory(DeslocamentoForm, extra=1)
 
+
 class MotoristaForm(forms.Form):
-    matricula = forms.CharField(label='Matrícula')
-    automovel = forms.CharField(label='Automóvel')
+    matricula = forms.CharField(label="Matrícula")
+    automovel = forms.CharField(label="Automóvel")
 
     carona_paga = forms.BooleanField()
 
     deslocamentos = DeslocamentoFormSet()
+
 
 class LoginForm(forms.Form):
 
@@ -62,6 +69,13 @@ class LoginForm(forms.Form):
         widget=forms.Select(),
     )
 
+    def __init__(self, *args, **kwargs):
+        super(LoginForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = "post"
+        self.helper.add_input(Submit("submit", "Login"))
+
+
 class MetodoPagamentoForm(forms.Form):
 
     tipo_pagamento = forms.ChoiceField(
@@ -71,15 +85,15 @@ class MetodoPagamentoForm(forms.Form):
         ]
     )
 
-    chave = forms.CharField(
-
-    )
+    chave = forms.CharField()
 
     custo = forms.DecimalField()
 
+
 class SolicitacaoForm(forms.Form):
 
-    mensagem = forms.CharField(label='Mensagem', widget=forms.Textarea())
+    mensagem = forms.CharField(label="Mensagem", widget=forms.Textarea())
+
 
 class EditCaroneiroForm(forms.Form):
 
@@ -90,6 +104,7 @@ class EditCaroneiroForm(forms.Form):
     senha_confirmacao = forms.CharField(widget=forms.PasswordInput)
 
     matricula = forms.CharField()
+
 
 class EditMotoristaForm(forms.Form):
 

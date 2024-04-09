@@ -39,11 +39,8 @@
                     </div>
                 </div>
             </div>
-        {% empty %}
-            <div class="solicitacao">
-                <p><a href="#" class="link-info link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Ver todas as suas Solicitações</a></p>
-            </div>
         {% endfor %}
+        <p><a href="#" class="link-info link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Ver todas as suas Solicitações</a></p>
     </div>
 
     <h2>Suas Conversas</h2>
@@ -64,8 +61,7 @@
                     <span class="badge bg-primary rounded-pill">{% conversa_get_mensagens_nao_visualizadas request conversa %}</span>
                 {% endif %}
             </li>
-        {% empty %}
-            <p><a href="#" class="link-info link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Ver todas as suas Conversas</a></p>
         {% endfor %}
     </ol>
+    <p><a href="{% url 'conversaList' %}" class="link-info link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Ver todas as suas Conversas</a></p>
 {% endblock %}

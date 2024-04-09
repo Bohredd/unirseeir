@@ -1,5 +1,6 @@
 {% include 'base.html' %}
 
+{% load crispy_forms_tags %}
 {% block content %}
     <!DOCTYPE html>
     <html>
@@ -11,7 +12,7 @@
         <h1>Cadastro Motorista</h1>
         <form method="post" enctype="multipart/form-data" id="motorista-form">
             {% csrf_token %}
-            {{ form.as_p }}
+            {{ form|crispy }}
     
             <!-- Deslocamentos -->
             <h2>Deslocamentos</h2>
