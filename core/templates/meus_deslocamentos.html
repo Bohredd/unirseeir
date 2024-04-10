@@ -45,7 +45,7 @@
         <button type="button" id="adicionar-deslocamento-final">Adicionar Novo Deslocamento</button>
     </div>
 
-    <!-- Adicione a div para o mapa -->
+    <!-- Div para o mapa -->
     <div id="map" style="height: 400px;"></div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -86,6 +86,15 @@
                 $('#id_deslocamentos-' + deslocamentoCount + '-ponto_saida').val(ponto);
                 $('#id_deslocamentos-' + deslocamentoCount + '-ponto_destino').val(ponto);
             });
+
+            // Obter a localização do usuário e centralizar o mapa nessa localização
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+                    map.setView([userLat, userLng], 12); // Centralizar o mapa na localização do usuário
+                });
+            }
         });
     </script>
 {% endblock %}
