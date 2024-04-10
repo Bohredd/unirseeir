@@ -22,7 +22,7 @@
     <button type="button" id="adicionar-deslocamento">Adicionar Deslocamento</button>
 
     <div id="novo-deslocamento" style="display: none;">
-        <!-- Modelo do formulário de deslocamento -->
+
         <div id="modelo-deslocamento" style="display: none;">
             <div class="deslocamento">
                 <label for="id_deslocamentos-0-dia_semana">Dia da Semana:</label>
@@ -32,21 +32,18 @@
                 <label for="id_deslocamentos-0-hora_volta">Hora de Volta:</label>
                 <input type="time" id="id_deslocamentos-0-hora_volta" name="deslocamentos-0-hora_volta">
 
-                <!-- Campos ocultos para coordenadas -->
                 <input type="hidden" id="id_deslocamentos-0-ponto_saida" name="deslocamentos-0-ponto_saida">
                 <input type="hidden" id="id_deslocamentos-0-ponto_destino" name="deslocamentos-0-ponto_destino">
             </div>
         </div>
 
-        <!-- Deslocamentos Container -->
         <div id="deslocamentos-container">
         </div>
 
         <button type="button" id="adicionar-deslocamento-final">Adicionar Novo Deslocamento</button>
     </div>
 
-    <!-- Div para o mapa -->
-    <div id="map" style="height: 400px;"></div>
+    <div id="map" style="height: 200px;"></div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -58,12 +55,12 @@
             $('#adicionar-deslocamento').click(function() {
                 $('#novo-deslocamento').toggle();
                 if ($('#novo-deslocamento').is(':visible')) {
-                    adicionarDeslocamento(); // Adiciona um novo deslocamento quando o formulário é revelado
+                    adicionarDeslocamento();
                 }
             });
 
             $('#adicionar-deslocamento-final').click(function() {
-                adicionarDeslocamento(); // Adiciona um novo deslocamento quando o botão final é clicado
+                adicionarDeslocamento();
             });
 
             function adicionarDeslocamento() {
@@ -72,27 +69,23 @@
                 $('#deslocamentos-container').append(novoDeslocamento);
             }
 
-            // Configuração do mapa Leaflet
-            var map = L.map('map').setView([-23.5505, -46.6333], 12); // São Paulo coordinates
+            var map = L.map('map').setView([-23.5505, -46.6333], 12);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap contributors'
             }).addTo(map);
 
-            // Adiciona marcadores ao clicar no mapa e atualiza os campos ocultos de coordenadas
-            map.on('click', function(e) {
-                const pontoLat = e.latlng.lat;
-                const pontoLng = e.latlng.lng;
-                const ponto = `${pontoLat},${pontoLng}`;
-                $('#id_deslocamentos-' + deslocamentoCount + '-ponto_saida').val(ponto);
-                $('#id_deslocamentos-' + deslocamentoCount + '-ponto_destino').val(ponto);
-            });
+            map.on('click', function(e){
+              var coord = e.latlng;
+              var lat = coord.lat;
+              var lng = coord.lng;
+              console.log("You clicked the map at latitude: " + lat + " and longitude: " + lng);
+              });
 
-            // Obter a localização do usuário e centralizar o mapa nessa localização
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(function(position) {
                     const userLat = position.coords.latitude;
                     const userLng = position.coords.longitude;
-                    map.setView([userLat, userLng], 12); // Centralizar o mapa na localização do usuário
+                    map.setView([userLat, userLng], 12);
                 });
             }
         });
