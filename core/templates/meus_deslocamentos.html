@@ -1,33 +1,91 @@
 {% extends 'header.html' %}
 
 {% block content %}
-    {% if formset|length > 0 %}
-         <form method="post">
-            {% csrf_token %}
-            {{ formset.management_form }}
-            {% for form in formset %}
+    <h2>Seus deslocamentos registrados</h2>
+    <div id="form-container">
+        {% for form in formset %}
+            <form method="post" id="{{ form.prefix }}">
+                {% csrf_token %}
+                {{ formset.management_form }}
                 <div>
                     {{ form.as_p }}
                     {% if form.instance.pk %}
                         <button type="submit">Editar</button>
                     {% else %}
-                        <button type="button" onclick="editarDeslocamento({{ form.prefix }})">Salvar</button>
+                        <button type="button" onclick="salvarDeslocamento('{{ form.prefix }}')">Salvar</button>
                     {% endif %}
                 </div>
-            {% endfor %}
-            <input type="submit" value="Salvar Tudo" style="margin-top: 5px">
-        </form>
-    {% else %}
-        <p> vc n possui deslocamento crie um </p>
-    {% endif %}
+            </form>
+        {% endfor %}
+    </div>
 
+    <button type="button" id="adicionar-deslocamento">Adicionar Deslocamento</button>
+
+    <div id="novo-deslocamento" style="display: none;">
+        <!-- Modelo do formulário de deslocamento -->
+        <div id="modelo-deslocamento" style="display: none;">
+            <div class="deslocamento">
+                <label for="id_deslocamentos-0-dia_semana">Dia da Semana:</label>
+                <input type="text" id="id_deslocamentos-0-dia_semana" name="deslocamentos-0-dia_semana">
+                <label for="id_deslocamentos-0-hora_ida">Hora de Ida:</label>
+                <input type="time" id="id_deslocamentos-0-hora_ida" name="deslocamentos-0-hora_ida">
+                <label for="id_deslocamentos-0-hora_volta">Hora de Volta:</label>
+                <input type="time" id="id_deslocamentos-0-hora_volta" name="deslocamentos-0-hora_volta">
+
+                <!-- Campos ocultos para coordenadas -->
+                <input type="hidden" id="id_deslocamentos-0-ponto_saida" name="deslocamentos-0-ponto_saida">
+                <input type="hidden" id="id_deslocamentos-0-ponto_destino" name="deslocamentos-0-ponto_destino">
+            </div>
+        </div>
+
+        <!-- Deslocamentos Container -->
+        <div id="deslocamentos-container">
+        </div>
+
+        <button type="button" id="adicionar-deslocamento-final">Adicionar Novo Deslocamento</button>
+    </div>
+
+    <!-- Adicione a div para o mapa -->
+    <div id="map" style="height: 400px;"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
-        function editarDeslocamento(prefix) {
-            var form = document.querySelector(`form[id$="${prefix}"]`);
-            form.querySelector('button[type="button"]').style.display = 'none';
-            form.querySelector('button[type="submit"]').style.display = 'inline-block';
-            var inputs = form.querySelectorAll('input, select');
-            inputs.forEach(input => input.removeAttribute('disabled'));
-        }
+        $(document).ready(function() {
+            let deslocamentoCount = 0;
+            const modeloDeslocamento = $('#modelo-deslocamento').html();
+
+            $('#adicionar-deslocamento').click(function() {
+                $('#novo-deslocamento').toggle();
+                if ($('#novo-deslocamento').is(':visible')) {
+                    adicionarDeslocamento(); // Adiciona um novo deslocamento quando o formulário é revelado
+                }
+            });
+
+            $('#adicionar-deslocamento-final').click(function() {
+                adicionarDeslocamento(); // Adiciona um novo deslocamento quando o botão final é clicado
+            });
+
+            function adicionarDeslocamento() {
+                deslocamentoCount++;
+                const novoDeslocamento = modeloDeslocamento.replace(/id_deslocamentos-0-/g, `id_deslocamentos-${deslocamentoCount}-`);
+                $('#deslocamentos-container').append(novoDeslocamento);
+            }
+
+            // Configuração do mapa Leaflet
+            var map = L.map('map').setView([-23.5505, -46.6333], 12); // São Paulo coordinates
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Adiciona marcadores ao clicar no mapa e atualiza os campos ocultos de coordenadas
+            map.on('click', function(e) {
+                const pontoLat = e.latlng.lat;
+                const pontoLng = e.latlng.lng;
+                const ponto = `${pontoLat},${pontoLng}`;
+                $('#id_deslocamentos-' + deslocamentoCount + '-ponto_saida').val(ponto);
+                $('#id_deslocamentos-' + deslocamentoCount + '-ponto_destino').val(ponto);
+            });
+        });
     </script>
 {% endblock %}

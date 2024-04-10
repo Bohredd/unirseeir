@@ -715,22 +715,30 @@ def switch_account_view(request):
                 "home",
             )
 
+DeslocamentoFormSet = modelformset_factory(
+    Deslocamento, form=DeslocamentoForm, extra=1
+)
 
 @is_tipo("motorista")
 @login_required
 def meus_deslocamentos_view(request):
-
-    DeslocamentoFormSet = modelformset_factory(
-        Deslocamento, fields=("dia_semana", "hora_ida", "hora_volta"), extra=1
-    )
-
     if request.method == "POST":
         formset = DeslocamentoFormSet(request.POST)
 
-        print(formset.cleaned_data)
-
         if formset.is_valid():
-            formset.save()
+            instances = formset.save(commit=False)
+            for instance in instances:
+                ponto_saida = instance.ponto_saida
+                ponto_destino = instance.ponto_destino
+
+                if ponto_saida and ponto_destino:
+                    ponto_x_saida = ponto_saida.x
+                    ponto_y_saida = ponto_saida.y
+                    ponto_x_destino = ponto_destino.x
+                    ponto_y_destino = ponto_destino.y
+
+
+                instance.save()
     else:
         deslocamentos = Deslocamento.objects.filter(motorista__user_id=request.user.id)
         formset = DeslocamentoFormSet(queryset=deslocamentos)

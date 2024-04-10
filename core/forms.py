@@ -4,6 +4,8 @@ from django.forms import formset_factory
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 
+from core.models import Deslocamento
+
 
 class CadastroForm(forms.Form):
 
@@ -46,13 +48,11 @@ class DiasSemana(TextChoices):
     quinta = ("quinta", "Quinta")
     sexta = ("sexta", "Sexta")
 
-class DeslocamentoForm(forms.Form):
-    dia_semana = forms.ChoiceField(choices=DiasSemana, widget=forms.Select(attrs={'class': 'form-control'}))
-    hora_ida = forms.TimeField()
-    hora_volta = forms.TimeField()
 
-
-DeslocamentoFormSet = formset_factory(DeslocamentoForm, extra=1)
+class DeslocamentoForm(forms.ModelForm):
+    class Meta:
+        model = Deslocamento
+        fields = ("dia_semana", "hora_ida", "hora_volta", "ponto_saida", "ponto_destino")
 
 
 class MotoristaForm(forms.Form):
@@ -60,8 +60,6 @@ class MotoristaForm(forms.Form):
     automovel = forms.CharField(label="Automóvel")
 
     carona_paga = forms.BooleanField()
-
-    deslocamentos = DeslocamentoFormSet()
 
 
 class LoginForm(forms.Form):
@@ -127,8 +125,11 @@ class EditMotoristaForm(forms.Form):
 
     automovel = forms.CharField()
     carona_paga = forms.BooleanField()
-    deslocamentos = DeslocamentoFormSet()
+#    deslocamentos = DeslocamentoFormSet()
+
 
 class MensagemForm(forms.Form):
 
-    conteudo = forms.CharField(widget=forms.Textarea(), label="Digite sua mensagem aqui")
+    conteudo = forms.CharField(
+        widget=forms.Textarea(), label="Digite sua mensagem aqui"
+    )
