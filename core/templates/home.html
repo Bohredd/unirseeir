@@ -21,7 +21,7 @@
                             <p class="card-text">Caroneiros: {{ membros }}</p>
                         {% else %}
                             {% if carona.vagas != 0 %}
-                                <p class="card-text">Vamos procurar caroneiros?</p>
+                                <p class="card-text">Sem caroneiros registrados na carona.</p>
                                 <a href="{% url 'findCaroneiro' %}" class="btn btn-info">Buscar Caroneiros!</a>
                             {% endif %}
                         {% endif %}

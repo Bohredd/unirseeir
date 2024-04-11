@@ -660,11 +660,13 @@ def gerar_caminho_view(request, carona):
 
 @login_required
 def minha_conta_view(request):
-    print("minha conta view acessada")
-    print(request.user.tipo_ativo)
-    print(request.user)
 
     if request.user.tipo_ativo == "motorista":
+
+        if request.method == "POST":
+
+            dados = request.POST
+            print(dados)
 
         objeto = Motorista.objects.filter(
             user=request.user,
@@ -684,6 +686,12 @@ def minha_conta_view(request):
             }
         )
     else:
+
+        if request.method == "POST":
+
+            dados = request.POST
+            print(dados)
+
         objeto = Caroneiro.objects.filter(
             user=request.user,
         ).first()
