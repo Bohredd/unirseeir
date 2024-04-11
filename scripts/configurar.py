@@ -1,32 +1,36 @@
+# 1 * Rodar makemigrations
 import subprocess
 
-# Comando para mudar para o diretório pai
-cd_comando = "cd .."
+resultado = subprocess.run(
+    "python manage.py makemigrations",
+    shell=True,
+    capture_output=True,
+    text=True,
+)
 
-# Comando para rodar makemigrations
-makemigrations_comando = "python manage.py makemigrations"
+# 2 * Rodar mirate
+print(resultado.returncode)
 
-# Comando para rodar migrate
-migrate_comando = "python manage.py migrate"
-
-# Comando para carregar dados
-loaddata_comando = "python manage.py loaddata dump.yaml"
-
-# Executar o comando cd ..
-subprocess.run(cd_comando, shell=True)
-
-# Executar o comando makemigrations
-resultado_makemigrations = subprocess.run(makemigrations_comando, shell=True, capture_output=True, text=True)
-
-# Executar o comando migrate se makemigrations for bem-sucedido
-if resultado_makemigrations.returncode == 0:
-    resultado_migrate = subprocess.run(migrate_comando, shell=True, capture_output=True, text=True)
+if resultado.returncode == 0:
+    resultado = subprocess.run(
+        "python manage.py migrate",
+        shell=True,
+        capture_output=True,
+        text=True,
+    )
     print("migrate rodado")
 
-    # Executar o comando loaddata se migrate for bem-sucedido
-    if resultado_migrate.returncode == 0:
-        resultado_loaddata = subprocess.run(loaddata_comando, shell=True, capture_output=True, text=True)
-        print(resultado_loaddata)
+# 3 * Carregar dados
 
-        if resultado_loaddata.returncode == 0:
-            print("Banco configurado, migrations executadas e dados instalados.")
+print(resultado.returncode)
+
+if resultado.returncode == 0:
+
+    instalacao_fixtures = subprocess.run(
+        "python manage.py loaddata dump.yaml",
+    )
+
+    print(instalacao_fixtures)
+
+    if instalacao_fixtures.returncode == 0:
+        print("Banco configurado, migrations executadas e dados intalados.")
