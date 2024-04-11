@@ -15,6 +15,12 @@ Notion     | [Notion](https://www.notion.so/bohredd-dev/UNIr-se-e-IR-3e508774ac8
 `` python scripits/projeto.py `` <- Configurar ainda
 
 #### Configuração do banco de dados ####
-``python scripts/configurar.py`` <- Testar
+``python scripts/configurar.py``
 
 <hr>
+
+### Super User ##
+
+Login      |  Senha
+---------- | ----------
+admin      |  admin
