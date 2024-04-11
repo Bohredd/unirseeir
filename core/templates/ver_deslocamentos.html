@@ -1,9 +1,33 @@
 {% extends 'header.html' %}
-
+{% load caronas_tags %}
 {% block content %}
+
+    <div class="card">
+        <div class="card-header">
+            Deslocamentos
+        </div>
+        <div class="card-body">
+            <blockquote class="blockquote mb-0">
+                <p>Motorista: {{ carona.motorista.nome }}</p>
+                <footer class="blockquote-footer"> Tens interesse de entrar para a carona?<button type="button" class="btn btn-info"
+                                        onclick="openCriarSolicitacao({{ carona.id }})">QUERO!
+                                </button></footer>
+            </blockquote>
+        </div>
+    </div>
+
     {% for deslocamento in carona.motorista.deslocamentos.all %}
-        <p style="margin-top: 5px" class="card-text">Saida: {{ deslocamento.ponto_saida_endereco }}</p>
-        <p style="margin-top: 5px" class="card-text">Destino: {{ deslocamento.ponto_destino_endereco }}</p>
+        <div class="card" style="margin-top: 5px">
+            <div class="card-header">
+                Deslocamento de {{ deslocamento.dia_semana }}
+            </div>
+            <div class="card-body">
+                <p class="card-text">Saida: {{ deslocamento.ponto_saida_endereco }}
+                    às {{ deslocamento.horario_saida_ponto_saida }}</p>
+                <p class="card-text">Destino: {{ deslocamento.ponto_destino_endereco }}</p>
+                <iframe srcdoc="{% gerar_mapa deslocamento %}" style="max-width: 100%; max-height: 100%"></iframe>
+            </div>
+        </div>
     {% empty %}
         <p class="card-text">
             Esse motorista ainda não registrou nenhum deslocamento.
