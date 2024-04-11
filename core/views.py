@@ -26,7 +26,7 @@ from core.models import (
     Extrato,
     Deslocamento,
 )
-from core.utils import generate_pdf, get_user
+from core.utils import generate_pdf, get_user, get_menor_distancia_deslocamentos
 from core.patcher import registrar_deslocamentos
 from django.http import HttpResponse
 from django.contrib.auth.models import User
@@ -351,6 +351,21 @@ def banco_view(request):
 
 
 @login_required
+@is_tipo("caroneiro")
+def ver_deslocamentos_motoristas(request, carona):
+
+    carona = Carona.objects.get(id=carona)
+
+    return render(
+        request,
+        "ver_deslocamentos.html",
+        {
+            "carona": carona,
+        },
+    )
+
+
+@login_required
 @user_in_carona()
 def carona_view(request, carona):
     carona = Carona.objects.get(id=carona)
@@ -506,12 +521,38 @@ def conversa_view(request, id):
 @is_tipo("caroneiro")
 def find_carona(request):
 
+    latitude, longitude = (None, None)
+    if request.method == "GET":
+
+        latitude = request.GET.get("la")
+        longitude = request.GET.get("lo")
+
+        print(latitude, longitude)
+
     carona = Carona.objects.filter(
         ativa=True,
         vagas__gt=0,
     )
 
-    return render(request, "find_carona.html", {"caronas": carona})
+    if latitude and longitude:
+        print("tem dados")
+        caronas_ordenadas = []
+
+        for carona_obj in carona.all():
+            menor_distancia = get_menor_distancia_deslocamentos(
+                latitude, longitude, carona_obj
+            )
+            caronas_ordenadas.append((carona_obj, menor_distancia))
+
+        caronas_ordenadas.sort(key=lambda x: x[1], reverse=True)
+
+        carona = [carona_obj for carona_obj, _ in caronas_ordenadas]
+
+    return render(
+        request,
+        "find_carona.html",
+        {"caronas": carona, "latitude": latitude, "longitude": longitude},
+    )
 
 
 @login_required
@@ -715,9 +756,9 @@ def switch_account_view(request):
                 "home",
             )
 
-DeslocamentoFormSet = modelformset_factory(
-    Deslocamento, form=DeslocamentoForm, extra=1
-)
+
+DeslocamentoFormSet = modelformset_factory(Deslocamento, form=DeslocamentoForm, extra=1)
+
 
 @is_tipo("motorista")
 @login_required
@@ -736,7 +777,6 @@ def meus_deslocamentos_view(request):
                     ponto_y_saida = ponto_saida.y
                     ponto_x_destino = ponto_destino.x
                     ponto_y_destino = ponto_destino.y
-
 
                 instance.save()
     else:

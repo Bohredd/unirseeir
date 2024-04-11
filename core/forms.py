@@ -52,7 +52,7 @@ class DiasSemana(TextChoices):
 class DeslocamentoForm(forms.ModelForm):
     class Meta:
         model = Deslocamento
-        fields = ("dia_semana", "hora_ida", "hora_volta", "ponto_saida", "ponto_destino")
+        fields = ("dia_semana", "horario_saida_ponto_saida", "ponto_saida", "ponto_destino")
 
 
 class MotoristaForm(forms.Form):

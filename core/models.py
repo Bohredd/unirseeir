@@ -91,8 +91,7 @@ class Deslocamento(models.Model):
         choices=DiasSemana.choices,
         max_length=20,
     )
-    hora_ida = models.TimeField()
-    hora_volta = models.TimeField()
+    horario_saida_ponto_saida = models.TimeField()
     ponto_saida = models.ForeignKey(
         Ponto,
         on_delete=models.CASCADE,
@@ -106,6 +105,14 @@ class Deslocamento(models.Model):
         related_name="deslocamentos_destino",
         null=True,
         blank=True,
+    )
+
+    ponto_saida_endereco = models.CharField(
+        max_length=250,
+    )
+
+    ponto_destino_endereco = models.CharField(
+        max_length=250,
     )
 
 
@@ -208,9 +215,6 @@ class Caroneiro(models.Model):
 class Combinado(models.Model):
 
     caroneiro = models.ForeignKey(Caroneiro, on_delete=models.CASCADE)
-    ida = models.BooleanField(default=False)
-    volta = models.BooleanField(default=False)
-
     dia_semana = models.IntegerField()
 
 
@@ -242,16 +246,9 @@ class Carona(models.Model):
 
         combinados = self.combinados.all().filter(
             caroneiro=caroneiro,
-        )
+        ).count()
 
-        custo_total = 0
-        for combinado in combinados:
-            custo_total += (
-                self.motorista.custo
-                if combinado.ida and combinado.volta
-                else self.motorista.custo / 2
-            ) * 4
-        print(custo_total)
+        custo_total = combinados * self.motorista.custo if combinados > 0 and self.motorista.custo > 0 else 0
 
         return obter_qr_code_pix(
             self.motorista.nome, self.motorista.pagamento.chave, custo_total

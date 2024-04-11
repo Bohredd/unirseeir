@@ -1,0 +1,12 @@
+{% extends 'header.html' %}
+
+{% block content %}
+    {% for deslocamento in carona.motorista.deslocamentos.all %}
+        <p style="margin-top: 5px" class="card-text">Saida: {{ deslocamento.ponto_saida_endereco }}</p>
+        <p style="margin-top: 5px" class="card-text">Destino: {{ deslocamento.ponto_destino_endereco }}</p>
+    {% empty %}
+        <p class="card-text">
+            Esse motorista ainda não registrou nenhum deslocamento.
+        </p>
+    {% endfor %}
+{% endblock %}

@@ -7,6 +7,8 @@ from django.http import HttpResponse
 from config.models import Config
 from core.contrato import get_template_contrato
 from django.contrib.auth.models import User
+from geopy.distance import geodesic
+from geopy.geocoders import Nominatim
 
 def generate_pdf(carona, caroneiro, tipo):
 
@@ -91,3 +93,41 @@ def get_user(cleaned_data):
     return User.objects.filter(
         username=matricula,
     ).first()
+
+def get_menor_distancia_deslocamentos(latitude, longitude, carona):
+    print(latitude, longitude, carona)
+    print("testeee")
+
+    geolocator = Nominatim(user_agent="my_geocoder")
+
+    deslocamentos = carona.motorista.deslocamentos.all()
+    coord1 = (latitude, longitude)
+    coord2 = None
+    menor_distancia = None
+    for deslocamento in deslocamentos:
+
+        if deslocamento.ponto_saida:
+            coord2 = (deslocamento.ponto_saida.x, deslocamento.ponto_saida.y)
+            print(coord2, "tem ponto_saida")
+        else:
+            localizacao = geolocator.geocode(deslocamento.ponto_saida_endereco)
+            if localizacao:
+                latitude_endereco = localizacao.latitude
+                longitude_endereco = localizacao.longitude
+
+                coord2 = (latitude_endereco, longitude_endereco)
+
+        if menor_distancia is None:
+            menor_distancia = geodesic(coord1, coord2).meters
+            print(menor_distancia, "era none")
+        else:
+            if menor_distancia < geodesic(coord1, coord2).meters:
+                print(
+                    geodesic(coord1, coord2).meters,
+                    " essa é menor que a antiga ",
+                    menor_distancia,
+                )
+                menor_distancia = geodesic(coord1, coord2).meters
+
+    print("Menor distancia: ", menor_distancia)
+    return f"{menor_distancia:.1f}"
