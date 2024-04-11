@@ -114,10 +114,6 @@ def register_view(request):
                     usuario=user,
                 )
 
-                user = authenticate(
-                    request, username=user.username, password=user.password
-                )
-
                 if "comprovante" in request.FILES:
                     comprovante = request.FILES["comprovante"]
                 else:
@@ -129,6 +125,10 @@ def register_view(request):
                     matricula=matricula,
                     curso=curso,
                     from_username=matricula,
+                )
+
+                user = authenticate(
+                    request, username=matricula, password=senha
                 )
 
                 login(request, user)
@@ -149,7 +149,7 @@ def register_view(request):
                     )
 
                     user = authenticate(
-                        request, username=user.username, password=user.password
+                        request, username=matricula, password=senha
                     )
 
                     comprovante = request.FILES["comprovante"]
@@ -193,7 +193,7 @@ def metodo_pagamento_view(request):
 
             motorista.pagamento = metodo_pagamento
             motorista.save()
-            return redirect("minhaConta", id=request.user.id)
+            return redirect("minhaConta")
     else:
         form = MetodoPagamentoForm()
 
@@ -219,12 +219,14 @@ def register_type_view(request, tipo):
 
                 if temp is not None:
 
+                    usuario = User.objects.get(username=matricula)
+
                     Motorista.objects.create(
                         nome=temp.nome,
                         matricula=temp.matricula,
                         comprovante=temp.comprovante,
                         curso=temp.curso,
-                        user=request.user,
+                        user=usuario,
                         carona_paga=carona_paga,
                         automovel=automovel,
                     )

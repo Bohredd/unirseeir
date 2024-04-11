@@ -59,7 +59,7 @@ class MotoristaForm(forms.Form):
     matricula = forms.CharField(label="Matrícula")
     automovel = forms.CharField(label="Automóvel")
 
-    carona_paga = forms.BooleanField()
+    carona_paga = forms.BooleanField(required=False)
 
 
 class LoginForm(forms.Form):
