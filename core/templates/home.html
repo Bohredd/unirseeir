@@ -21,7 +21,15 @@
                             Carona {{ carona.id }}</a>
                     </div>
                 </div>
+            {% empty %}
+                <li class="list-group-item d-flix justify=content-between align-items-center">
+                    Você não está em nenhuma carona :(
+                </li>
             {% endfor %}
+        {% else %}
+            <li class="list-group-item d-flix justify=content-between align-items-center">
+                Você não está em nenhuma carona :(
+            </li>
         {% endif %}
     </div>
 

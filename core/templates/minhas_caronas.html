@@ -28,7 +28,7 @@
                         <a href="{% url 'findCarona' %}" class="btn btn-primary">Vamos atrás de uma carona!</a>
                       {% else %}
                       <h5 class="card-title">Tens interesse de criar uma?</h5>
-                        <a href="{% url 'findCarona' %}" class="btn btn-primary">Vamos criar uma imediatamente!</a>
+                        <a href="{% url 'criarMinhaCarona' %}" class="btn btn-primary">Vamos criar uma imediatamente!</a>
                       {% endif %}
                   </div>
                 {% if request.user.tipo_ativo == 'caroneiro' %}

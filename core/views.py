@@ -350,10 +350,30 @@ def banco_view(request):
 
 
 @login_required
+@is_tipo("motorista")
+def criar_minha_carona(request):
+
+    if Carona.objects.filter(
+        motorista__user=request.user,
+    ).exists():
+        messages.warning(
+            request,
+            "Você já é motorista de uma carona!",
+        )
+        return redirect(
+            "home",
+        )
+
+    return HttpResponse("teste")
+
+
+@login_required
 @is_tipo("caroneiro")
 def ver_deslocamentos_motoristas(request, carona):
 
     carona = Carona.objects.get(id=carona)
+
+    print(carona)
 
     return render(
         request,
@@ -599,8 +619,17 @@ def bate_papo_view_list(request):
     # return HttpResponse(conversa)
 
 
-def gerar_caminho_view(request, carona_id):
-    pass
+def gerar_caminho_view(request, carona):
+
+    carona = Carona.objects.get(id=carona)
+    print(carona)
+    return render(
+        request,
+        "generate_caminho.html",
+        {
+            "carona": carona,
+        },
+    )
 
 
 @login_required

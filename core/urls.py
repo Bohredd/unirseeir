@@ -24,6 +24,7 @@ from core.views import (
     banco_view,
     meus_deslocamentos_view,
     ver_deslocamentos_motoristas,
+    criar_minha_carona,
 )
 
 urlpatterns = [
@@ -35,7 +36,7 @@ urlpatterns = [
     path("find/carona/", find_carona, name="findCarona"),
     path("find/caroneiro/", find_caroneiro, name="findCaroneiro"),
     path("conversa/list/", bate_papo_view_list, name="conversaList"),
-    path("carona/gerar_caminho/<int:carona>/", gerar_caminho_view, name="gerarCaminho"),
+    path("carona/gerar/caminho/<int:carona>/", gerar_caminho_view, name="gerarCaminho"),
     path("account/", minha_conta_view, name="minhaConta"),
     path("cadastro/pagamento/", metodo_pagamento_view, name="metodoPagamento"),
     path(
@@ -65,4 +66,5 @@ urlpatterns = [
         ver_deslocamentos_motoristas,
         name="verDeslocamentosMotorista",
     ),
+    path("carona/criar/", criar_minha_carona, name="criarMinhaCarona"),
 ]
