@@ -29,11 +29,10 @@ def user_in_carona():
             if carona_id:
                 carona = Carona.objects.filter(pk=carona_id)
                 if carona.exists():
-
                     carona = carona.first()
                     if (
                         carona.caroneiros.all().filter(user=request.user).exists()
-                        or carona.motorista == request.user
+                        or carona.motorista.user == request.user
                     ):
                         return view_func(request, *args, **kwargs)
 
