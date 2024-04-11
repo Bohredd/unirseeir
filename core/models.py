@@ -250,6 +250,9 @@ class Carona(models.Model):
 
         custo_total = combinados * self.motorista.custo if combinados > 0 and self.motorista.custo > 0 else 0
 
+        print("Custo do motorista; ", self.motorista.custo)
+        print("Custo total R$", custo_total, " para a quantia de combinados: ", combinados)
+
         return obter_qr_code_pix(
             self.motorista.nome, self.motorista.pagamento.chave, custo_total
         )

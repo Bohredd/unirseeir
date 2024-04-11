@@ -275,7 +275,9 @@ def register_type_view(request, tipo):
 
 
 def comercial_view(request):
-    return HttpResponse("pagina inicial ficticia")
+    carona = Carona.objects.first()
+    qr_code_base64 = carona.generate_pix(Caroneiro.objects.first())
+    return render(request, "pix.html", {"qr_code_base64": qr_code_base64})
 
 
 def logout_view(request):
@@ -286,9 +288,6 @@ def logout_view(request):
 @login_required
 def home_view(request):
     print(request.user)
-    # carona = Carona.objects.first()
-    # qr_code_base64 = carona.generate_pix(Caroneiro.objects.first())
-    # return render(request, "pix.html", {"qr_code_base64": qr_code_base64})
 
     if request.user.tipo_ativo == "motorista":
         caronas_ativas_do_usuario = Carona.objects.filter(
