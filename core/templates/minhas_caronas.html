@@ -19,9 +19,10 @@
                                 <p class="card-text">Vamos procurar caroneiros?</p>
                                 <a href="{% url 'findCaroneiro' %}" class="btn btn-info">Buscar Caroneiros!</a>
                             {% endif %}
-                        {% endif %}                        <a href="{% url 'caronaView' carona.id %}"
-                                                              class="btn btn-primary">Acessar
-                        Carona {{ carona.id }}</a>
+                        {% endif %}
+                        <a href="{% url 'caronaView' carona.id %}"
+                           class="btn btn-primary">Acessar
+                            Carona {{ carona.id }}</a>
                     </div>
                 </div>
             {% endfor %}
