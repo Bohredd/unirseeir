@@ -58,18 +58,21 @@ def get_carona_membros(carona):
     if len(membros) == 1:
         return membros[0]
     else:
-        string_arrumada = ""
+        if len(membros) > 1:
+            string_arrumada = ""
 
-        for index, usuario in enumerate(membros):
+            for index, usuario in enumerate(membros):
 
-            if index == len(membros) - 2:
-                string_arrumada += f"{usuario} "
-            elif index != len(membros) - 1:
-                string_arrumada += f"{usuario}, "
-            else:
-                string_arrumada += f"{usuario}."
+                if index == len(membros) - 2:
+                    string_arrumada += f"{usuario} "
+                elif index != len(membros) - 1:
+                    string_arrumada += f"{usuario}, "
+                else:
+                    string_arrumada += f"{usuario}."
 
-        return string_arrumada
+            return string_arrumada
+
+    return 0
 
 @register.simple_tag
 def get_carona_motorista(request, carona):

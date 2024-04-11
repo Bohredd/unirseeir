@@ -15,6 +15,7 @@ from core.forms import (
     EditCaroneiroForm,
     MensagemForm,
     DeslocamentoForm,
+    CaronaForm,
 )
 from core.models import (
     Carona,
@@ -27,7 +28,7 @@ from core.models import (
     Deslocamento,
 )
 from core.utils import generate_pdf, get_user, get_menor_distancia_deslocamentos
-from core.patcher import registrar_deslocamentos
+from django.db import models
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -127,9 +128,7 @@ def register_view(request):
                     from_username=matricula,
                 )
 
-                user = authenticate(
-                    request, username=matricula, password=senha
-                )
+                user = authenticate(request, username=matricula, password=senha)
 
                 login(request, user)
             else:
@@ -148,9 +147,7 @@ def register_view(request):
                         usuario=user,
                     )
 
-                    user = authenticate(
-                        request, username=matricula, password=senha
-                    )
+                    user = authenticate(request, username=matricula, password=senha)
 
                     comprovante = request.FILES["comprovante"]
 
@@ -366,7 +363,34 @@ def criar_minha_carona(request):
             "home",
         )
 
-    return HttpResponse("teste")
+    if request.method == "POST":
+
+        form = CaronaForm(request.POST)
+
+        if form.is_valid():
+            tipo = form.cleaned_data["tipo"]
+
+            print(tipo)
+
+            carona = Carona.objects.create(
+                tipo=tipo,
+                motorista=Motorista.objects.get(user=request.user),
+                ativa=True,
+            )
+
+            return redirect("caronaView", carona.id)
+
+    else:
+        form = CaronaForm()
+
+    return render(
+        request,
+        "create_carona.html",
+        {
+            "request": request,
+            "form": form,
+        },
+    )
 
 
 @login_required
@@ -817,4 +841,22 @@ def meus_deslocamentos_view(request):
         request,
         "meus_deslocamentos.html",
         {"formset": formset},
+    )
+
+def solicitacao_list(request):
+
+    solicitacoes = solicitacoes = (
+        Solicitacao.objects.filter(
+            models.Q(enviado_por=request.user) | models.Q(enviado_para=request.user),
+            respondida=False,
+            visualizada=False,
+        )
+        .distinct()
+        .order_by("enviado_em")
+    )
+
+    return render(
+        request,
+        "solicitacao_list.html",
+        {"solicitacoes": solicitacoes},
     )

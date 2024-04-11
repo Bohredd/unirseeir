@@ -16,7 +16,15 @@
                     <h5 class="card-header">Carona {{ carona.id }}</h5>
                     <div class="card-body">
                         <h5 class="card-title">Motorista: {% get_carona_motorista request carona %}</h5>
-                        <p class="card-text">Caroneiros: {% get_carona_membros carona %}</p>
+                        {% get_carona_membros carona as membros %}
+                        {% if membros != 0 %}
+                            <p class="card-text">Caroneiros: {{ membros }}</p>
+                        {% else %}
+                            {% if carona.vagas != 0 %}
+                                <p class="card-text">Vamos procurar caroneiros?</p>
+                                <a href="{% url 'findCaroneiro' %}" class="btn btn-info">Buscar Caroneiros!</a>
+                            {% endif %}
+                        {% endif %}
                         <a href="{% url 'caronaView' carona.id %}" class="btn btn-primary">Acessar
                             Carona {{ carona.id }}</a>
                     </div>
@@ -56,7 +64,8 @@
                 </div>
             </div>
         {% endfor %}
-        <p><a href="#" class="link-info link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Ver
+        <p><a href="{% url 'solicitacaoList' %}"
+              class="link-info link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Ver
             todas as suas Solicitações</a></p>
     </div>
 

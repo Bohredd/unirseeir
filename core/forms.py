@@ -133,3 +133,14 @@ class MensagemForm(forms.Form):
     conteudo = forms.CharField(
         widget=forms.Textarea(), label="Digite sua mensagem aqui"
     )
+
+class CaronaForm(forms.Form):
+
+    tipo = forms.ChoiceField(
+        choices=[
+            ("", "Tipo de Automóvel"),
+            ("carro", "Carro"),
+            ("moto", "Moto"),
+        ],
+        widget=forms.Select(),
+    )

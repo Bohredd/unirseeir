@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="card" style="margin-bottom: 10px">
-  <h5 class="card-header">Carona do {{ carona.motorista.nome }}</h5>
+  <h5 class="card-header">{% if request.user.first_name == carona.motorista.nome %} Sua Carona {% else %} Carona do {{ carona.motorista.nome }}{% endif %}</h5>
   <div class="card-body">
     <h5 class="card-title">a</h5>
     <p class="card-text">b</p>
