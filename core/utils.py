@@ -130,4 +130,4 @@ def get_menor_distancia_deslocamentos(latitude, longitude, carona):
                 menor_distancia = geodesic(coord1, coord2).meters
 
     print("Menor distancia: ", menor_distancia)
-    return f"{menor_distancia:.1f}"
+    return f"{menor_distancia:.1f}" if menor_distancia is not None else "Não foi possível obter dados geográficos."

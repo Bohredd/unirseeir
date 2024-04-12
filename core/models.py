@@ -175,7 +175,6 @@ class Motorista(models.Model):
             return sum(avaliacoes.values_list("nota", flat=True)) / len(avaliacoes)
         return 0
 
-
 class Caroneiro(models.Model):
     nome = models.CharField(max_length=200)
     matricula = models.CharField(max_length=20, unique=True)
@@ -240,7 +239,7 @@ class Carona(models.Model):
         blank=True,
         null=True,
     )
-    ativa = models.BooleanField(default=True)
+    ativa = models.BooleanField(default=False)
 
     def generate_pix(self, caroneiro):
 

@@ -375,7 +375,6 @@ def criar_minha_carona(request):
             carona = Carona.objects.create(
                 tipo=tipo,
                 motorista=Motorista.objects.get(user=request.user),
-                ativa=True,
             )
 
             return redirect("caronaView", carona.id)
@@ -496,7 +495,14 @@ def minhas_caronas(request):
 
 @login_required
 def solicitacao_view(request, id):
-    pass
+
+    solicitacao = Solicitacao.objects.get(pk=id)
+
+    return render(
+        request,
+        "ver_solicitacao.html",
+        {"solicitacao": solicitacao},
+    )
 
 
 @login_required
@@ -593,6 +599,7 @@ def find_carona(request):
 
         carona = [carona_obj for carona_obj, _ in caronas_ordenadas]
 
+    print(carona)
     return render(
         request,
         "find_carona.html",
@@ -850,6 +857,7 @@ def meus_deslocamentos_view(request):
         "meus_deslocamentos.html",
         {"formset": formset},
     )
+
 
 def solicitacao_list(request):
 

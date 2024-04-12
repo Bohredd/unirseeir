@@ -44,7 +44,7 @@ def get_distancia_saida(latitude, longitude, carona):
                 menor_distancia = geodesic(coord1, coord2).meters
 
     print("Menor distancia: ", menor_distancia)
-    return float(menor_distancia)
+    return float(menor_distancia) if menor_distancia is not None else "Não foi possível obter dados geográficos."
 
 def get_coordinates(address):
     geolocator = Nominatim(user_agent="my_app")
