@@ -25,9 +25,11 @@ from core.views import (
     meus_deslocamentos_view,
     ver_deslocamentos_motoristas,
     criar_minha_carona,
+    landing_view
 )
 
 urlpatterns = [
+    path("landing/", landing_view, name="landing"),
     path("", home_view, name="home"),
     path("acessar/", login_view, name="login"),
     path("cadastro/", register_view, name="register"),

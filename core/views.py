@@ -818,3 +818,6 @@ def meus_deslocamentos_view(request):
         "meus_deslocamentos.html",
         {"formset": formset},
     )
+
+def landing_view(request):
+    return render(request,"home2.html")

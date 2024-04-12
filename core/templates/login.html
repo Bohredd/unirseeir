@@ -1,15 +1,49 @@
 {% include 'base.html' %}
 {% load crispy_forms_tags %}
+{% load static %}
 
 {% block content %}
 
-    Login
-    <form method="post">
-        {% csrf_token %}
-        {{ form|crispy }}
-        <input type="submit" value="Acessar">
-    </form>
-    
-    <h2> Ainda não tem um conta?</h2>
-    <a href="{% url 'register' %}">Criar imediatamente</a>
+    <head>
+    <title>Unirseeir</title>
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="../static/css/login.css">
+
+</head>
+
+<div class="wrapper">
+        <div class="logo">
+            <img src="{% static 'unirseeir.png' %}" alt="">
+        </div>
+        <div class="text-center mt-4 name">
+            Unir-se e IR
+        </div>
+        <form class="p-3 mt-3" method="post">
+            <div class="form-field d-flex align-items-center">
+                <span class="far fa-user"></span>
+                 {% csrf_token %}
+                   
+                <input type="text" name=" {{ form.matricula.name }}" id=" {{ form.matricula.id }}" placeholder="Matricula"> 
+            </div>
+            <div class="form-field d-flex align-items-center">
+                <span class="fas fa-key"></span>
+                <input type="password" name=" {{ form.senha.name }}" id=" {{ form.senha.id }}" placeholder="Senha">
+
+            </div>
+
+            <div class="form-field d-flex align-items-center">
+
+                <button type="button" value="" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  {{ form.tipo }}
+                </button>
+
+
+            </div>
+            <button class="btn mt-3">Login</button>
+        </form>
+        <div class="text-center fs-6">
+            <a href="#">Esqueceu a senha?</a>Ou<a href="{% url 'register' %}">Criar imediatamente</a>
+        </div>
+    </div>
 {% endblock %}

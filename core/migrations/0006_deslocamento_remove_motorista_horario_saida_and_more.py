@@ -16,8 +16,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('dia_semana', models.IntegerField()),
-                ('hora_ida', models.IntegerField()),
-                ('hora_volta', models.IntegerField()),
+                ('hora_ida', models.TimeField()),
+                ('hora_volta', models.TimeField()),
             ],
         ),
         migrations.RemoveField(
