@@ -449,7 +449,6 @@ def minhas_caronas(request):
     if request.user.tipo_ativo == "motorista":
         caronas_ativas_do_usuario = Carona.objects.filter(
             motorista__user=request.user,
-            ativa=True,
         )
     else:
         voce = Caroneiro.objects.filter(
