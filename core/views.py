@@ -859,7 +859,7 @@ DeslocamentoFormSet = modelformset_factory(Deslocamento, form=DeslocamentoForm, 
 
 
 @is_tipo("motorista")
-@login_required
+@login_required # TODO: REFAZER ESSA VIEW AQUI PARA CRIAR OS DESLOCAMENTOS E EDITA-LOS
 def meus_deslocamentos_view(request):
     if request.method == "POST":
         formset = DeslocamentoFormSet(request.POST)

@@ -64,7 +64,7 @@ class DiasSemana(TextChoices):
     sexta = ("sexta", "Sexta")
 
 
-class DeslocamentoForm(forms.ModelForm):
+class DeslocamentoForm(forms.ModelForm): # TODO: AJUSTAR ERSSE FORM LEVANDO EM CONTA O ENDEREÇO DE DESTINO / CEP BLA BLA BLA BLA
     class Meta:
         model = Deslocamento
         fields = (
@@ -145,9 +145,6 @@ class EditMotoristaForm(forms.Form):
 
     automovel = forms.CharField()
     carona_paga = forms.BooleanField()
-
-
-#    deslocamentos = DeslocamentoFormSet()
 
 
 class MensagemForm(forms.Form):
