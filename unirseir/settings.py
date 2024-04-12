@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "core",
     "crispy_forms",
     "crispy_bootstrap5",
+    'bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -98,12 +99,44 @@ WSGI_APPLICATION = "unirseir.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+#DATABASES = {
+ #   "default": {
+  #      "ENGINE": "django.db.backends.sqlite3",
+   #     "NAME": BASE_DIR / "db.sqlite3",
+    #}
+#}
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+
+    'default': {
+
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+
+        'NAME': 'postgres',
+
+        'USER': 'postgres',
+
+        'PASSWORD': 'root',
+
+        'HOST': 'localhost',
+
+        'PORT': '5432',
+
     }
+
 }
+
+##PRODUCTION EXAMPLE
+##DATABASES = {
+    ##'default': {
+        ##'ENGINE': 'django.db.backends.postgresql',
+        ##'NAME': 'postgres',
+       ## 'USER': 'masteruser',
+       ## 'PASSWORD': '12345678',
+       ## 'HOST': 'w3-django-project.cdxmgq9zqqlr.us-east-1.rds.amazonaws.com',
+       ## 'PORT': '5432'
+   ## }
+##}
 
 
 # Password validation

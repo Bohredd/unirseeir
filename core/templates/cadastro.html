@@ -1,19 +1,30 @@
 {% include 'base.html' %}
 
 {% load crispy_forms_tags %}
+{% load static %}
 {% block content %}
     <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Cadastro</title>
-    </head>
-    <body>
-    <h1>Realize o cadastro e selecione seu tipo de conta</h1>
+     <head>
+    <title>Cadastro</title>
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="../static/css/login.css">
+</head>
+ <h1>Realize o cadastro e selecione seu tipo de conta</h1>
+<div class="wrapper">
+  <div class="logo">
+            <img src="{% static 'unirseeir.png' %}" alt="">
+        </div>
+        <div class="text-center mt-4 name">
+            Unir-se e IR
+        </div>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form|crispy }}
-        <input type="submit" value="Cadastrar">
+        <input type="submit" class="btn mt-3" value="Cadastrar">
     </form>
-    </body>
-    </html>
+</div>
+
+  
 {% endblock %}
+

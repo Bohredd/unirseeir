@@ -1,31 +1,54 @@
+from crispy_forms.bootstrap import PrependedText
 from django import forms
 from django.db.models import TextChoices
 from django.forms import formset_factory
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit
+from crispy_forms.layout import Submit, Layout
 
 from core.models import Deslocamento
 
 
 class CadastroForm(forms.Form):
 
-    nome = forms.CharField(max_length=200)
+    nome = forms.CharField(
+        label='',
+        widget=forms.TextInput(attrs={'placeholder': 'nome'}),
+        max_length=200
+    )
 
-    email = forms.EmailField()
+    email = forms.EmailField(
+        label='',
+        widget=forms.TextInput(attrs={'placeholder': 'email'}))
 
-    senha = forms.CharField(widget=forms.PasswordInput)
-    senha_confirmacao = forms.CharField(widget=forms.PasswordInput)
+    senha = forms.CharField(
+        label='',
+        widget=forms.PasswordInput(
+            attrs={'placeholder': 'senha'}),
+    )
+    senha_confirmacao = forms.CharField(
+        label='',
+        widget=forms.PasswordInput(attrs={'placeholder': 'senha'}),)
 
-    matricula = forms.CharField()
+    matricula = forms.CharField(
+        label='',
+        widget=forms.TextInput(attrs={'placeholder': 'matricula'})
+    )
 
-    curso = forms.CharField()
+    curso = forms.CharField(
+        label='',
+        widget=forms.TextInput(attrs={'placeholder': 'curso'})
+    )
+
 
     comprovante = forms.FileField(
+        label='Comprovante',
+        widget=forms.FileInput(attrs={'placeholder': 'comprovante'}),
         allow_empty_file=False,
         required=False,
     )
 
     tipo = forms.ChoiceField(
+        label='',
         choices=[
             ("", "Escolha o tipo de Cadastro"),
             ("motorista", "Motorista"),
@@ -64,10 +87,14 @@ class MotoristaForm(forms.Form):
 
 class LoginForm(forms.Form):
 
-    matricula = forms.CharField()
-    senha = forms.CharField(widget=forms.PasswordInput)
+    matricula = forms.CharField(
+        label='',
+        widget=forms.TextInput(attrs={'placeholder': 'Matricula'})
+    )
+    senha = forms.CharField(label='',widget=forms.PasswordInput(attrs={'placeholder': 'Senha'}))
 
     tipo = forms.ChoiceField(
+        label='',
         choices=[
             ("", "Tipo de Conta"),
             ("motorista", "Motorista"),
@@ -81,6 +108,9 @@ class LoginForm(forms.Form):
         self.helper = FormHelper()
         self.helper.form_method = "post"
         self.helper.add_input(Submit("submit", "Login"))
+        self.helper.layout = Layout(
+            PrependedText('matricula','<span class="far fa-user"></span>', placeholder="Matricula")
+        )
 
 
 class MetodoPagamentoForm(forms.Form):
