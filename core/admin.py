@@ -12,6 +12,7 @@ from core.models import (
     Temporario,
     Extrato,
     Movimentacao,
+    Endereco,
 )
 
 
@@ -53,3 +54,4 @@ admin.site.register(Solicitacao)
 admin.site.register(Temporario)
 admin.site.register(Extrato)
 admin.site.register(Movimentacao)
+admin.site.register(Endereco)

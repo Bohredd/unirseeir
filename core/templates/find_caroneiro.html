@@ -1,6 +1,6 @@
 {% extends 'header.html' %}
 {% load static %}
-
+{% load caroneiro_tags %}
 {% block content %}
 
     {% for caroneiro in caroneiros_disponiveis %}
@@ -17,8 +17,12 @@
                                 Curso: {{ caroneiro.curso }} {{ caroneiro.semestre_atual }}
                             </p>
                             <p>
-                                Bairro: {{ caroneiro.bairro }}
+                                Bairro: {{ caroneiro.endereco.bairro }}
                             </p>
+
+                            {% get_menor_distancia_cep latitude longitude caroneiro.endereco.cep as distancia%}
+                            <p class="card-text"> <i class="bi bi-geo-alt"></i> O endereço do usuário é a <span style="color: {% if distancia < 1000 %} green {% else %} red{% endif %}">{{ distancia|floatformat:1 }} metros </span> de você! </p>
+
                             <p class="card-text"><span class="text-body-secondary">Deseja convida-lo para sua carona ?</span>
                                 <button type="button" class="btn btn-info"
                                         onclick="openCriarSolicitacao( {{caroneiro.id}} )">QUERO!
@@ -47,5 +51,25 @@
 
             window.open(url, 'Popup', 'width=' + width + ', height=' + height + ', left=' + left + ', top=' + top);
         }
+
+        function getLocationAndRedirect() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    const currentUrl = window.location.href;
+
+                    if (!currentUrl.includes('la=') || !currentUrl.includes('lo=')) {
+                        const urlWithCoordinates = `${currentUrl}?la=${latitude}&lo=${longitude}`;
+                        window.location.href = urlWithCoordinates;
+                    }
+                });
+            } else {
+                console.log("Geolocation is not supported by this browser.");
+            }
+        }
+
+        getLocationAndRedirect();
     </script>
 {% endblock %}

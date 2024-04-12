@@ -4,8 +4,13 @@ from django.forms import formset_factory
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 
-from core.models import Deslocamento
+from core.models import Deslocamento, Endereco, EstadoChoices
 
+
+class EnderecoForm(forms.ModelForm):
+    class Meta:
+        model = Endereco
+        fields = '__all__'
 
 class CadastroForm(forms.Form):
 
@@ -34,6 +39,16 @@ class CadastroForm(forms.Form):
         widget=forms.Select(),
     )
 
+    endereco = EnderecoForm()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        senha = cleaned_data.get("senha")
+        senha_confirmacao = cleaned_data.get("senha_confirmacao")
+
+        if senha and senha_confirmacao and senha != senha_confirmacao:
+            raise forms.ValidationError("As senhas não coincidem.")
+
 
 class CaroneiroForm(forms.Form):
 
@@ -52,7 +67,12 @@ class DiasSemana(TextChoices):
 class DeslocamentoForm(forms.ModelForm):
     class Meta:
         model = Deslocamento
-        fields = ("dia_semana", "horario_saida_ponto_saida", "ponto_saida", "ponto_destino")
+        fields = (
+            "dia_semana",
+            "horario_saida_ponto_saida",
+            "ponto_saida",
+            "ponto_destino",
+        )
 
 
 class MotoristaForm(forms.Form):
@@ -125,6 +145,8 @@ class EditMotoristaForm(forms.Form):
 
     automovel = forms.CharField()
     carona_paga = forms.BooleanField()
+
+
 #    deslocamentos = DeslocamentoFormSet()
 
 
@@ -133,6 +155,7 @@ class MensagemForm(forms.Form):
     conteudo = forms.CharField(
         widget=forms.Textarea(), label="Digite sua mensagem aqui"
     )
+
 
 class CaronaForm(forms.Form):
 

@@ -16,6 +16,7 @@ from core.forms import (
     MensagemForm,
     DeslocamentoForm,
     CaronaForm,
+    EnderecoForm,
 )
 from core.models import (
     Carona,
@@ -27,7 +28,12 @@ from core.models import (
     Extrato,
     Deslocamento,
 )
-from core.utils import generate_pdf, get_user, get_menor_distancia_deslocamentos
+from core.utils import (
+    generate_pdf,
+    get_user,
+    get_menor_distancia_deslocamentos,
+    get_menor_distancia_cep,
+)
 from django.db import models
 from django.http import HttpResponse
 from django.contrib.auth.models import User
@@ -97,8 +103,11 @@ def register_view(request):
             matricula = form.cleaned_data["matricula"]
             curso = form.cleaned_data["curso"]
             tipo = form.cleaned_data["tipo"]
-
+            print(request.POST)
+            endereco = form.cleaned_data["endereco"]
             user = User.objects.filter(email=email, username=matricula)
+
+            print(endereco)
 
             if not user.exists() and senha == senha_confirmacao:
 
@@ -163,9 +172,14 @@ def register_view(request):
 
             return redirect(register_type_view, tipo)
     else:
-        form = CadastroForm()
+        form_cadastro = CadastroForm()
+        form_endereco = EnderecoForm()
 
-    return render(request, "cadastro.html", {"form": form})
+    return render(
+        request,
+        "cadastro.html",
+        {"form_cadastro": form_cadastro, "form_endereco": form_endereco},
+    )
 
 
 def metodo_pagamento_view(request):
@@ -585,7 +599,6 @@ def find_carona(request):
     )
 
     if latitude and longitude:
-        print("tem dados")
         caronas_ordenadas = []
 
         for carona_obj in carona.all():
@@ -610,6 +623,14 @@ def find_carona(request):
 @is_tipo("motorista")
 def find_caroneiro(request):
 
+    latitude, longitude = (None, None)
+
+    if request.method == "GET":
+        latitude = request.GET.get("la")
+        longitude = request.GET.get("lo")
+
+    print(latitude, longitude)
+
     caroneiros = list(
         Caroneiro.objects.filter(
             matricula_valida=True,
@@ -625,10 +646,19 @@ def find_caroneiro(request):
         ).exists():
             caroneiros_disponiveis.append(caroneiro)
 
+    if latitude and longitude:
+        caroneiros_disponiveis.sort(
+            key=lambda c: get_menor_distancia_cep(latitude, longitude, c.endereco.cep)
+        )
+
     return render(
         request,
         "find_caroneiro.html",
-        {"caroneiros_disponiveis": caroneiros_disponiveis},
+        {
+            "caroneiros_disponiveis": caroneiros_disponiveis,
+            "latitude": latitude,
+            "longitude": longitude,
+        },
     )
 
 

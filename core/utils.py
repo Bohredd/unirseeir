@@ -131,3 +131,19 @@ def get_menor_distancia_deslocamentos(latitude, longitude, carona):
 
     print("Menor distancia: ", menor_distancia)
     return f"{menor_distancia:.1f}" if menor_distancia is not None else "Não foi possível obter dados geográficos."
+
+def get_lat_long_from_cep(cep):
+    geolocator = Nominatim(user_agent="myGeocoder")
+    location = geolocator.geocode({"postalcode": cep}, exactly_one=True)
+    if location:
+        return location.latitude, location.longitude
+    return None, None
+
+def get_menor_distancia_cep(latitude, longitude, cep):
+    cep_latitude, cep_longitude = get_lat_long_from_cep(cep)
+    if cep_latitude is None or cep_longitude is None:
+        return None
+
+    distancia = geodesic((latitude, longitude), (cep_latitude, cep_longitude)).meters
+    print("Distancia: ", distancia, " metros")
+    return float(distancia) if distancia is not None else "Não foi possível obter dados geográficos."
