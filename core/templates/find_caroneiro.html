@@ -19,10 +19,10 @@
                             <p>
                                 Bairro: {{ caroneiro.endereco.bairro }}
                             </p>
-
-                            {% get_menor_distancia_cep latitude longitude caroneiro.endereco.cep as distancia%}
-                            <p class="card-text"> <i class="bi bi-geo-alt"></i> O endereço do usuário é a <span style="color: {% if distancia < 1000 %} green {% else %} red{% endif %}">{{ distancia|floatformat:1 }} metros </span> de você! </p>
-
+                            {% if latitude != None and longitude != None %}
+                                {% get_menor_distancia_cep latitude longitude caroneiro.endereco.cep as distancia%}
+                                <p class="card-text"> <i class="bi bi-geo-alt"></i> O endereço do usuário é a <span style="color: {% if distancia < 1000 %} green {% else %} red{% endif %}">{{ distancia|floatformat:1 }} metros </span> de você! </p>
+                            {% endif %}
                             <p class="card-text"><span class="text-body-secondary">Deseja convida-lo para sua carona ?</span>
                                 <button type="button" class="btn btn-info"
                                         onclick="openCriarSolicitacao( {{caroneiro.id}} )">QUERO!

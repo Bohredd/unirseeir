@@ -646,7 +646,7 @@ def find_caroneiro(request):
         ).exists():
             caroneiros_disponiveis.append(caroneiro)
 
-    if latitude and longitude:
+    if latitude is not None and longitude is not None :
         caroneiros_disponiveis.sort(
             key=lambda c: get_menor_distancia_cep(latitude, longitude, c.endereco.cep)
         )
