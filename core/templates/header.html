@@ -1,6 +1,6 @@
 {% include 'base.html' %}
 {% load static %}
-
+{% load solicitacao_tags %}
 <div class="container-fluid overflow-hidden">
     <div class="row vh-100 overflow-auto">
         <div class="col-12 col-sm-3 col-xl-2 px-sm-2 px-0 bg-dark d-flex sticky-top">
@@ -55,13 +55,27 @@
 
                     <li class="nav-item">
                         <a href="{% url 'conversaList' %}" class="nav-link px-sm-0 px-2">
-                            <i class="fs-5 bi-chat-dots-fill"></i><span class="ms-1 d-none d-sm-inline">Minhas Conversas</span>
+                            <i class="fs-5 bi-chat-dots-fill"></i><span
+                                class="ms-1 d-none d-sm-inline">Minhas Conversas</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{% url 'solicitacaoList' %}" class="nav-link px-sm-0 px-2">
+                            {% get_solicitacoes_quantia request as quantia_solicitacoes %}
+                            {% if quantia_solicitacoes > 0 %}
+                                <i class="fs-5 bi-send-exclamation-fill">
+                            {% else %}
+                                <i class="fs-5 bi-send-fill">
+                            {% endif %}</i><span
+                                class="ms-1 d-none d-sm-inline">Minhas Solicitações</span>
                         </a>
                     </li>
 
                     {% if request.user.tipo_ativo == 'motorista' %}
                         <a href="{% url 'meusDeslocamentos' %}" class="nav-link px-sm-0 px-2">
-                            <i class="fs-5 bi-geo-fill"></i><span class="ms-1 d-none d-sm-inline">Meus Deslocamentos</span>
+                            <i class="fs-5 bi-geo-fill"></i><span
+                                class="ms-1 d-none d-sm-inline">Meus Deslocamentos</span>
                         </a>
                     {% endif %}
                 </ul>
