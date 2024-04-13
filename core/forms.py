@@ -1,16 +1,18 @@
 from django import forms
 from django.db.models import TextChoices
-from django.forms import formset_factory
+from django.forms import inlineformset_factory
+from django.forms.widgets import DateTimeInput
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 
-from core.models import Deslocamento, Endereco, EstadoChoices
+from core.models import Deslocamento, Endereco, Motorista
 
 
 class EnderecoForm(forms.ModelForm):
     class Meta:
         model = Endereco
-        fields = '__all__'
+        fields = "__all__"
+
 
 class CadastroForm(forms.Form):
 
@@ -64,14 +66,25 @@ class DiasSemana(TextChoices):
     sexta = ("sexta", "Sexta")
 
 
-class DeslocamentoForm(forms.ModelForm): # TODO: AJUSTAR ERSSE FORM LEVANDO EM CONTA O ENDEREÇO DE DESTINO / CEP BLA BLA BLA BLA
+class DeslocamentoForm(forms.ModelForm):
+    horario_saida_ponto_saida = forms.TimeField(
+        label="Horário de Saída no Ponto de Saída",
+        widget=forms.TimeInput(attrs={"type": "time"}),
+    )
+
     class Meta:
         model = Deslocamento
         fields = (
             "dia_semana",
             "horario_saida_ponto_saida",
-            "ponto_saida",
-            "ponto_destino",
+            "ponto_saida_endereco",
+            "ponto_destino_endereco",
+        )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["horario_saida_ponto_saida"].widget.attrs.update(
+            {"class": "form-control"}
         )
 
 

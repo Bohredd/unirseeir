@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.forms import modelformset_factory
+from django.forms import modelformset_factory, inlineformset_factory
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from config.models import Conversa, Mensagem, Conexao
@@ -646,7 +646,7 @@ def find_caroneiro(request):
         ).exists():
             caroneiros_disponiveis.append(caroneiro)
 
-    if latitude is not None and longitude is not None :
+    if latitude is not None and longitude is not None:
         caroneiros_disponiveis.sort(
             key=lambda c: get_menor_distancia_cep(latitude, longitude, c.endereco.cep)
         )
@@ -855,37 +855,22 @@ def switch_account_view(request):
             )
 
 
-DeslocamentoFormSet = modelformset_factory(Deslocamento, form=DeslocamentoForm, extra=1)
-
-
 @is_tipo("motorista")
-@login_required # TODO: REFAZER ESSA VIEW AQUI PARA CRIAR OS DESLOCAMENTOS E EDITA-LOS
+@login_required
 def meus_deslocamentos_view(request):
+    motorista = Motorista.objects.get(user=request.user)
+    DeslocamentoFormSet = modelformset_factory(Deslocamento, form=DeslocamentoForm, extra=1)
+
     if request.method == "POST":
-        formset = DeslocamentoFormSet(request.POST)
-
+        formset = DeslocamentoFormSet(request.POST, queryset=motorista.deslocamentos.all())
         if formset.is_valid():
-            instances = formset.save(commit=False)
-            for instance in instances:
-                ponto_saida = instance.ponto_saida
-                ponto_destino = instance.ponto_destino
-
-                if ponto_saida and ponto_destino:
-                    ponto_x_saida = ponto_saida.x
-                    ponto_y_saida = ponto_saida.y
-                    ponto_x_destino = ponto_destino.x
-                    ponto_y_destino = ponto_destino.y
-
-                instance.save()
+            formset.save()
+            messages.success(request, "Deslocamentos salvos com sucesso!")
+            return redirect("home")
     else:
-        deslocamentos = Deslocamento.objects.filter(motorista__user_id=request.user.id)
-        formset = DeslocamentoFormSet(queryset=deslocamentos)
+        formset = DeslocamentoFormSet(queryset=motorista.deslocamentos.all())
 
-    return render(
-        request,
-        "meus_deslocamentos.html",
-        {"formset": formset},
-    )
+    return render(request, "meus_deslocamentos.html", {"formset": formset})
 
 
 def solicitacao_list(request):

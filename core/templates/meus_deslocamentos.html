@@ -1,50 +1,16 @@
 {% extends 'header.html' %}
-
+{% load crispy_forms_tags %}
 {% block content %}
     <h2>Seus deslocamentos registrados</h2>
     <div id="form-container">
-        {% for form in formset %}
-            <form method="post" id="{{ form.prefix }}">
-                {% csrf_token %}
-                {{ formset.management_form }}
-                <div>
-                    {{ form.as_p }}
-                    {% if form.instance.pk %}
-                        <button type="submit">Editar</button>   
-                    {% else %}
-                        <button type="button" onclick="salvarDeslocamento('{{ form.prefix }}')">Salvar</button>
-                    {% endif %}
-                </div>
-            </form>
-        {% endfor %}
+        <form method="post">
+            {% csrf_token %}
+            {{ formset.management_form }}
+            {% for form in formset %}
+                {{ form|crispy }}
+                <hr>
+            {% endfor %}
+            <button type="submit">Salvar deslocamentos</button>
+        </form>
     </div>
-
-    <div id="map" style="height: 200px;"></div>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script>
-        $(document).ready(function() {
-
-            var map = L.map('map').setView([-23.5505, -46.6333], 12);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
-
-            map.on('click', function(e){
-              var coord = e.latlng;
-              var lat = coord.lat;
-              var lng = coord.lng;
-              console.log("You clicked the map at latitude: " + lat + " and longitude: " + lng);
-              });
-
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    const userLat = position.coords.latitude;
-                    const userLng = position.coords.longitude;
-                    map.setView([userLat, userLng], 12);
-                });
-            }
-        });
-    </script>
 {% endblock %}
