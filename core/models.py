@@ -116,7 +116,6 @@ class Deslocamento(models.Model):
         max_length=250,
     )
 
-
 class Temporario(models.Model):
 
     nome = models.CharField(max_length=200)
@@ -154,6 +153,12 @@ class EstadoChoices(TextChoices):
     SAO_PAULO = ("SP", "São Paulo")
     SERGIPE = ("SE", "Sergipe")
     TOCANTINS = ("TO", "Tocantins")
+
+class Cidade(models.Model):
+
+    pais = models.CharField(max_length=30)
+    estado = models.CharField(choices=EstadoChoices.choices, max_length=30)
+    cidade = models.CharField(max_length=100)
 
 class Endereco(models.Model):
 

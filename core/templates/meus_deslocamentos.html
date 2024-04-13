@@ -7,10 +7,14 @@
             {% csrf_token %}
             {{ formset.management_form }}
             {% for form in formset %}
-                {{ form|crispy }}
+                <div class="card">
+                    <div class="card-body">
+                    {{ form|crispy }}
+                    </div>
+                </div>
                 <hr>
             {% endfor %}
-            <button type="submit">Salvar deslocamentos</button>
+            <button class='btn btn-primary' type="submit">Salvar deslocamentos</button>
         </form>
     </div>
 {% endblock %}

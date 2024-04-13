@@ -52,3 +52,7 @@ def ativar_carona(sender, instance, action, **kwargs):
         if carona.motorista.deslocamentos.all().count() > 0:
             carona.ativa = True
             carona.save(update_fields=["ativa"])
+
+
+#@receiver(pre_save, sender=Motorista)
+#def ajustar_pontos_carona(sender, instance: Motorista, **kwargs):

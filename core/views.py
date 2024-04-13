@@ -864,7 +864,15 @@ def meus_deslocamentos_view(request):
     if request.method == "POST":
         formset = DeslocamentoFormSet(request.POST, queryset=motorista.deslocamentos.all())
         if formset.is_valid():
-            formset.save()
+            instances = formset.save()
+
+            for instance in instances:
+                motorista.deslocamentos.add(
+                    instance,
+                )
+
+            motorista.save()
+
             messages.success(request, "Deslocamentos salvos com sucesso!")
             return redirect("home")
     else:
