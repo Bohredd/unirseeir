@@ -12,7 +12,7 @@ Notion     | [Notion](https://www.notion.so/bohredd-dev/UNIr-se-e-IR-3e508774ac8
 
 ### Comando de configuração ###
 #### Configuração do projeto ####
-`` python scripits/projeto.py `` <- Configurar ainda
+`` python scripts/projeto.py `` <- Configurar ainda
 
 #### Configuração do banco de dados ####
 ``python scripts/configurar.py``

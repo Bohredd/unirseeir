@@ -1,0 +1,18 @@
+{% extends 'header.html' %}
+
+{% block content %}
+
+    <div class="card w-100" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title">Criando sua Carona</h5>
+            <h6 class="card-subtitle mb-2 text-body-secondary">Aqui você preenche os dados da sua carona</h6>
+{#            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's#}
+{#                content.</p>#}
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-info"> Criar </button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

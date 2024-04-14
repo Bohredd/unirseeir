@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.forms import modelformset_factory
+from django.forms import modelformset_factory, inlineformset_factory
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from config.models import Conversa, Mensagem, Conexao
@@ -15,6 +15,8 @@ from core.forms import (
     EditCaroneiroForm,
     MensagemForm,
     DeslocamentoForm,
+    CaronaForm,
+    EnderecoForm,
 )
 from core.models import (
     Carona,
@@ -26,8 +28,13 @@ from core.models import (
     Extrato,
     Deslocamento,
 )
-from core.utils import generate_pdf, get_user, get_menor_distancia_deslocamentos
-from core.patcher import registrar_deslocamentos
+from core.utils import (
+    generate_pdf,
+    get_user,
+    get_menor_distancia_deslocamentos,
+    get_menor_distancia_cep,
+)
+from django.db import models
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -96,8 +103,11 @@ def register_view(request):
             matricula = form.cleaned_data["matricula"]
             curso = form.cleaned_data["curso"]
             tipo = form.cleaned_data["tipo"]
-
+            print(request.POST)
+            endereco = form.cleaned_data["endereco"]
             user = User.objects.filter(email=email, username=matricula)
+
+            print(endereco)
 
             if not user.exists() and senha == senha_confirmacao:
 
@@ -127,9 +137,7 @@ def register_view(request):
                     from_username=matricula,
                 )
 
-                user = authenticate(
-                    request, username=matricula, password=senha
-                )
+                user = authenticate(request, username=matricula, password=senha)
 
                 login(request, user)
             else:
@@ -148,9 +156,7 @@ def register_view(request):
                         usuario=user,
                     )
 
-                    user = authenticate(
-                        request, username=matricula, password=senha
-                    )
+                    user = authenticate(request, username=matricula, password=senha)
 
                     comprovante = request.FILES["comprovante"]
 
@@ -166,9 +172,14 @@ def register_view(request):
 
             return redirect(register_type_view, tipo)
     else:
-        form = CadastroForm()
+        form_cadastro = CadastroForm()
+        form_endereco = EnderecoForm()
 
-    return render(request, "cadastro.html", {"form": form})
+    return render(
+        request,
+        "cadastro.html",
+        {"form_cadastro": form_cadastro, "form_endereco": form_endereco},
+    )
 
 
 def metodo_pagamento_view(request):
@@ -366,7 +377,33 @@ def criar_minha_carona(request):
             "home",
         )
 
-    return HttpResponse("teste")
+    if request.method == "POST":
+
+        form = CaronaForm(request.POST)
+
+        if form.is_valid():
+            tipo = form.cleaned_data["tipo"]
+
+            print(tipo)
+
+            carona = Carona.objects.create(
+                tipo=tipo,
+                motorista=Motorista.objects.get(user=request.user),
+            )
+
+            return redirect("caronaView", carona.id)
+
+    else:
+        form = CaronaForm()
+
+    return render(
+        request,
+        "create_carona.html",
+        {
+            "request": request,
+            "form": form,
+        },
+    )
 
 
 @login_required
@@ -426,7 +463,6 @@ def minhas_caronas(request):
     if request.user.tipo_ativo == "motorista":
         caronas_ativas_do_usuario = Carona.objects.filter(
             motorista__user=request.user,
-            ativa=True,
         )
     else:
         voce = Caroneiro.objects.filter(
@@ -472,7 +508,14 @@ def minhas_caronas(request):
 
 @login_required
 def solicitacao_view(request, id):
-    pass
+
+    solicitacao = Solicitacao.objects.get(pk=id)
+
+    return render(
+        request,
+        "ver_solicitacao.html",
+        {"solicitacao": solicitacao},
+    )
 
 
 @login_required
@@ -556,7 +599,6 @@ def find_carona(request):
     )
 
     if latitude and longitude:
-        print("tem dados")
         caronas_ordenadas = []
 
         for carona_obj in carona.all():
@@ -569,6 +611,7 @@ def find_carona(request):
 
         carona = [carona_obj for carona_obj, _ in caronas_ordenadas]
 
+    print(carona)
     return render(
         request,
         "find_carona.html",
@@ -579,6 +622,14 @@ def find_carona(request):
 @login_required
 @is_tipo("motorista")
 def find_caroneiro(request):
+
+    latitude, longitude = (None, None)
+
+    if request.method == "GET":
+        latitude = request.GET.get("la")
+        longitude = request.GET.get("lo")
+
+    print(latitude, longitude)
 
     caroneiros = list(
         Caroneiro.objects.filter(
@@ -595,10 +646,19 @@ def find_caroneiro(request):
         ).exists():
             caroneiros_disponiveis.append(caroneiro)
 
+    if latitude is not None and longitude is not None:
+        caroneiros_disponiveis.sort(
+            key=lambda c: get_menor_distancia_cep(latitude, longitude, c.endereco.cep)
+        )
+
     return render(
         request,
         "find_caroneiro.html",
-        {"caroneiros_disponiveis": caroneiros_disponiveis},
+        {
+            "caroneiros_disponiveis": caroneiros_disponiveis,
+            "latitude": latitude,
+            "longitude": longitude,
+        },
     )
 
 
@@ -636,11 +696,13 @@ def gerar_caminho_view(request, carona):
 
 @login_required
 def minha_conta_view(request):
-    print("minha conta view acessada")
-    print(request.user.tipo_ativo)
-    print(request.user)
 
     if request.user.tipo_ativo == "motorista":
+
+        if request.method == "POST":
+
+            dados = request.POST
+            print(dados)
 
         objeto = Motorista.objects.filter(
             user=request.user,
@@ -660,6 +722,12 @@ def minha_conta_view(request):
             }
         )
     else:
+
+        if request.method == "POST":
+
+            dados = request.POST
+            print(dados)
+
         objeto = Caroneiro.objects.filter(
             user=request.user,
         ).first()
@@ -787,36 +855,48 @@ def switch_account_view(request):
             )
 
 
-DeslocamentoFormSet = modelformset_factory(Deslocamento, form=DeslocamentoForm, extra=1)
-
-
 @is_tipo("motorista")
 @login_required
 def meus_deslocamentos_view(request):
+    motorista = Motorista.objects.get(user=request.user)
+    DeslocamentoFormSet = modelformset_factory(Deslocamento, form=DeslocamentoForm, extra=1)
+
     if request.method == "POST":
-        formset = DeslocamentoFormSet(request.POST)
-
+        formset = DeslocamentoFormSet(request.POST, queryset=motorista.deslocamentos.all())
         if formset.is_valid():
-            instances = formset.save(commit=False)
+            instances = formset.save()
+
             for instance in instances:
-                ponto_saida = instance.ponto_saida
-                ponto_destino = instance.ponto_destino
+                motorista.deslocamentos.add(
+                    instance,
+                )
 
-                if ponto_saida and ponto_destino:
-                    ponto_x_saida = ponto_saida.x
-                    ponto_y_saida = ponto_saida.y
-                    ponto_x_destino = ponto_destino.x
-                    ponto_y_destino = ponto_destino.y
+            motorista.save()
 
-                instance.save()
+            messages.success(request, "Deslocamentos salvos com sucesso!")
+            return redirect("home")
     else:
-        deslocamentos = Deslocamento.objects.filter(motorista__user_id=request.user.id)
-        formset = DeslocamentoFormSet(queryset=deslocamentos)
+        formset = DeslocamentoFormSet(queryset=motorista.deslocamentos.all())
+
+    return render(request, "meus_deslocamentos.html", {"formset": formset})
+
+
+def solicitacao_list(request):
+
+    solicitacoes = solicitacoes = (
+        Solicitacao.objects.filter(
+            models.Q(enviado_por=request.user) | models.Q(enviado_para=request.user),
+            respondida=False,
+            visualizada=False,
+        )
+        .distinct()
+        .order_by("enviado_em")
+    )
 
     return render(
         request,
-        "meus_deslocamentos.html",
-        {"formset": formset},
+        "solicitacao_list.html",
+        {"solicitacoes": solicitacoes},
     )
 
 def landing_view(request):

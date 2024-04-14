@@ -1,11 +1,18 @@
 from crispy_forms.bootstrap import PrependedText
 from django import forms
 from django.db.models import TextChoices
-from django.forms import formset_factory
+from django.forms import inlineformset_factory
+from django.forms.widgets import DateTimeInput
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout
 
-from core.models import Deslocamento
+from core.models import Deslocamento, Endereco, Motorista
+
+
+class EnderecoForm(forms.ModelForm):
+    class Meta:
+        model = Endereco
+        fields = "__all__"
 
 
 class CadastroForm(forms.Form):
@@ -57,6 +64,16 @@ class CadastroForm(forms.Form):
         widget=forms.Select(),
     )
 
+    endereco = EnderecoForm()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        senha = cleaned_data.get("senha")
+        senha_confirmacao = cleaned_data.get("senha_confirmacao")
+
+        if senha and senha_confirmacao and senha != senha_confirmacao:
+            raise forms.ValidationError("As senhas não coincidem.")
+
 
 class CaroneiroForm(forms.Form):
 
@@ -73,9 +90,25 @@ class DiasSemana(TextChoices):
 
 
 class DeslocamentoForm(forms.ModelForm):
+    horario_saida_ponto_saida = forms.TimeField(
+        label="Horário de Saída no Ponto de Saída",
+        widget=forms.TimeInput(attrs={"type": "time"}),
+    )
+
     class Meta:
         model = Deslocamento
-        fields = ("dia_semana", "horario_saida_ponto_saida", "ponto_saida", "ponto_destino")
+        fields = (
+            "dia_semana",
+            "horario_saida_ponto_saida",
+            "ponto_saida_endereco",
+            "ponto_destino_endereco",
+        )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["horario_saida_ponto_saida"].widget.attrs.update(
+            {"class": "form-control"}
+        )
 
 
 class MotoristaForm(forms.Form):
@@ -155,11 +188,22 @@ class EditMotoristaForm(forms.Form):
 
     automovel = forms.CharField()
     carona_paga = forms.BooleanField()
-#    deslocamentos = DeslocamentoFormSet()
 
 
 class MensagemForm(forms.Form):
 
     conteudo = forms.CharField(
         widget=forms.Textarea(), label="Digite sua mensagem aqui"
+    )
+
+
+class CaronaForm(forms.Form):
+
+    tipo = forms.ChoiceField(
+        choices=[
+            ("", "Tipo de Automóvel"),
+            ("carro", "Carro"),
+            ("moto", "Moto"),
+        ],
+        widget=forms.Select(),
     )

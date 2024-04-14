@@ -1,0 +1,35 @@
+{% extends 'header.html' %}
+{% load static %}
+
+{% block content %}
+
+    <style>
+        .limpador-href {
+            text-decoration: none;
+            color: #0000EE;
+        }
+
+        .limpador-href:hover {
+            text-decoration: none;
+            color: #FF914D;
+        }
+    </style>
+    <h2>Suas Solicitacoes</h2>
+    <ol class="list-group">
+        {% for solicitacao in solicitacoes %}
+                <li class="list-group-item d-flex justify-content-between align-items-center" style="margin-bottom: 5px">
+                    <div class="d-flex align-items-center">
+                        <div class="ms-3">
+                            <p class="fw-bold mb-0">Enviado por: {{ solicitacao.enviado_por.first_name }}</p>
+                            <p class="fw-bold mb-0">Enviado para: {{ solicitacao.enviado_para.first_name }}</p>
+                            <p class="fw-light mb-0">Conteudo: {{ solicitacao.mensagem }}</p>
+                        </div>
+                    </div>
+                </li>
+        {% empty %}
+            <li class="list-group-item d-flix justify=content-between align-items-center">
+                Você não possui nenhuma solicitação :(
+            </li>
+        {% endfor %}
+    </ol>
+{% endblock %}

@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 import crispy_forms
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 INSTALLED_APPS = [

@@ -85,6 +85,7 @@ class DiasSemana(TextChoices):
     quinta = ("quinta", "Quinta")
     sexta = ("sexta", "Sexta")
 
+
 class Deslocamento(models.Model):
 
     dia_semana = models.CharField(
@@ -115,7 +116,6 @@ class Deslocamento(models.Model):
         max_length=250,
     )
 
-
 class Temporario(models.Model):
 
     nome = models.CharField(max_length=200)
@@ -123,6 +123,52 @@ class Temporario(models.Model):
     comprovante = models.FileField(upload_to=get_upload_path)
     curso = models.CharField(max_length=100)
     from_username = models.CharField(max_length=100)
+
+
+class EstadoChoices(TextChoices):
+    ACRE = ("AC", "Acre")
+    ALAGOAS = ("AL", "Alagoas")
+    AMAPA = ("AP", "Amapá")
+    AMAZONAS = ("AM", "Amazonas")
+    BAHIA = ("BA", "Bahia")
+    CEARA = ("CE", "Ceará")
+    DISTRITO_FEDERAL = ("DF", "Distrito Federal")
+    ESPIRITO_SANTO = ("ES", "Espírito Santo")
+    GOIAS = ("GO", "Goiás")
+    MARANHAO = ("MA", "Maranhão")
+    MATO_GROSSO = ("MT", "Mato Grosso")
+    MATO_GROSSO_DO_SUL = ("MS", "Mato Grosso do Sul")
+    MINAS_GERAIS = ("MG", "Minas Gerais")
+    PARA = ("PA", "Pará")
+    PARAIBA = ("PB", "Paraíba")
+    PARANA = ("PR", "Paraná")
+    PERNAMBUCO = ("PE", "Pernambuco")
+    PIAUI = ("PI", "Piauí")
+    RIO_DE_JANEIRO = ("RJ", "Rio de Janeiro")
+    RIO_GRANDE_DO_NORTE = ("RN", "Rio Grande do Norte")
+    RIO_GRANDE_DO_SUL = ("RS", "Rio Grande do Sul")
+    RONDONIA = ("RO", "Rondônia")
+    RORAIMA = ("RR", "Roraima")
+    SANTA_CATARINA = ("SC", "Santa Catarina")
+    SAO_PAULO = ("SP", "São Paulo")
+    SERGIPE = ("SE", "Sergipe")
+    TOCANTINS = ("TO", "Tocantins")
+
+class Cidade(models.Model):
+
+    pais = models.CharField(max_length=30)
+    estado = models.CharField(choices=EstadoChoices.choices, max_length=30)
+    cidade = models.CharField(max_length=100)
+
+class Endereco(models.Model):
+
+    cidade = models.CharField(max_length=100)
+    estado = models.CharField(choices=EstadoChoices.choices, max_length=30)
+    logradouro = models.CharField(max_length=100)
+    bairro = models.CharField(max_length=100)
+    numero = models.IntegerField()
+    complemento = models.CharField(max_length=100)
+    cep = models.CharField(max_length=30)
 
 
 class Motorista(models.Model):
@@ -148,6 +194,12 @@ class Motorista(models.Model):
         Deslocamento,
     )
     matricula_valida = models.BooleanField(default=True)
+    endereco = models.ForeignKey(
+        Endereco,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -182,6 +234,9 @@ class Caroneiro(models.Model):
     comprovante = models.FileField(upload_to=get_upload_path)
     curso = models.CharField(max_length=100)
     matricula_valida = models.BooleanField(default=True)
+    endereco = models.ForeignKey(
+        Endereco, on_delete=models.CASCADE, null=True, blank=True
+    )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -240,18 +295,28 @@ class Carona(models.Model):
         blank=True,
         null=True,
     )
-    ativa = models.BooleanField(default=True)
+    ativa = models.BooleanField(default=False)
 
     def generate_pix(self, caroneiro):
 
-        combinados = self.combinados.all().filter(
-            caroneiro=caroneiro,
-        ).count()
+        combinados = (
+            self.combinados.all()
+            .filter(
+                caroneiro=caroneiro,
+            )
+            .count()
+        )
 
-        custo_total = combinados * self.motorista.custo if combinados > 0 and self.motorista.custo > 0 else 0
+        custo_total = (
+            combinados * self.motorista.custo
+            if combinados > 0 and self.motorista.custo > 0
+            else 0
+        )
 
         print("Custo do motorista; ", self.motorista.custo)
-        print("Custo total R$", custo_total, " para a quantia de combinados: ", combinados)
+        print(
+            "Custo total R$", custo_total, " para a quantia de combinados: ", combinados
+        )
 
         return obter_qr_code_pix(
             self.motorista.nome, self.motorista.pagamento.chave, custo_total
