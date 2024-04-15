@@ -20,7 +20,8 @@
         </div>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form|crispy }}
+         {{ form_cadastro|crispy }}
+        {{ form_endereco|crispy }}
         <input type="submit" class="btn mt-3" value="Cadastrar">
     </form>
 </div>

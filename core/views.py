@@ -26,13 +26,13 @@ from core.models import (
     MetodoPagamento,
     Solicitacao,
     Extrato,
-    Deslocamento,
+    Deslocamento, Endereco,
 )
 from core.utils import (
     generate_pdf,
     get_user,
     get_menor_distancia_deslocamentos,
-    get_menor_distancia_cep,
+    get_menor_distancia_cep, get_address_by_cep,
 )
 from django.db import models
 from django.http import HttpResponse
@@ -105,6 +105,14 @@ def register_view(request):
             tipo = form.cleaned_data["tipo"]
             print(request.POST)
             endereco = form.cleaned_data["endereco"]
+            cep = form.cleaned_data["cep"]
+            estado = form.cleaned_data["estado"]
+            cidade = form.cleaned_data["cidade"]
+            logradouro = form.cleaned_data["logradouro"]
+            bairro = form.cleaned_data["bairro"]
+            numero = form.cleaned_data["numero"]
+            complemento = form.cleaned_data["complemento"]
+
             user = User.objects.filter(email=email, username=matricula)
 
             print(endereco)
@@ -118,6 +126,10 @@ def register_view(request):
                     email=email,
                     password=senha,
                     tipo_ativo=tipo,
+                )
+
+                Endereco.objects.create(
+                    endereco=endereco
                 )
 
                 Extrato.objects.create(

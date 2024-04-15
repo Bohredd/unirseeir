@@ -7,9 +7,23 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout
 
 from core.models import Deslocamento, Endereco, Motorista
+from core.utils import get_address_by_cep
 
 
 class EnderecoForm(forms.ModelForm):
+
+    cep = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'CEP'}))
+
+    cidade = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Cidade'}))#attrs={'placeholder': 'email', 'value': 'example@example.com'}))
+
+    logradouro = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Logradouro'}))
+
+    bairro = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Bairro'}))
+
+    numero = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Numero'}))
+
+    complemento = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Complemento'}))
+
     class Meta:
         model = Endereco
         fields = "__all__"
@@ -24,6 +38,7 @@ class CadastroForm(forms.Form):
     )
 
     email = forms.EmailField(
+        initial='example@example.com',
         label='',
         widget=forms.TextInput(attrs={'placeholder': 'email'}))
 

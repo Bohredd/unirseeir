@@ -3,7 +3,7 @@ import datetime
 from django.db import models
 from django.db.models import TextChoices
 from django.shortcuts import redirect, reverse
-from core.utils import verificar_matricula_valida, obter_qr_code_pix
+from core.utils import verificar_matricula_valida, obter_qr_code_pix, get_address_by_cep
 from django.contrib.auth.models import User
 from django.contrib import messages
 
@@ -161,14 +161,14 @@ class Cidade(models.Model):
     cidade = models.CharField(max_length=100)
 
 class Endereco(models.Model):
-
+    cep = models.CharField(max_length=30)
     cidade = models.CharField(max_length=100)
     estado = models.CharField(choices=EstadoChoices.choices, max_length=30)
     logradouro = models.CharField(max_length=100)
     bairro = models.CharField(max_length=100)
     numero = models.IntegerField()
     complemento = models.CharField(max_length=100)
-    cep = models.CharField(max_length=30)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
 class Motorista(models.Model):
@@ -395,7 +395,7 @@ User.add_to_class(
 
 User.add_to_class(
     "foto",
-    models.FileField(upload_to=get_upload_path),
+    models.FileField(upload_to=get_upload_path,null=True),
 )
 
 
@@ -576,3 +576,5 @@ class Extrato(models.Model):
         )
 
         return saidas_mes
+
+

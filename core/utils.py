@@ -2,6 +2,7 @@ import io
 import re
 import requests
 import PyPDF2
+import json
 from xhtml2pdf import pisa
 from django.http import HttpResponse
 from config.models import Config
@@ -147,3 +148,9 @@ def get_menor_distancia_cep(latitude, longitude, cep):
     distancia = geodesic((latitude, longitude), (cep_latitude, cep_longitude)).meters
     print("Distancia: ", distancia, " metros")
     return float(distancia) if distancia is not None else "Não foi possível obter dados geográficos."
+
+def get_address_by_cep(cep):
+    address = requests.get("https://viacep.com.br/ws/{}/json/".format(cep))
+    if address.status_code == 200:
+        data = json.loads(address.content)
+        return data
