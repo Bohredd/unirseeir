@@ -104,18 +104,18 @@ def register_view(request):
             curso = form.cleaned_data["curso"]
             tipo = form.cleaned_data["tipo"]
             print(request.POST)
-            endereco = form.cleaned_data["endereco"]
-            cep = form.cleaned_data["cep"]
-            estado = form.cleaned_data["estado"]
-            cidade = form.cleaned_data["cidade"]
-            logradouro = form.cleaned_data["logradouro"]
-            bairro = form.cleaned_data["bairro"]
-            numero = form.cleaned_data["numero"]
-            complemento = form.cleaned_data["complemento"]
+            endereco_form = form.endereco
+            #cep = form.cleaned_data["cep"]
+            #estado = form.cleaned_data["estado"]
+            #cidade = form.cleaned_data["cidade"]
+            #logradouro = form.cleaned_data["logradouro"]
+            #bairro = form.cleaned_data["bairro"]
+            #numero = form.cleaned_data["numero"]
+            #complemento = form.cleaned_data["complemento"]
 
             user = User.objects.filter(email=email, username=matricula)
 
-            print(endereco)
+            ##print(endereco)
 
             if not user.exists() and senha == senha_confirmacao:
 
@@ -128,9 +128,21 @@ def register_view(request):
                     tipo_ativo=tipo,
                 )
 
+                user.save()
+
                 Endereco.objects.create(
-                    endereco=endereco
+                    cep=endereco_form.cep,
+                    cidade=endereco_form.cidade,
+                    estado=endereco_form.estado,
+                    logradouro=endereco_form.logradouro,
+                    bairro=endereco_form.bairro,
+                    numero=endereco_form.numero,
+                    complemento = endereco_form.complemento,
+                    usuario=user,
+
                 )
+                endereco = endereco_form.save(commit=False)
+                endereco.save()
 
                 Extrato.objects.create(
                     usuario=user,

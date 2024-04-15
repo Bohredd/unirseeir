@@ -168,7 +168,6 @@ class Endereco(models.Model):
     bairro = models.CharField(max_length=100)
     numero = models.IntegerField()
     complemento = models.CharField(max_length=100)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
 class Motorista(models.Model):
