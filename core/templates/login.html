@@ -20,6 +20,7 @@
             Unir-se e IR
         </div>
         <form class="p-3 mt-3" method="post">
+            {% csrf_token %}
             {{ form|crispy }}
         <button type="submit" class="btn mt-3">Login</button>
             

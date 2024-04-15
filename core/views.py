@@ -137,7 +137,7 @@ def register_view(request):
                     logradouro=endereco_form.logradouro,
                     bairro=endereco_form.bairro,
                     numero=endereco_form.numero,
-                    complemento = endereco_form.complemento,
+                    complemento=endereco_form.complemento,
                     usuario=user,
 
                 )
@@ -295,7 +295,7 @@ def register_type_view(request, tipo):
                     comprovante=temp.comprovante,
                     curso=temp.curso,
                     user=request.user,
-                )
+                ).save()
 
                 temp.delete()
 
