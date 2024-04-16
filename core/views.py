@@ -728,8 +728,38 @@ def minha_conta_view(request):
 
         if request.method == "POST":
 
-            dados = request.POST
-            print(dados)
+            form = EditMotoristaForm(request.POST)
+            if form.is_valid():
+                print(form.cleaned_data)
+
+                motorista = Motorista.objects.filter(
+                    user=request.user,
+                )
+
+                if motorista.exists():
+
+                    motorista = motorista.first()
+
+                    nome = form.cleaned_data["nome"]
+                    email = form.cleaned_data["email"]
+                    senha = form.cleaned_data["senha"]
+                    matricula = form.cleaned_data["matricula"]
+                    automovel = form.cleaned_data["automovel"]
+                    carona_paga = form.cleaned_data["carona_paga"]
+
+                    request.user.first_name = nome
+                    request.user.last_name = nome.split(" ")[0]
+                    request.user.email = email
+                    request.user.set_password(senha)
+                    request.user.save()
+
+                    motorista.nome = nome
+                    motorista.matricula = matricula
+                    motorista.automovel = automovel
+                    motorista.carona_paga = carona_paga
+                    motorista.save()
+
+
 
         objeto = Motorista.objects.filter(
             user=request.user,
@@ -752,8 +782,32 @@ def minha_conta_view(request):
 
         if request.method == "POST":
 
-            dados = request.POST
-            print(dados)
+            form = EditCaroneiroForm(request.POST)
+
+            if form.is_valid():
+                print(form.cleaned_data)
+
+                nome = form.cleaned_data["nome"]
+                email = form.cleaned_data["email"]
+                senha = form.cleaned_data["senha"]
+                matricula = form.cleaned_data["matricula"]
+
+                caroneiro = Caroneiro.objects.filter(
+                    user=request.user,
+                )
+
+                if caroneiro.exists():
+                    caroneiro = caroneiro.first()
+
+                    request.user.first_name = nome
+                    request.user.last_name = nome.split(" ")[0]
+                    request.user.email = email
+                    request.user.set_password(senha)
+                    request.user.save()
+
+                    caroneiro.nome = nome
+                    caroneiro.matricula = matricula
+                    caroneiro.save()
 
         objeto = Caroneiro.objects.filter(
             user=request.user,
@@ -960,7 +1014,6 @@ def esqueci_minha_senha(request):
                 # Alterar a senha do usuário
                 user_obj.set_password(nova_senha)
                 user_obj.save()
-
 
                 assunto = "Redefinição de Senha"
                 mensagem = f"""

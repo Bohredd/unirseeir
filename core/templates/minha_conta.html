@@ -7,7 +7,9 @@
 
     
     <h2> Edite suas informações da conta</h2>
-    {% csrf_token %}
-    {{ form|crispy }}
-    <button type="submit" class="btn btn-primary"> Salvar alterações </button>
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-primary"> Salvar alterações </button>
+    </form>
 {% endblock %}
