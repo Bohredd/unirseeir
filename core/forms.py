@@ -6,7 +6,7 @@ from django.forms.widgets import DateTimeInput
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout
 
-from core.models import Deslocamento, Endereco, Motorista
+from core.models import Deslocamento, Endereco, Motorista, Cursos
 from core.utils import get_address_by_cep
 
 
@@ -20,7 +20,7 @@ class EnderecoForm(forms.ModelForm):
 
     class Meta:
         model = Endereco
-        fields = "__all__"
+        fields = ["cep", "estado", "cidade", "logradouro", "bairro", "numero", "complemento"]
 
     class Media:
         js = ('endereco_form.js',)
@@ -53,9 +53,10 @@ class CadastroForm(forms.Form):
         widget=forms.TextInput(attrs={'placeholder': 'Digite sua matricula'})
     )
 
-    curso = forms.CharField(
+    curso = forms.ChoiceField(
+        choices=Cursos.choices,
         label='',
-        widget=forms.TextInput(attrs={'placeholder': 'Digite o nome do seu curso'})
+        widget=forms.Select(),
     )
 
 

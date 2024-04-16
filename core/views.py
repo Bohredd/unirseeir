@@ -94,7 +94,6 @@ def login_view(request):
 
     return render(request, "login.html", {"form": form})
 
-
 def register_view(request):
 
     if request.method == "POST":
@@ -107,15 +106,18 @@ def register_view(request):
             matricula = form.cleaned_data["matricula"]
             curso = form.cleaned_data["curso"]
             tipo = form.cleaned_data["tipo"]
+
             print(request.POST)
-            endereco_form = form.endereco
-            # cep = form.cleaned_data["cep"]
-            # estado = form.cleaned_data["estado"]
-            # cidade = form.cleaned_data["cidade"]
-            # logradouro = form.cleaned_data["logradouro"]
-            # bairro = form.cleaned_data["bairro"]
-            # numero = form.cleaned_data["numero"]
-            # complemento = form.cleaned_data["complemento"]
+
+            cep = request.POST["cep"]
+            estado = request.POST["estado"]
+            cidade = request.POST["cidade"]
+            logradouro = request.POST["logradouro"]
+            bairro = request.POST["bairro"]
+            numero = request.POST["numero"]
+            complemento = request.POST["complemento"]
+
+            print(cep, estado, cidade, logradouro, bairro, numero, complemento)
 
             user = User.objects.filter(email=email, username=matricula)
 
@@ -135,17 +137,15 @@ def register_view(request):
                 user.save()
 
                 Endereco.objects.create(
-                    cep=endereco_form.cep,
-                    cidade=endereco_form.cidade,
-                    estado=endereco_form.estado,
-                    logradouro=endereco_form.logradouro,
-                    bairro=endereco_form.bairro,
-                    numero=endereco_form.numero,
-                    complemento=endereco_form.complemento,
-                    usuario=user,
+                    cep=cep,
+                    cidade=cidade,
+                    estado=estado,
+                    logradouro=logradouro,
+                    bairro=bairro,
+                    numero=numero,
+                    complemento=complemento,
+                    user=user,
                 )
-                endereco = endereco_form.save(commit=False)
-                endereco.save()
 
                 Extrato.objects.create(
                     usuario=user,

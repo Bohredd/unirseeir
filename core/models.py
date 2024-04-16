@@ -8,6 +8,124 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 
 
+class Cursos(TextChoices):
+
+    ESCOLHA = "Escolha um Curso", "Escolha um Curso"
+    ABI_ARTES_CENICAS = "ABI - Artes Cênicas", "ABI - Artes Cênicas"
+    ABI_CIENCIAS_BIOLOGICAS = (
+        "ABI - Ciências Biológicas",
+        "ABI - Ciências Biológicas",
+    )
+    ADMINISTRACAO = "Administração", "Administração"
+    AGRONEGOCIO = "Agronegócio", "Agronegócio"
+    AGRONOMIA = "Agronomia", "Agronomia"
+    ALIMENTOS = "Alimentos", "Alimentos"
+    ARQUITETURA_E_URBANISMO = "Arquitetura e Urbanismo", "Arquitetura e Urbanismo"
+    ARQUIVOLOGIA = "Arquivologia", "Arquivologia"
+    ARTES_CENICAS_DIRECAO_TEATRAL = (
+        "Artes Cênicas - Direção Teatral",
+        "Artes Cênicas - Direção Teatral",
+    )
+    ARTES_CENICAS_INTERPRETACAO_TEATRAL = (
+        "Artes Cênicas - Interpretação Teatral",
+        "Artes Cênicas - Interpretação Teatral",
+    )
+    ARTES_VISUAIS = "Artes Visuais", "Artes Visuais"
+    CIENCIA_DA_COMPUTACAO = "Ciência da Computação", "Ciência da Computação"
+    CIENCIAS_BIOLOGICAS = "Ciências Biológicas", "Ciências Biológicas"
+    CIENCIAS_CONTABEIS = "Ciências Contábeis", "Ciências Contábeis"
+    CIENCIAS_ECONOMICAS = "Ciências Econômicas", "Ciências Econômicas"
+    CIENCIAS_SOCIAIS = "Ciências Sociais", "Ciências Sociais"
+    COMUNICACAO_SOCIAL_PRODUCAO_EDITORIAL = (
+        "Comunicação Social - Produção Editorial",
+        "Comunicação Social - Produção Editorial",
+    )
+    COMUNICACAO_SOCIAL_PUBLICIDADE_PROPAGANDA = (
+        "Comunicação Social - Publicidade e Propaganda",
+        "Comunicação Social - Publicidade e Propaganda",
+    )
+    COMUNICACAO_SOCIAL_RELACOES_PUBLICAS = (
+        "Comunicação Social - Relações Públicas",
+        "Comunicação Social - Relações Públicas",
+    )
+    DANCA_BACHARELADO = "Dança - Bacharelado", "Dança - Bacharelado"
+    DANCA_LICENCIATURA = "Dança - Licenciatura", "Dança - Licenciatura"
+    DESENHO_INDUSTRIAL = "Desenho Industrial", "Desenho Industrial"
+    DIREITO = "Direito", "Direito"
+    EDUCACAO_ESPECIAL = "Educação Especial", "Educação Especial"
+    EDUCACAO_FISICA = "Educação Física", "Educação Física"
+    ELETRONICA_INDUSTRIAL = "Eletrônica Industrial", "Eletrônica Industrial"
+    ENFERMAGEM = "Enfermagem", "Enfermagem"
+    ENGENHARIA_ACUSTICA = "Engenharia Acústica", "Engenharia Acústica"
+    ENGENHARIA_AEROESPACIAL = "Engenharia Aeroespacial", "Engenharia Aeroespacial"
+    ENGENHARIA_AMBIENTAL_SANITARIA = (
+        "Engenharia Ambiental e Sanitária",
+        "Engenharia Ambiental e Sanitária",
+    )
+    ENGENHARIA_CIVIL = "Engenharia Civil", "Engenharia Civil"
+    ENGENHARIA_ELETRICA = "Engenharia Elétrica", "Engenharia Elétrica"
+    ENGENHARIA_FLORESTAL = "Engenharia Florestal", "Engenharia Florestal"
+    ENGENHARIA_MECANICA = "Engenharia Mecânica", "Engenharia Mecânica"
+    ENGENHARIA_QUIMICA = "Engenharia Química", "Engenharia Química"
+    ENGENHARIA_COMPUTACAO = "Engenharia da Computação", "Engenharia da Computação"
+    ENGENHARIA_CONTROLE_AUTOMACAO = (
+        "Engenharia de Controle e Automação",
+        "Engenharia de Controle e Automação",
+    )
+    ENGENHARIA_PRODUCAO = "Engenharia de Produção", "Engenharia de Produção"
+    ENGENHARIA_TELECOMUNICACOES = (
+        "Engenharia de Telecomunicações",
+        "Engenharia de Telecomunicações",
+    )
+    ESTATISTICA = "Estatística", "Estatística"
+    FABRICACAO_MECANICA = "Fabricação Mecânica", "Fabricação Mecânica"
+    FARMACIA = "Farmácia", "Farmácia"
+    FILOSOFIA = "Filosofia", "Filosofia"
+    FISIOTERAPIA = "Fisioterapia", "Fisioterapia"
+    FONOAUDIOLOGIA = "Fonoaudiologia", "Fonoaudiologia"
+    FISICA = "Física", "Física"
+    GEOGRAFIA = "Geografia", "Geografia"
+    GEOPROCESSAMENTO = "Geoprocessamento", "Geoprocessamento"
+    GESTAO_AMBIENTAL = "Gestão Ambiental", "Gestão Ambiental"
+    GESTAO_COOPERATIVAS = "Gestão de Cooperativas", "Gestão de Cooperativas"
+    GESTAO_TURISMO = "Gestão de Turismo", "Gestão de Turismo"
+    HISTORIA = "História", "História"
+    JORNALISMO = "Jornalismo", "Jornalismo"
+    LETRAS_ESPANHOL = "Letras - Espanhol", "Letras - Espanhol"
+    LETRAS_INGLES = "Letras - Inglês", "Letras - Inglês"
+    LETRAS_LINGUA_PORTUGUESA = (
+        "Letras - Língua Portuguesa",
+        "Letras - Língua Portuguesa",
+    )
+    LETRAS_PORTUGUES = "Letras - Português", "Letras - Português"
+    MATEMATICA = "Matemática", "Matemática"
+    MEDICINA = "Medicina", "Medicina"
+    MEDICINA_VETERINARIA = "Medicina Veterinária", "Medicina Veterinária"
+    METEOROLOGIA = "Meteorologia", "Meteorologia"
+    MUSICA = "Música", "Música"
+    MUSICA_TECNOLOGIA = "Música e Tecnologia", "Música e Tecnologia"
+    NUTRICAO = "Nutrição", "Nutrição"
+    NAO_CONSTA = "Não Consta", "Não Consta"
+    ODONTOLOGIA = "Odontologia", "Odontologia"
+    PEDAGOGIA = "Pedagogia", "Pedagogia"
+    PROCESSOS_QUIMICOS = "Processos Químicos", "Processos Químicos"
+    PROGRAMA_ESPECIAL_GRADUACAO_FORMACAO_PROFESSORES_EDUCACAO_PROFISSIONAL = (
+        "Programa Especial de Graduação de Formação de Professores para A Educação Profissional",
+        "Programa Especial de Graduação de Formação de Professores para A Educação Profissional",
+    )
+    PSICOLOGIA = "Psicologia", "Psicologia"
+    QUIMICA = "Química", "Química"
+    QUIMICA_INDUSTRIAL = "Química Industrial", "Química Industrial"
+    REDES_COMPUTADORES = "Redes de Computadores", "Redes de Computadores"
+    RELACOES_INTERNACIONAIS = "Relações Internacionais", "Relações Internacionais"
+    SERVICO_SOCIAL = "Serviço Social", "Serviço Social"
+    SISTEMAS_INFORMACAO = "Sistemas de Informação", "Sistemas de Informação"
+    SISTEMAS_INTERNET = "Sistemas para Internet", "Sistemas para Internet"
+    TEATRO = "Teatro", "Teatro"
+    TERAPIA_OCUPACIONAL = "Terapia Ocupacional", "Terapia Ocupacional"
+    ZOOTECNIA = "Zootecnia", "Zootecnia"
+
+
 def get_upload_path(instance, filename):
     if isinstance(instance, Caroneiro) or isinstance(instance, Motorista):
         return f"files/carona/{instance.user.username}/comprovantes/{filename}"
@@ -116,12 +234,17 @@ class Deslocamento(models.Model):
         max_length=250,
     )
 
+    cep = models.CharField(
+        max_length=30,
+    )
+
+
 class Temporario(models.Model):
 
     nome = models.CharField(max_length=200)
     matricula = models.CharField(max_length=20)
     comprovante = models.FileField(upload_to=get_upload_path)
-    curso = models.CharField(max_length=100)
+    curso = models.CharField(max_length=200, choices=Cursos.choices)
     from_username = models.CharField(max_length=100)
 
 
@@ -154,11 +277,13 @@ class EstadoChoices(TextChoices):
     SERGIPE = ("SE", "Sergipe")
     TOCANTINS = ("TO", "Tocantins")
 
+
 class Cidade(models.Model):
 
     pais = models.CharField(max_length=30)
     estado = models.CharField(choices=EstadoChoices.choices, max_length=30)
     cidade = models.CharField(max_length=100)
+
 
 class Endereco(models.Model):
     cep = models.CharField(max_length=30)
@@ -168,6 +293,10 @@ class Endereco(models.Model):
     bairro = models.CharField(max_length=100)
     numero = models.IntegerField()
     complemento = models.CharField(max_length=100)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+    )
 
 
 class Motorista(models.Model):
@@ -175,7 +304,7 @@ class Motorista(models.Model):
     matricula = models.CharField(max_length=20, unique=True)
     comprovante = models.FileField(upload_to=get_upload_path)
 
-    curso = models.CharField(max_length=100)
+    curso = models.CharField(max_length=200, choices=Cursos.choices)
 
     automovel = models.CharField(
         max_length=200, verbose_name="Qual o automóvel dirigido:"
@@ -231,7 +360,7 @@ class Caroneiro(models.Model):
     nome = models.CharField(max_length=200)
     matricula = models.CharField(max_length=20, unique=True)
     comprovante = models.FileField(upload_to=get_upload_path)
-    curso = models.CharField(max_length=100)
+    curso = models.CharField(max_length=200, choices=Cursos.choices)
     matricula_valida = models.BooleanField(default=True)
     endereco = models.ForeignKey(
         Endereco, on_delete=models.CASCADE, null=True, blank=True
@@ -394,7 +523,7 @@ User.add_to_class(
 
 User.add_to_class(
     "foto",
-    models.FileField(upload_to=get_upload_path,null=True),
+    models.FileField(upload_to=get_upload_path, null=True),
 )
 
 
@@ -575,5 +704,3 @@ class Extrato(models.Model):
         )
 
         return saidas_mes
-
-
