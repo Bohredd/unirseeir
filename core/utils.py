@@ -10,6 +10,8 @@ from core.contrato import get_template_contrato
 from django.contrib.auth.models import User
 from geopy.distance import geodesic
 from geopy.geocoders import Nominatim
+import random
+import string
 
 def generate_pdf(carona, caroneiro, tipo):
 
@@ -85,15 +87,17 @@ def obter_qr_code_pix(
 
     return qrcode
 
+
 def get_user(cleaned_data):
 
-    matricula = cleaned_data['matricula']
-    senha = cleaned_data['senha']
-    tipo = cleaned_data['tipo']
+    matricula = cleaned_data["matricula"]
+    senha = cleaned_data["senha"]
+    tipo = cleaned_data["tipo"]
 
     return User.objects.filter(
         username=matricula,
     ).first()
+
 
 def get_menor_distancia_deslocamentos(latitude, longitude, carona):
     print(latitude, longitude, carona)
@@ -131,7 +135,12 @@ def get_menor_distancia_deslocamentos(latitude, longitude, carona):
                 menor_distancia = geodesic(coord1, coord2).meters
 
     print("Menor distancia: ", menor_distancia)
-    return f"{menor_distancia:.1f}" if menor_distancia is not None else "Não foi possível obter dados geográficos."
+    return (
+        f"{menor_distancia:.1f}"
+        if menor_distancia is not None
+        else "Não foi possível obter dados geográficos."
+    )
+
 
 def get_lat_long_from_cep(cep):
     geolocator = Nominatim(user_agent="myGeocoder")
@@ -140,6 +149,7 @@ def get_lat_long_from_cep(cep):
         return location.latitude, location.longitude
     return None, None
 
+
 def get_menor_distancia_cep(latitude, longitude, cep):
     cep_latitude, cep_longitude = get_lat_long_from_cep(cep)
     if cep_latitude is None or cep_longitude is None:
@@ -147,7 +157,12 @@ def get_menor_distancia_cep(latitude, longitude, cep):
 
     distancia = geodesic((latitude, longitude), (cep_latitude, cep_longitude)).meters
     print("Distancia: ", distancia, " metros")
-    return float(distancia) if distancia is not None else "Não foi possível obter dados geográficos."
+    return (
+        float(distancia)
+        if distancia is not None
+        else "Não foi possível obter dados geográficos."
+    )
+
 
 def get_address_by_cep(cep):
     address = requests.get("https://viacep.com.br/ws/{}/json/".format(cep))
@@ -157,10 +172,7 @@ def get_address_by_cep(cep):
 
     return None
 
-import random
-import string
-
 def gerar_senha(tamanho=16):
     caracteres = string.ascii_letters + string.digits + string.punctuation
-    senha = ''.join(random.choice(caracteres) for _ in range(tamanho))
+    senha = "".join(random.choice(caracteres) for _ in range(tamanho))
     return senha

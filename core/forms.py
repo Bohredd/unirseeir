@@ -1,74 +1,101 @@
 from crispy_forms.bootstrap import PrependedText
 from django import forms
 from django.db.models import TextChoices
-from django.forms import inlineformset_factory
-from django.forms.widgets import DateTimeInput
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout
 
-from core.models import Deslocamento, Endereco, Motorista, Cursos
-from core.utils import get_address_by_cep
+from core.models import Deslocamento, Endereco, Cursos
 
 
 class EnderecoForm(forms.ModelForm):
-    cep = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'CEP', 'id': 'id_cep'}))
-    cidade = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Cidade', 'id': 'id_cidade'}))
-    logradouro = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Logradouro', 'id': 'id_logradouro'}))
-    bairro = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Bairro', 'id': 'id_bairro'}))
-    numero = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Numero', 'id': 'id_numero'}))
-    complemento = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Complemento', 'id': 'id_complemento'}))
+    cep = forms.CharField(
+        label="", widget=forms.TextInput(attrs={"placeholder": "CEP", "id": "id_cep"})
+    )
+    cidade = forms.CharField(
+        label="",
+        widget=forms.TextInput(attrs={"placeholder": "Cidade", "id": "id_cidade"}),
+    )
+    logradouro = forms.CharField(
+        label="",
+        widget=forms.TextInput(
+            attrs={"placeholder": "Logradouro", "id": "id_logradouro"}
+        ),
+    )
+    bairro = forms.CharField(
+        label="",
+        widget=forms.TextInput(attrs={"placeholder": "Bairro", "id": "id_bairro"}),
+    )
+    numero = forms.CharField(
+        label="",
+        widget=forms.TextInput(attrs={"placeholder": "Numero", "id": "id_numero"}),
+    )
+    complemento = forms.CharField(
+        label="",
+        widget=forms.TextInput(
+            attrs={"placeholder": "Complemento", "id": "id_complemento"}
+        ),
+    )
 
     class Meta:
         model = Endereco
-        fields = ["cep", "estado", "cidade", "logradouro", "bairro", "numero", "complemento"]
+        fields = [
+            "cep",
+            "estado",
+            "cidade",
+            "logradouro",
+            "bairro",
+            "numero",
+            "complemento",
+        ]
 
     class Media:
-        js = ('endereco_form.js',)
+        js = ("endereco_form.js",)
 
 
 class CadastroForm(forms.Form):
 
     nome = forms.CharField(
-        label='',
-        widget=forms.TextInput(attrs={'placeholder': 'Digite seu nome'}),
-        max_length=200
+        label="",
+        widget=forms.TextInput(attrs={"placeholder": "Digite seu nome"}),
+        max_length=200,
     )
 
     email = forms.EmailField(
-        initial='seu@email.aqui',
-        label='',
-        widget=forms.TextInput(attrs={'placeholder': 'email'}))
+        initial="seu@email.aqui",
+        label="",
+        widget=forms.TextInput(attrs={"placeholder": "email"}),
+    )
 
     senha = forms.CharField(
-        label='',
-        widget=forms.PasswordInput(
-            attrs={'placeholder': 'Digite sua senha'}),
+        label="",
+        widget=forms.PasswordInput(attrs={"placeholder": "Digite sua senha"}),
     )
     senha_confirmacao = forms.CharField(
-        label='',
-        widget=forms.PasswordInput(attrs={'placeholder': 'Digite sua senha'}),)
+        label="",
+        widget=forms.PasswordInput(attrs={"placeholder": "Digite sua senha"}),
+    )
 
     matricula = forms.CharField(
-        label='',
-        widget=forms.TextInput(attrs={'placeholder': 'Digite sua matricula'})
+        label="", widget=forms.TextInput(attrs={"placeholder": "Digite sua matricula"})
     )
 
     curso = forms.ChoiceField(
         choices=Cursos.choices,
-        label='',
+        label="",
         widget=forms.Select(),
     )
 
-
     comprovante = forms.FileField(
-        label='Comprovante',
-        widget=forms.FileInput(attrs={'placeholder': 'Selecione seu comprovante de Matrícula'}),
+        label="Comprovante",
+        widget=forms.FileInput(
+            attrs={"placeholder": "Selecione seu comprovante de Matrícula"}
+        ),
         allow_empty_file=False,
         required=False,
     )
 
     tipo = forms.ChoiceField(
-        label='',
+        label="",
         choices=[
             ("", "Escolha o tipo de Cadastro"),
             ("motorista", "Motorista"),
@@ -134,13 +161,14 @@ class MotoristaForm(forms.Form):
 class LoginForm(forms.Form):
 
     matricula = forms.CharField(
-        label='',
-        widget=forms.TextInput(attrs={'placeholder': 'Matricula'})
+        label="", widget=forms.TextInput(attrs={"placeholder": "Matricula"})
     )
-    senha = forms.CharField(label='',widget=forms.PasswordInput(attrs={'placeholder': 'Senha'}))
+    senha = forms.CharField(
+        label="", widget=forms.PasswordInput(attrs={"placeholder": "Senha"})
+    )
 
     tipo = forms.ChoiceField(
-        label='',
+        label="",
         choices=[
             ("", "Tipo de Conta"),
             ("motorista", "Motorista"),
@@ -155,7 +183,11 @@ class LoginForm(forms.Form):
         self.helper.form_method = "post"
         self.helper.add_input(Submit("submit", "Login"))
         self.helper.layout = Layout(
-            PrependedText('matricula','<span class="far fa-user"></span>', placeholder="Matricula")
+            PrependedText(
+                "matricula",
+                '<span class="far fa-user"></span>',
+                placeholder="Matricula",
+            )
         )
 
 
@@ -220,6 +252,7 @@ class CaronaForm(forms.Form):
         ],
         widget=forms.Select(),
     )
+
 
 class EsqueciSenha(forms.Form):
 

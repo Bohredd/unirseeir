@@ -1,9 +1,8 @@
 import datetime
-
 from django.db import models
 from django.db.models import TextChoices
 from django.shortcuts import redirect, reverse
-from core.utils import verificar_matricula_valida, obter_qr_code_pix, get_address_by_cep
+from core.utils import obter_qr_code_pix
 from django.contrib.auth.models import User
 from django.contrib import messages
 

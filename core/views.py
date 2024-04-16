@@ -94,6 +94,7 @@ def login_view(request):
 
     return render(request, "login.html", {"form": form})
 
+
 def register_view(request):
 
     if request.method == "POST":
@@ -758,8 +759,6 @@ def minha_conta_view(request):
                     motorista.automovel = automovel
                     motorista.carona_paga = carona_paga
                     motorista.save()
-
-
 
         objeto = Motorista.objects.filter(
             user=request.user,

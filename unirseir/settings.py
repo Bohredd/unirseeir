@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     "core",
     "crispy_forms",
     "crispy_bootstrap5",
-    'bootstrap5',
+    "bootstrap5",
 ]
 
 MIDDLEWARE = [
@@ -102,9 +102,9 @@ WSGI_APPLICATION = "unirseir.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-   "default": {
-       "ENGINE": "django.db.backends.sqlite3",
-       "NAME": BASE_DIR / "db.sqlite3",
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
@@ -130,14 +130,14 @@ DATABASES = {
 
 ##PRODUCTION EXAMPLE
 ##DATABASES = {
-    ##'default': {
-        ##'ENGINE': 'django.db.backends.postgresql',
-        ##'NAME': 'postgres',
-       ## 'USER': 'masteruser',
-       ## 'PASSWORD': '12345678',
-       ## 'HOST': 'w3-django-project.cdxmgq9zqqlr.us-east-1.rds.amazonaws.com',
-       ## 'PORT': '5432'
-   ## }
+##'default': {
+##'ENGINE': 'django.db.backends.postgresql',
+##'NAME': 'postgres',
+## 'USER': 'masteruser',
+## 'PASSWORD': '12345678',
+## 'HOST': 'w3-django-project.cdxmgq9zqqlr.us-east-1.rds.amazonaws.com',
+## 'PORT': '5432'
+## }
 ##}
 
 
@@ -194,9 +194,9 @@ LOGIN_URL = "/acessar/"
 
 # settings.py
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'unirseeir@gmail.com'
-EMAIL_HOST_PASSWORD = config('EMAIL_UNIRSEEIR_PASSWORD')
+EMAIL_HOST_USER = "unirseeir@gmail.com"
+EMAIL_HOST_PASSWORD = config("EMAIL_UNIRSEEIR_PASSWORD")

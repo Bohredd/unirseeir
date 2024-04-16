@@ -27,7 +27,7 @@ from core.views import (
     criar_minha_carona,
     landing_view,
     solicitacao_list,
-esqueci_minha_senha,
+    esqueci_minha_senha,
 )
 
 urlpatterns = [
