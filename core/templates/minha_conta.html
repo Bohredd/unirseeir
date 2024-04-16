@@ -2,6 +2,10 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
+
+        <title>UNIr-se | Minha Conta </title>
+
+    
     <h2> Edite suas informações da conta</h2>
     {% csrf_token %}
     {{ form|crispy }}

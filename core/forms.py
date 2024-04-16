@@ -11,60 +11,57 @@ from core.utils import get_address_by_cep
 
 
 class EnderecoForm(forms.ModelForm):
-
-    cep = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'CEP'}))
-
-    cidade = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Cidade'}))#attrs={'placeholder': 'email', 'value': 'example@example.com'}))
-
-    logradouro = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Logradouro'}))
-
-    bairro = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Bairro'}))
-
-    numero = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Numero'}))
-
-    complemento = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Complemento'}))
+    cep = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'CEP', 'id': 'id_cep'}))
+    cidade = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Cidade', 'id': 'id_cidade'}))
+    logradouro = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Logradouro', 'id': 'id_logradouro'}))
+    bairro = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Bairro', 'id': 'id_bairro'}))
+    numero = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Numero', 'id': 'id_numero'}))
+    complemento = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Complemento', 'id': 'id_complemento'}))
 
     class Meta:
         model = Endereco
         fields = "__all__"
+
+    class Media:
+        js = ('endereco_form.js',)
 
 
 class CadastroForm(forms.Form):
 
     nome = forms.CharField(
         label='',
-        widget=forms.TextInput(attrs={'placeholder': 'nome'}),
+        widget=forms.TextInput(attrs={'placeholder': 'Digite seu nome'}),
         max_length=200
     )
 
     email = forms.EmailField(
-        initial='example@example.com',
+        initial='seu@email.aqui',
         label='',
         widget=forms.TextInput(attrs={'placeholder': 'email'}))
 
     senha = forms.CharField(
         label='',
         widget=forms.PasswordInput(
-            attrs={'placeholder': 'senha'}),
+            attrs={'placeholder': 'Digite sua senha'}),
     )
     senha_confirmacao = forms.CharField(
         label='',
-        widget=forms.PasswordInput(attrs={'placeholder': 'senha'}),)
+        widget=forms.PasswordInput(attrs={'placeholder': 'Digite sua senha'}),)
 
     matricula = forms.CharField(
         label='',
-        widget=forms.TextInput(attrs={'placeholder': 'matricula'})
+        widget=forms.TextInput(attrs={'placeholder': 'Digite sua matricula'})
     )
 
     curso = forms.CharField(
         label='',
-        widget=forms.TextInput(attrs={'placeholder': 'curso'})
+        widget=forms.TextInput(attrs={'placeholder': 'Digite o nome do seu curso'})
     )
 
 
     comprovante = forms.FileField(
         label='Comprovante',
-        widget=forms.FileInput(attrs={'placeholder': 'comprovante'}),
+        widget=forms.FileInput(attrs={'placeholder': 'Selecione seu comprovante de Matrícula'}),
         allow_empty_file=False,
         required=False,
     )

@@ -1,12 +1,15 @@
 /* Importing fonts from Google */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
 
-/* Reseting */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: 'Poppins', sans-serif;
+}
+
+form {
+    margin-top: 0;
 }
 
 body {
@@ -16,13 +19,13 @@ body {
     background-repeat: no-repeat; /* Prevent the background image from repeating */
      background-size: cover; /* Cover the entire element */
     width: 100%; /* Set the width to 100% to fill the screen horizontally */
-    height: 100vh; /* Set the height to 100% of the viewport height */
+    height: 100%; /* Set the height to 100% of the viewport height */
 }
 
 .wrapper {
     max-width: 350px;
     min-height: 500px;
-    margin: 180px auto;
+    margin: 0px auto;
     padding: 40px 30px 30px 30px;
 
 

@@ -154,3 +154,5 @@ def get_address_by_cep(cep):
     if address.status_code == 200:
         data = json.loads(address.content)
         return data
+
+    return None

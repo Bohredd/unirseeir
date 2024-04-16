@@ -4,28 +4,54 @@
 {% load static %}
 {% block content %}
     <!DOCTYPE html>
-     <head>
-    <title>Cadastro</title>
-    <meta charset="UTF-8">
+    <head>
+    <title>UNIr-se | Cadastre-se </title>
+        <meta charset="UTF-8">
 
-    <link rel="stylesheet" href="../static/css/login.css">
-</head>
- <h1>Realize o cadastro e selecione seu tipo de conta</h1>
-<div class="wrapper">
-  <div class="logo">
+        <link rel="stylesheet" href="../static/css/login.css">
+    </head>
+{#    <h1>Realize o cadastro e selecione seu tipo de conta</h1>#}
+    <div class="wrapper">
+        <div class="logo">
             <img src="{% static 'unirseeir.png' %}" alt="">
         </div>
         <div class="text-center mt-4 name">
             Unir-se e IR
         </div>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-         {{ form_cadastro|crispy }}
-        {{ form_endereco|crispy }}
-        <input type="submit" class="btn mt-3" value="Cadastrar">
-    </form>
-</div>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form_cadastro|crispy }}
+            {{ form_endereco|crispy }}
+            <input type="submit" class="btn mt-3" value="Cadastrar">
+        </form>
+    </div>
 
-  
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById('id_cep').addEventListener('input', function () {
+                var cep = this.value.replace(/\D/g, '');
+                if (cep.length === 8) {
+                    fetch('https://viacep.com.br/ws/' + cep + '/json/')
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById('id_cidade').value = data.localidade || '';
+                            document.getElementById('id_logradouro').value = data.logradouro || '';
+                            document.getElementById('id_bairro').value = data.bairro || '';
+
+                            var estadoSelect = document.getElementById('id_estado');
+                            var estadoOption = estadoSelect.querySelector(`option[value="${data.uf || ''}"]`);
+                            if (estadoOption) {
+                                estadoOption.selected = true;
+                            }
+
+                            document.getElementById('id_numero').focus();
+                        })
+                        .catch(error => console.error('Erro ao consultar o CEP:', error));
+                }
+            });
+        });
+    </script>
+
+
 {% endblock %}
 
