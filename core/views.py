@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
-from django.forms import modelformset_factory, inlineformset_factory
+from django.core.mail import send_mail
+from django.forms import modelformset_factory
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from config.models import Conversa, Mensagem, Conexao
@@ -17,6 +18,7 @@ from core.forms import (
     DeslocamentoForm,
     CaronaForm,
     EnderecoForm,
+    EsqueciSenha,
 )
 from core.models import (
     Carona,
@@ -26,13 +28,15 @@ from core.models import (
     MetodoPagamento,
     Solicitacao,
     Extrato,
-    Deslocamento, Endereco,
+    Deslocamento,
+    Endereco,
 )
 from core.utils import (
     generate_pdf,
     get_user,
     get_menor_distancia_deslocamentos,
-    get_menor_distancia_cep, get_address_by_cep,
+    get_menor_distancia_cep,
+    gerar_senha,
 )
 from django.db import models
 from django.http import HttpResponse
@@ -105,13 +109,13 @@ def register_view(request):
             tipo = form.cleaned_data["tipo"]
             print(request.POST)
             endereco_form = form.endereco
-            #cep = form.cleaned_data["cep"]
-            #estado = form.cleaned_data["estado"]
-            #cidade = form.cleaned_data["cidade"]
-            #logradouro = form.cleaned_data["logradouro"]
-            #bairro = form.cleaned_data["bairro"]
-            #numero = form.cleaned_data["numero"]
-            #complemento = form.cleaned_data["complemento"]
+            # cep = form.cleaned_data["cep"]
+            # estado = form.cleaned_data["estado"]
+            # cidade = form.cleaned_data["cidade"]
+            # logradouro = form.cleaned_data["logradouro"]
+            # bairro = form.cleaned_data["bairro"]
+            # numero = form.cleaned_data["numero"]
+            # complemento = form.cleaned_data["complemento"]
 
             user = User.objects.filter(email=email, username=matricula)
 
@@ -139,7 +143,6 @@ def register_view(request):
                     numero=endereco_form.numero,
                     complemento=endereco_form.complemento,
                     usuario=user,
-
                 )
                 endereco = endereco_form.save(commit=False)
                 endereco.save()
@@ -883,10 +886,14 @@ def switch_account_view(request):
 @login_required
 def meus_deslocamentos_view(request):
     motorista = Motorista.objects.get(user=request.user)
-    DeslocamentoFormSet = modelformset_factory(Deslocamento, form=DeslocamentoForm, extra=1)
+    DeslocamentoFormSet = modelformset_factory(
+        Deslocamento, form=DeslocamentoForm, extra=1
+    )
 
     if request.method == "POST":
-        formset = DeslocamentoFormSet(request.POST, queryset=motorista.deslocamentos.all())
+        formset = DeslocamentoFormSet(
+            request.POST, queryset=motorista.deslocamentos.all()
+        )
         if formset.is_valid():
             instances = formset.save()
 
@@ -923,5 +930,84 @@ def solicitacao_list(request):
         {"solicitacoes": solicitacoes},
     )
 
+
 def landing_view(request):
-    return render(request,"home2.html")
+    return render(request, "home2.html")
+
+
+def esqueci_minha_senha(request):
+
+    if request.method == "POST":
+
+        form = EsqueciSenha(request.POST)
+
+        if form.is_valid():
+            matricula = form.cleaned_data["matricula"]
+            email = form.cleaned_data["email"]
+
+            print(matricula, email)
+
+            user = User.objects.filter(
+                email=email,
+                username=matricula,
+            )
+
+            if user.exists():
+
+                nova_senha = gerar_senha()
+                user_obj = user.first()
+
+                # Alterar a senha do usuário
+                user_obj.set_password(nova_senha)
+                user_obj.save()
+
+
+                assunto = "Redefinição de Senha"
+                mensagem = f"""
+                Ei, {user_obj.first_name}!
+
+                Sua nova senha chegou!
+
+                Nova senha: {nova_senha}
+
+                Copie a senha acima e use-a para acessar sua conta.
+
+                Atenciosamente,
+                UNIr-se e Ir.
+                """
+                rementente = "unirseeir@gmail.com"
+                destinatario = [
+                    f"{user_obj.email}",
+                ]
+                send_mail(
+                    assunto,
+                    mensagem,
+                    rementente,
+                    destinatario,
+                )
+
+                messages.success(
+                    request,
+                    f"Senha alterada com sucesso! Verifique seu E-Mail!",
+                )
+
+                return redirect(
+                    "login",
+                )
+
+            else:
+                messages.error(
+                    request,
+                    "Não há nenhum usuário com essa Matrícula e/ou E-Mail!",
+                )
+
+                return redirect("esqueciMinhaSenha")
+
+    else:
+        form = EsqueciSenha()
+
+    return render(
+        request,
+        "esqueci_senha.html",
+        {"form": form},
+    )

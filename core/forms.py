@@ -219,3 +219,9 @@ class CaronaForm(forms.Form):
         ],
         widget=forms.Select(),
     )
+
+class EsqueciSenha(forms.Form):
+
+    matricula = forms.CharField(label="Matricula")
+
+    email = forms.EmailField()

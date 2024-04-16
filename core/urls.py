@@ -27,6 +27,7 @@ from core.views import (
     criar_minha_carona,
     landing_view,
     solicitacao_list,
+esqueci_minha_senha,
 )
 
 urlpatterns = [
@@ -71,4 +72,5 @@ urlpatterns = [
         name="verDeslocamentosMotorista",
     ),
     path("carona/criar/", criar_minha_carona, name="criarMinhaCarona"),
+    path("esqueci/", esqueci_minha_senha, name="esqueciMinhaSenha"),
 ]

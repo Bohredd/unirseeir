@@ -11,6 +11,18 @@
     <link rel="stylesheet" href="../static/css/login.css">
 
 </head>
+    
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} d-flex align-items-center" role="alert">
+                    <strong>{{ message }}!</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                            aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </ul>
+    {% endif %}
 
 <div class="wrapper">
         <div class="logo">
@@ -26,7 +38,7 @@
             
         </form>
         <div class="text-center fs-6">
-            <a href="#">Esqueceu a senha?</a>Ou<a href="{% url 'register' %}">Criar imediatamente</a>
+            <a href="{% url 'esqueciMinhaSenha' %}">Esqueceu a senha?</a>Ou<a href="{% url 'register' %}">Criar imediatamente</a>
         </div>
     </div>
 {% endblock %}
