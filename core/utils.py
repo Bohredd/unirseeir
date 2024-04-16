@@ -3,6 +3,7 @@ import re
 import requests
 import PyPDF2
 import json
+from django.contrib.auth.hashers import check_password
 from xhtml2pdf import pisa
 from django.http import HttpResponse
 from config.models import Config
@@ -12,6 +13,7 @@ from geopy.distance import geodesic
 from geopy.geocoders import Nominatim
 import random
 import string
+from django.contrib import messages
 
 def generate_pdf(carona, caroneiro, tipo):
 
@@ -97,6 +99,26 @@ def get_user(cleaned_data):
     return User.objects.filter(
         username=matricula,
     ).first()
+
+def get_message_login(cleaned_data):
+
+    matricula = cleaned_data["matricula"]
+    senha = cleaned_data["senha"]
+
+    if User.objects.filter(username=matricula).exists():
+
+        user = User.objects.get(username=matricula)
+
+        if check_password(senha, user.password):
+
+            return "Matrícula inválida, tente novamente"
+
+        else:
+            return "Senha inválida, tente novamente"
+    elif not User.objects.filter(username=matricula).exists():
+        return "Usuário inexistente, caso deseja, crie uma conta!"
+
+    return None
 
 
 def get_menor_distancia_deslocamentos(latitude, longitude, carona):

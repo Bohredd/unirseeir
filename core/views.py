@@ -38,6 +38,7 @@ from core.utils import (
     get_menor_distancia_deslocamentos,
     get_menor_distancia_cep,
     gerar_senha,
+    get_message_login,
 )
 from django.db import models
 from django.http import HttpResponse
@@ -76,6 +77,11 @@ def login_view(request):
         if form.is_valid():
             usuario = get_user(form.cleaned_data)
 
+            message = get_message_login(form.cleaned_data)
+            print(message)
+            if message is not None:
+                messages.error(request, message)
+
             if usuario is not None:
 
                 user = authenticate(
@@ -90,6 +96,7 @@ def login_view(request):
                     return redirect(
                         home_view,
                     )
+
     else:
         form = LoginForm()
 
@@ -339,8 +346,6 @@ def logout_view(request):
 
 @login_required
 def home_view(request):
-    print(request.user)
-
     if request.user.tipo_ativo == "motorista":
         caronas_ativas_do_usuario = Carona.objects.filter(
             motorista__user=request.user,
@@ -384,7 +389,6 @@ def banco_view(request):
 
         movimentacoes = extrato.movimentacao.all().order_by("-data_movimentacao")[:10]
 
-        print(movimentacoes)
         return render(
             request,
             "banco.html",
@@ -423,8 +427,6 @@ def criar_minha_carona(request):
         if form.is_valid():
             tipo = form.cleaned_data["tipo"]
 
-            print(tipo)
-
             carona = Carona.objects.create(
                 tipo=tipo,
                 motorista=Motorista.objects.get(user=request.user),
@@ -450,8 +452,6 @@ def criar_minha_carona(request):
 def ver_deslocamentos_motoristas(request, carona):
 
     carona = Carona.objects.get(id=carona)
-
-    print(carona)
 
     return render(
         request,
@@ -479,8 +479,6 @@ def carona_view(request, carona):
 def solicitacao_acao(request, situacao, solicitacao):
     # true = aceitar
     # false = recusar
-
-    print(situacao, solicitacao)
 
     solicitacao = Solicitacao.objects.get(id=solicitacao)
 
@@ -606,8 +604,6 @@ def conversa_view(request, id):
 
     mensagens = mensagens[:10]
 
-    print(mensagens)
-
     return render(
         request,
         "conversa_view.html",
@@ -630,8 +626,6 @@ def find_carona(request):
         latitude = request.GET.get("la")
         longitude = request.GET.get("lo")
 
-        print(latitude, longitude)
-
     carona = Carona.objects.filter(
         ativa=True,
         vagas__gt=0,
@@ -650,7 +644,6 @@ def find_carona(request):
 
         carona = [carona_obj for carona_obj, _ in caronas_ordenadas]
 
-    print(carona)
     return render(
         request,
         "find_carona.html",
@@ -667,8 +660,6 @@ def find_caroneiro(request):
     if request.method == "GET":
         latitude = request.GET.get("la")
         longitude = request.GET.get("lo")
-
-    print(latitude, longitude)
 
     caroneiros = list(
         Caroneiro.objects.filter(
@@ -708,8 +699,6 @@ def bate_papo_view_list(request):
         membros__in=[request.user],
     )
 
-    # print(conversa)
-
     return render(
         request,
         "conversa_list.html",
@@ -717,13 +706,11 @@ def bate_papo_view_list(request):
             "conversas": conversa,
         },
     )
-    # return HttpResponse(conversa)
-
 
 def gerar_caminho_view(request, carona):
 
     carona = Carona.objects.get(id=carona)
-    print(carona)
+
     return render(
         request,
         "generate_caminho.html",
@@ -742,7 +729,6 @@ def minha_conta_view(request):
 
             form = EditMotoristaForm(request.POST)
             if form.is_valid():
-                print(form.cleaned_data)
 
                 motorista = Motorista.objects.filter(
                     user=request.user,
@@ -777,8 +763,6 @@ def minha_conta_view(request):
             user=request.user,
         ).first()
 
-        print(objeto)
-
         form = EditMotoristaForm(
             initial={
                 "nome": objeto.nome,
@@ -797,13 +781,11 @@ def minha_conta_view(request):
             form = EditCaroneiroForm(request.POST)
 
             if form.is_valid():
-                print(form.cleaned_data)
 
                 nome = form.cleaned_data["nome"]
                 email = form.cleaned_data["email"]
                 senha = form.cleaned_data["senha"]
                 matricula = form.cleaned_data["matricula"]
-                print(request.FILES)
                 foto = request.FILES["foto"]
 
                 caroneiro = Caroneiro.objects.filter(
@@ -827,8 +809,6 @@ def minha_conta_view(request):
         objeto = Caroneiro.objects.filter(
             user=request.user,
         ).first()
-
-        print(objeto)
 
         form = EditCaroneiroForm(
             initial={
@@ -1013,8 +993,6 @@ def esqueci_minha_senha(request):
         if form.is_valid():
             matricula = form.cleaned_data["matricula"]
             email = form.cleaned_data["email"]
-
-            print(matricula, email)
 
             user = User.objects.filter(
                 email=email,
