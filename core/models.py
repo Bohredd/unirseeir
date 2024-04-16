@@ -128,6 +128,8 @@ class Cursos(TextChoices):
 def get_upload_path(instance, filename):
     if isinstance(instance, Caroneiro) or isinstance(instance, Motorista):
         return f"files/carona/{instance.user.username}/comprovantes/{filename}"
+    elif isinstance(instance, User):
+        return f"files/carona/{instance.username}/comprovantes/{filename}"
 
     return f"files/carona/{instance.matricula}/comprovantes/{filename}"
 

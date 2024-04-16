@@ -19,6 +19,7 @@ from core.forms import (
     CaronaForm,
     EnderecoForm,
     EsqueciSenha,
+    FotoPerfilForm,
 )
 from core.models import (
     Carona,
@@ -99,6 +100,8 @@ def register_view(request):
 
     if request.method == "POST":
         form = CadastroForm(request.POST)
+
+        print(request.FILES)
         if form.is_valid():
             nome = form.cleaned_data["nome"]
             email = form.cleaned_data["email"]
@@ -133,6 +136,7 @@ def register_view(request):
                     email=email,
                     password=senha,
                     tipo_ativo=tipo,
+                    foto=request.FILES["foto"],
                 )
 
                 user.save()
@@ -178,6 +182,7 @@ def register_view(request):
                     user = user.first()
 
                     user.tipo_ativo = tipo
+                    user.foto = request.FILES["foto"]
                     user.save()
 
                     Extrato.objects.create(
@@ -202,11 +207,16 @@ def register_view(request):
     else:
         form_cadastro = CadastroForm()
         form_endereco = EnderecoForm()
+        form_foto = FotoPerfilForm()
 
     return render(
         request,
         "cadastro.html",
-        {"form_cadastro": form_cadastro, "form_endereco": form_endereco},
+        {
+            "form_cadastro": form_cadastro,
+            "form_endereco": form_endereco,
+            "form_foto": form_foto,
+        },
     )
 
 
@@ -303,8 +313,9 @@ def register_type_view(request, tipo):
 
                 temp.delete()
 
-                return render(request, "cadastro_caroneiro.html")
-        else:
+                return redirect(
+                    "home",
+                )
             pass
     else:
         if tipo == "motorista":
@@ -747,11 +758,13 @@ def minha_conta_view(request):
                     matricula = form.cleaned_data["matricula"]
                     automovel = form.cleaned_data["automovel"]
                     carona_paga = form.cleaned_data["carona_paga"]
+                    foto = request.FILES["foto"]
 
                     request.user.first_name = nome
                     request.user.last_name = nome.split(" ")[0]
                     request.user.email = email
                     request.user.set_password(senha)
+                    request.user.foto = foto
                     request.user.save()
 
                     motorista.nome = nome
@@ -790,6 +803,8 @@ def minha_conta_view(request):
                 email = form.cleaned_data["email"]
                 senha = form.cleaned_data["senha"]
                 matricula = form.cleaned_data["matricula"]
+                print(request.FILES)
+                foto = request.FILES["foto"]
 
                 caroneiro = Caroneiro.objects.filter(
                     user=request.user,
@@ -802,6 +817,7 @@ def minha_conta_view(request):
                     request.user.last_name = nome.split(" ")[0]
                     request.user.email = email
                     request.user.set_password(senha)
+                    request.user.foto = foto
                     request.user.save()
 
                     caroneiro.nome = nome

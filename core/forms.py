@@ -220,6 +220,15 @@ class EditCaroneiroForm(forms.Form):
 
     matricula = forms.CharField()
 
+    foto = forms.FileField(
+        label="Foto de Perfil",
+        widget=forms.FileInput(
+            attrs={"placeholder": "Selecione a Foto para o seu Perfil"}
+        ),
+        allow_empty_file=False,
+        required=False,
+    )
+
 
 class EditMotoristaForm(forms.Form):
 
@@ -233,6 +242,16 @@ class EditMotoristaForm(forms.Form):
 
     automovel = forms.CharField()
     carona_paga = forms.BooleanField()
+
+    foto = forms.FileField(
+        label="Foto de Perfil",
+        widget=forms.FileInput(
+            attrs={"placeholder": "Selecione a Foto para o seu Perfil"}
+        ),
+        allow_empty_file=False,
+        required=False,
+    )
+
 
 
 class MensagemForm(forms.Form):
@@ -259,3 +278,15 @@ class EsqueciSenha(forms.Form):
     matricula = forms.CharField(label="Matricula")
 
     email = forms.EmailField()
+
+
+class FotoPerfilForm(forms.Form):
+
+    foto = forms.FileField(
+        label="Foto de Perfil",
+        widget=forms.FileInput(
+            attrs={"placeholder": "Selecione a Foto para o seu Perfil"}
+        ),
+        allow_empty_file=False,
+        required=False,
+    )
