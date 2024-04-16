@@ -1017,6 +1017,8 @@ def esqueci_minha_senha(request):
                 Nova senha: {nova_senha}
 
                 Copie a senha acima e use-a para acessar sua conta.
+                
+                Recomendamos expressivamente que você altere a senha para uma que você vá recordar.
 
                 Atenciosamente,
                 UNIr-se e Ir.
