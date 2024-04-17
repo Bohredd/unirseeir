@@ -4,7 +4,7 @@ from django.db.models import TextChoices
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout
 
-from core.models import Deslocamento, Endereco, Cursos
+from core.models import Deslocamento, Endereco, Cursos, Carona
 
 
 class EnderecoForm(forms.ModelForm):
@@ -253,6 +253,11 @@ class EditMotoristaForm(forms.Form):
     )
 
 
+class ValidarCaronaForms(forms.ModelForm):
+
+    class Meta:
+        model = Carona
+        fields = ['ativa']
 
 class MensagemForm(forms.Form):
 

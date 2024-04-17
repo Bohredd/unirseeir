@@ -20,6 +20,7 @@ from core.forms import (
     EnderecoForm,
     EsqueciSenha,
     FotoPerfilForm,
+    ValidarCaronaForms,
 )
 from core.models import (
     Carona,
@@ -78,9 +79,6 @@ def login_view(request):
             usuario = get_user(form.cleaned_data)
 
             message = get_message_login(form.cleaned_data)
-            print(message)
-            if message is not None:
-                messages.error(request, message)
 
             if usuario is not None:
 
@@ -96,7 +94,14 @@ def login_view(request):
                     return redirect(
                         home_view,
                     )
-
+                else:
+                    print(message)
+                    if message is not None:
+                        messages.error(request, message)
+            else:
+                print(message)
+                if message is not None:
+                    messages.error(request, message)
     else:
         form = LoginForm()
 
@@ -158,6 +163,8 @@ def register_view(request):
                     complemento=complemento,
                     user=user,
                 )
+
+                print(Endereco.objects.last())
 
                 Extrato.objects.create(
                     usuario=user,
@@ -277,6 +284,10 @@ def register_type_view(request, tipo):
 
                     usuario = User.objects.get(username=matricula)
 
+                    endereco = Endereco.objects.filter(
+                        user=usuario,
+                    ).first()
+
                     Motorista.objects.create(
                         nome=temp.nome,
                         matricula=temp.matricula,
@@ -285,6 +296,7 @@ def register_type_view(request, tipo):
                         user=usuario,
                         carona_paga=carona_paga,
                         automovel=automovel,
+                        endereco=endereco,
                     )
 
                     # registrar_deslocamentos(
@@ -310,12 +322,17 @@ def register_type_view(request, tipo):
                     matricula=matricula,
                 ).last()
 
+                endereco = Endereco.objects.filter(
+                    user__username=matricula,
+                ).first()
+
                 Caroneiro.objects.create(
                     nome=temp.nome,
                     matricula=temp.matricula,
                     comprovante=temp.comprovante,
                     curso=temp.curso,
                     user=request.user,
+                    endereco=endereco,
                 ).save()
 
                 temp.delete()
@@ -467,11 +484,21 @@ def ver_deslocamentos_motoristas(request, carona):
 def carona_view(request, carona):
     carona = Carona.objects.get(id=carona)
 
+    if request.method == "POST":
+
+        form = ValidarCaronaForms(request.POST, instance=carona)
+
+        if form.is_valid():
+            form.save()
+    else:
+        form = ValidarCaronaForms(instance=carona)
+
     return render(
         request,
         "carona.html",
         {
             "carona": carona,
+            "form": form,
         },
     )
 
@@ -631,6 +658,8 @@ def find_carona(request):
         vagas__gt=0,
     )
 
+    print(carona)
+
     if latitude and longitude:
         caronas_ordenadas = []
 
@@ -674,7 +703,10 @@ def find_caroneiro(request):
             ativa=True,
             caroneiros__id=caroneiro.id,
         ).exists():
-            caroneiros_disponiveis.append(caroneiro)
+            print(caroneiro)
+            print(caroneiro.endereco)
+            if caroneiro.endereco:
+                caroneiros_disponiveis.append(caroneiro)
 
     if latitude is not None and longitude is not None:
         caroneiros_disponiveis.sort(

@@ -110,7 +110,7 @@ def get_message_login(cleaned_data):
         user = User.objects.get(username=matricula)
 
         if check_password(senha, user.password):
-
+            # if
             return "Matrícula inválida, tente novamente"
 
         else:

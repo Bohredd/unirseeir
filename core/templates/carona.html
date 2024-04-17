@@ -1,21 +1,28 @@
 {% extends 'header.html' %}
-
+{% load crispy_forms_tags %}
 {% block content %}
-<title>UNIr-se | Ver Carona {{ carona.id }} </title>
+    <title>UNIr-se | Ver Carona {{ carona.id }} </title>
 
-<div class="card" style="margin-bottom: 10px">
-  <h5 class="card-header">{% if request.user.first_name == carona.motorista.nome %} Sua Carona {% else %} Carona do {{ carona.motorista.nome }}{% endif %}</h5>
-  <div class="card-body">
-    <h5 class="card-title">a</h5>
-    <p class="card-text">b</p>
-  </div>
-</div>
+    <div class="card" style="margin-bottom: 10px">
+        <h5 class="card-header">{% if request.user.first_name == carona.motorista.nome %} Sua Carona {% else %} Carona
+            do {{ carona.motorista.nome }}{% endif %}</h5>
+        <div class="card-body">
+            <h5 class="card-title">a</h5>
+            <p class="card-text">b</p>
+        </div>
+    </div>
 
-<div class="card">
-  <h5 class="card-header">Seu próximo compromisso: </h5> 
-  <div class="card-body">
-    <h5 class="card-title">buscar xyz as 07:55</h5>
-    <p class="card-text">local: xpto</p>
-  </div>
-</div>
+    <div class="card">
+        <h5 class="card-header">Seu próximo compromisso: </h5>
+        <div class="card-body">
+            <h5 class="card-title">buscar xyz as 07:55</h5>
+            <p class="card-text">local: xpto</p>
+        </div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-primary">Salvar Carona</button>
+    </form>
 {% endblock %}
