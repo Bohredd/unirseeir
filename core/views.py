@@ -270,7 +270,7 @@ def register_type_view(request, tipo):
                 carona_paga = form.cleaned_data["carona_paga"]
 
                 temp = Temporario.objects.filter(
-                    from_username=matricula,
+                    matricula=matricula,
                 ).last()
 
                 if temp is not None:
@@ -707,6 +707,7 @@ def bate_papo_view_list(request):
         },
     )
 
+
 def gerar_caminho_view(request, carona):
 
     carona = Carona.objects.get(id=carona)
@@ -744,13 +745,16 @@ def minha_conta_view(request):
                     matricula = form.cleaned_data["matricula"]
                     automovel = form.cleaned_data["automovel"]
                     carona_paga = form.cleaned_data["carona_paga"]
-                    foto = request.FILES["foto"]
+
+                    print(request.FILES)
+                    if "foto" in request.FILES:
+                        foto = request.FILES["foto"]
+                        request.user.foto = foto
 
                     request.user.first_name = nome
                     request.user.last_name = nome.split(" ")[0]
                     request.user.email = email
                     request.user.set_password(senha)
-                    request.user.foto = foto
                     request.user.save()
 
                     motorista.nome = nome
@@ -786,7 +790,6 @@ def minha_conta_view(request):
                 email = form.cleaned_data["email"]
                 senha = form.cleaned_data["senha"]
                 matricula = form.cleaned_data["matricula"]
-                foto = request.FILES["foto"]
 
                 caroneiro = Caroneiro.objects.filter(
                     user=request.user,
@@ -795,11 +798,14 @@ def minha_conta_view(request):
                 if caroneiro.exists():
                     caroneiro = caroneiro.first()
 
+                    if "foto" in request.FILES:
+                        foto = request.FILES["foto"]
+                        request.user.foto = foto
+
                     request.user.first_name = nome
                     request.user.last_name = nome.split(" ")[0]
                     request.user.email = email
                     request.user.set_password(senha)
-                    request.user.foto = foto
                     request.user.save()
 
                     caroneiro.nome = nome
