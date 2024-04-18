@@ -399,7 +399,21 @@ class Caroneiro(models.Model):
 class Combinado(models.Model):
 
     caroneiro = models.ForeignKey(Caroneiro, on_delete=models.CASCADE)
-    dia_semana = models.IntegerField()
+    deslocamento = models.ForeignKey(
+        Deslocamento,
+        on_delete=models.CASCADE,
+    )
+    ponto_encontro = models.ForeignKey(
+        Ponto,
+        on_delete=models.CASCADE,
+        related_name="ponto_encontro",
+        null=True,
+        blank=True,
+    )
+    endereco_ponto_encontro = models.CharField(
+        max_length=250,
+    )
+    horario_encontro_ponto_encontro = models.TimeField()
 
 
 class Carona(models.Model):
@@ -508,6 +522,26 @@ def verificar_solicitacoes(self):
 
     return solicitacoes
 
+
+def ver_minhas_caronas(self):
+
+    caronas_ativas = None
+    if self.tipo_ativo == "caroneiro":
+        caronas_ativas = Carona.objects.filter(
+            caroneiros__user=self,
+        )
+    else:
+        caronas_ativas = Carona.objects.filter(
+            motorista__user=self,
+        )
+
+    return caronas_ativas
+
+
+User.add_to_class(
+    "get_caronas_ativas",
+    ver_minhas_caronas,
+)
 
 User.add_to_class(
     "verificar_solicitacoes",

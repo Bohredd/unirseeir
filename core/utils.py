@@ -15,6 +15,7 @@ import random
 import string
 from django.contrib import messages
 
+
 def generate_pdf(carona, caroneiro, tipo):
 
     template_contrato = get_template_contrato(carona, caroneiro, tipo)
@@ -100,6 +101,7 @@ def get_user(cleaned_data):
         username=matricula,
     ).first()
 
+
 def get_message_login(cleaned_data):
 
     matricula = cleaned_data["matricula"]
@@ -122,9 +124,6 @@ def get_message_login(cleaned_data):
 
 
 def get_menor_distancia_deslocamentos(latitude, longitude, carona):
-    print(latitude, longitude, carona)
-    print("testeee")
-
     geolocator = Nominatim(user_agent="my_geocoder")
 
     deslocamentos = carona.motorista.deslocamentos.all()
@@ -135,7 +134,6 @@ def get_menor_distancia_deslocamentos(latitude, longitude, carona):
 
         if deslocamento.ponto_saida:
             coord2 = (deslocamento.ponto_saida.x, deslocamento.ponto_saida.y)
-            print(coord2, "tem ponto_saida")
         else:
             localizacao = geolocator.geocode(deslocamento.ponto_saida_endereco)
             if localizacao:
@@ -155,6 +153,11 @@ def get_menor_distancia_deslocamentos(latitude, longitude, carona):
                     menor_distancia,
                 )
                 menor_distancia = geodesic(coord1, coord2).meters
+
+    if not deslocamentos:
+        coord2 = get_coordinates_from_cep(carona.motorista.endereco.cep)
+        print("PELO CEP!", coord2)
+        menor_distancia = geodesic(coord1, coord2).meters
 
     print("Menor distancia: ", menor_distancia)
     return (
@@ -193,6 +196,19 @@ def get_address_by_cep(cep):
         return data
 
     return None
+
+
+def get_coordinates_from_cep(cep):
+    url = f"https://nominatim.openstreetmap.org/search?q={cep},br&format=json"
+    response = requests.get(url)
+    data = response.json()
+    if data:
+        latitude = float(data[0]["lat"])
+        longitude = float(data[0]["lon"])
+        return latitude, longitude
+    else:
+        return None
+
 
 def gerar_senha(tamanho=16):
     caracteres = string.ascii_letters + string.digits + string.punctuation

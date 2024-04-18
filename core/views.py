@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
+from django.db.models import Q
 from django.forms import modelformset_factory
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
@@ -32,6 +33,7 @@ from core.models import (
     Extrato,
     Deslocamento,
     Endereco,
+    Combinado,
 )
 from core.utils import (
     generate_pdf,
@@ -363,21 +365,8 @@ def logout_view(request):
 
 @login_required
 def home_view(request):
-    if request.user.tipo_ativo == "motorista":
-        caronas_ativas_do_usuario = Carona.objects.filter(
-            motorista__user=request.user,
-            ativa=True,
-        )
-    else:
-        voce = Caroneiro.objects.filter(
-            user=request.user,
-        ).first()
 
-        caronas_ativas_do_usuario = Carona.objects.filter(
-            ativa=True,
-            caroneiros=voce,
-        )
-
+    minhas_caronas = request.user.get_caronas_ativas()
     solicitacoes = request.user.verificar_solicitacoes()
 
     conversas = Conversa.objects.filter(
@@ -390,7 +379,7 @@ def home_view(request):
         {
             "conversas": conversas,
             "solicitacoes": solicitacoes,
-            "caronas": caronas_ativas_do_usuario,
+            "caronas": minhas_caronas,
         },
     )
 
@@ -493,12 +482,28 @@ def carona_view(request, carona):
     else:
         form = ValidarCaronaForms(instance=carona)
 
+    deslocamentos = Motorista.objects.get(
+        user=carona.motorista.user,
+    ).deslocamentos.all()
+
+    combinados = Combinado.objects.filter(
+        deslocamento__in=deslocamentos,
+    )
+
+    if request.user.tipo_ativo == 'caroneiro':
+        combinados = combinados.filter(
+            caroneiro__user=request.user,
+        )
+
+    print(combinados)
+
     return render(
         request,
         "carona.html",
         {
             "carona": carona,
             "form": form,
+            "combinados": combinados,
         },
     )
 
@@ -658,8 +663,6 @@ def find_carona(request):
         vagas__gt=0,
     )
 
-    print(carona)
-
     if latitude and longitude:
         caronas_ordenadas = []
 
@@ -669,7 +672,7 @@ def find_carona(request):
             )
             caronas_ordenadas.append((carona_obj, menor_distancia))
 
-        caronas_ordenadas.sort(key=lambda x: x[1], reverse=True)
+        caronas_ordenadas.sort(key=lambda x: x[1], reverse=False)
 
         carona = [carona_obj for carona_obj, _ in caronas_ordenadas]
 
