@@ -1,6 +1,16 @@
 {% include 'base.html' %}
 {% load static %}
 {% load solicitacao_tags %}
+<style>
+    .text-color-custom {
+        color: #ff711a;
+        transition: color 0.3s ease;
+    }
+
+    .text-color-custom:hover {
+        color: #ffb66e;
+    }
+</style>
 <div class="container-fluid overflow-hidden">
     <div class="row vh-100 overflow-auto">
         <div class="col-12 col-sm-3 col-xl-2 px-sm-2 px-0 bg-dark d-flex sticky-top">
@@ -14,7 +24,8 @@
                     id="menu">
                     <li class="nav-item">
                         <a href="{% url 'home' %}" class="nav-link px-sm-0 px-2">
-                            <i class="fs-5 bi-house"></i><span class="ms-1 d-none d-sm-inline">Home</span>
+                            <i class="fs-5 bi-house text-color-custom"></i><span
+                                class="ms-1 d-none d-sm-inline text-color-custom">Home</span>
                         </a>
                     </li>
                     <li>
@@ -29,9 +40,9 @@
                                 {% else %}
                                     bi bi-car-front-fill
                                 {% endif %}
-                            ">
+                            text-color-custom">
 
-                        </i><span class="ms-1 d-none d-sm-inline">
+                        </i><span class="ms-1 d-none d-sm-inline text-color-custom">
                                 {% if request.user.tipo_ativo == 'motorista' %}
                                     Procurar Caroneiros
                                 {% else %}
@@ -42,40 +53,42 @@
                     </li>
                     <li class="nav-item">
                         <a href="{% url 'minhasCaronas' %}" class="nav-link px-sm-0 px-2">
-                            <i class="fs-5 bi-person-raised-hand"></i><span class="ms-1 d-none d-sm-inline">Minhas Caronas</span>
+                            <i class="fs-5 bi-person-raised-hand text-color-custom"></i><span
+                                class="ms-1 d-none d-sm-inline text-color-custom">Minhas Caronas</span>
                         </a>
                     </li>
 
                     <li class="nav-item">
                         <a href="{% url 'bancoView' %}" class="nav-link px-sm-0 px-2">
-                            <i class="fs-5 bi-wallet2"></i><span class="ms-1 d-none d-sm-inline">Meu Saldo</span>
+                            <i class="fs-5 bi-wallet2 text-color-custom"></i><span
+                                class="ms-1 d-none d-sm-inline text-color-custom">Meu Saldo</span>
                         </a>
                     </li>
 
 
                     <li class="nav-item">
-                        <a href="{% url 'conversaList' %}" class="nav-link px-sm-0 px-2">
-                            <i class="fs-5 bi-chat-dots-fill"></i><span
-                                class="ms-1 d-none d-sm-inline">Minhas Conversas</span>
+                        <a href="{% url 'conversaList' %}" class="nav-link px-sm-0 px-2 text-color-custom">
+                            <i class="fs-5 bi-chat-dots-fill text-color-custom"></i><span
+                                class="ms-1 d-none d-sm-inline text-color-custom">Minhas Conversas</span>
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="{% url 'solicitacaoList' %}" class="nav-link px-sm-0 px-2">
+                        <a href="{% url 'solicitacaoList' %}" class="nav-link px-sm-0 px-2 text-color-custom">
                             {% get_solicitacoes_quantia request as quantia_solicitacoes %}
                             {% if quantia_solicitacoes > 0 %}
-                                <i class="fs-5 bi-send-exclamation-fill">
+                                <i class="fs-5 bi-send-exclamation-fill text-color-customtext-color-custom"></i>
                             {% else %}
-                                <i class="fs-5 bi-send-fill">
-                            {% endif %}</i><span
-                                class="ms-1 d-none d-sm-inline">Minhas Solicitações</span>
+                                <i class="fs-5 bi-send-fill text-color-custom"></i>
+                            {% endif %}<span
+                                class="ms-1 d-none d-sm-inline text-color-custom">Minhas Solicitações</span>
                         </a>
                     </li>
 
                     {% if request.user.tipo_ativo == 'motorista' %}
                         <a href="{% url 'meusDeslocamentos' %}" class="nav-link px-sm-0 px-2">
-                            <i class="fs-5 bi-geo-fill"></i><span
-                                class="ms-1 d-none d-sm-inline">Meus Deslocamentos</span>
+                            <i class="fs-5 bi-geo-fill text-color-custom"></i><span
+                                class="ms-1 d-none d-sm-inline text-color-custom">Meus Deslocamentos</span>
                         </a>
                     {% endif %}
                 </ul>

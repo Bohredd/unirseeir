@@ -70,6 +70,7 @@
                 <div class="accordion-body">
                     {% regroup combinados by caroneiro__user as combinados_por_caroneiro %}
                     {% for caroneiro in combinados_por_caroneiro %}
+                        ADICIONAR POSSIBILIDADE DE CRIAR NOVO COMBINADO AQUI
                         <h3>{{ caroneiro.list.0.caroneiro.nome }}</h3>
                         <ul>
                             {% for combinado in caroneiro.list %}
@@ -78,6 +79,7 @@
                             {% endfor %}
                         </ul>
                     {% empty %}
+                        ADICIONAR POSSIBILIDADE DE CRIAR NOVO COMBINADO AQUI
                         Sem combinados, gere um imediatamente.
                     {% endfor %}
                 </div>
