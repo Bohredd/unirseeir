@@ -596,58 +596,95 @@ class Solicitacao(models.Model):
         blank=True,
     )
 
-    def aceitar_solicitacao(self, request):
+    conteudo = models.TextField(
+        null=True,
+        blank=True,
+    )
+
+    deslocamento = models.ForeignKey(
+        Deslocamento,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+
+    def aceitar_solicitacao(self, request=None, tipo="Carona"):
         self.aceitar = True
 
-        if self.enviado_por_tipo == "motorista":
-            caroneiro = Caroneiro.objects.get(
-                user_id=self.enviado_para.id,
-            )
+        print("aceitar")
 
-            motorista = Motorista.objects.get(
-                user_id=self.enviado_por.id,
-            )
-
-            carona = Carona.objects.get(
-                motorista=motorista,
-            )
-
-            if carona.vagas != 0:
-                carona.caroneiros.add(
-                    caroneiro,
+        if tipo == "Carona":
+            if self.enviado_por_tipo == "motorista":
+                caroneiro = Caroneiro.objects.get(
+                    user_id=self.enviado_para.id,
                 )
-                carona.save()
+
+                motorista = Motorista.objects.get(
+                    user_id=self.enviado_por.id,
+                )
+
+                carona = Carona.objects.get(
+                    motorista=motorista,
+                )
+
+                if carona.vagas != 0:
+                    carona.caroneiros.add(
+                        caroneiro,
+                    )
+                    carona.save()
+                else:
+                    messages.error(
+                        request,
+                        f"A carona {self.carona.id} do motorista {self.carona.motorista.nome} está com as vagas cheias! Procure outra.",
+                    )
+                    return redirect(reverse("core:home"))
             else:
-                messages.error(
-                    request,
-                    f"A carona {self.carona.id} do motorista {self.carona.motorista.nome} está com as vagas cheias! Procure outra.",
+                caroneiro = Caroneiro.objects.get(
+                    user_id=self.enviado_por.id,
                 )
-                return redirect(reverse("core:home"))
+
+                motorista = Motorista.objects.get(
+                    user_id=self.enviado_para.id,
+                )
+
+                carona = Carona.objects.get(
+                    motorista=motorista,
+                )
+
+                if carona.vagas != 0:
+                    carona.caroneiros.add(
+                        caroneiro,
+                    )
+                    carona.save()
+                else:
+                    messages.error(
+                        request,
+                        f"A carona {self.carona.id} do motorista {self.carona.motorista.nome} está com as vagas cheias! Procure outra.",
+                    )
+                    return redirect(reverse("core:home"))
         else:
-            caroneiro = Caroneiro.objects.get(
-                user_id=self.enviado_por.id,
-            )
+            if tipo == "Combinado":
+                caroneiro = None
+                if self.enviado_por_tipo == "motorista":
+                    caroneiro = Caroneiro.objects.get(
+                        user_id=self.enviado_para.id,
+                    )
+                else:
+                    caroneiro = Caroneiro.objects.get(
+                        user_id=self.enviado_por.id,
+                    )
 
-            motorista = Motorista.objects.get(
-                user_id=self.enviado_para.id,
-            )
+                ponto_encontro = self.conteudo.split("<")[0].split(">")[0]
+                horario_ponto_encontro = self.conteudo.split("<")[1].split(">")[0]
 
-            carona = Carona.objects.get(
-                motorista=motorista,
-            )
-
-            if carona.vagas != 0:
-                carona.caroneiros.add(
-                    caroneiro,
+                print(ponto_encontro)
+                print(horario_ponto_encontro)
+                Combinado.objects.create(
+                    caroneiro=caroneiro,
+                    deslocamento=self.deslocamento,
+                    endereco_ponto_encontro=ponto_encontro,
+                    horario_encontro_ponto_encontro=horario_ponto_encontro,
                 )
-                carona.save()
-            else:
-                messages.error(
-                    request,
-                    f"A carona {self.carona.id} do motorista {self.carona.motorista.nome} está com as vagas cheias! Procure outra.",
-                )
-                return redirect(reverse("core:home"))
-
         self.respondida = True
         self.visualizada = True
         self.save()
@@ -657,6 +694,19 @@ class Solicitacao(models.Model):
         self.resposta = "neguei mano se fode ai"
         self.aceitar = False
         self.save()
+
+    # def enviar_combinado(self, request):
+    #
+    #     if request.user.tipo_ativo == "motorista":
+    #         motorista = Motorista.objects.get(
+    #             user=request.user,
+    #         )
+    #     else:
+    #         caroneiro = Carona.objects.get(
+    #             user=request.user,
+    #         )
+    #
+    #
 
 
 class MovimentacaoTipos(TextChoices):

@@ -22,6 +22,7 @@ from core.forms import (
     EsqueciSenha,
     FotoPerfilForm,
     ValidarCaronaForms,
+    CriarCombinadoForms,
 )
 from core.models import (
     Carona,
@@ -476,11 +477,13 @@ def carona_view(request, carona):
     if request.method == "POST":
 
         form = ValidarCaronaForms(request.POST, instance=carona)
+        formulario_combinado = CriarCombinadoForms(request.POST)
 
         if form.is_valid():
             form.save()
     else:
         form = ValidarCaronaForms(instance=carona)
+        formulario_combinado = CriarCombinadoForms()
 
     deslocamentos = Motorista.objects.get(
         user=carona.motorista.user,
@@ -490,7 +493,7 @@ def carona_view(request, carona):
         deslocamento__in=deslocamentos,
     )
 
-    if request.user.tipo_ativo == 'caroneiro':
+    if request.user.tipo_ativo == "caroneiro":
         combinados = combinados.filter(
             caroneiro__user=request.user,
         )
@@ -503,6 +506,7 @@ def carona_view(request, carona):
         {
             "carona": carona,
             "form": form,
+            "formulario_combinado": formulario_combinado,
             "combinados": combinados,
         },
     )
@@ -1099,4 +1103,38 @@ def esqueci_minha_senha(request):
         request,
         "esqueci_senha.html",
         {"form": form},
+    )
+
+def criar_combinado_view(request, objeto, tipoativo):
+
+    print("oii to na view")
+
+    print("id objeto: ", objeto, "tipoativo: ", tipoativo)
+
+
+    if request.method == "POST":
+        form = CriarCombinadoForms()
+        if form.is_valid():
+            print(form.cleaned_data)
+
+    else:
+        form = CriarCombinadoForms()
+
+    id = objeto
+    from core import models as core_models
+    objeto = tipoativo.title()
+    objeto = getattr(core_models, objeto)
+    objeto = objeto.objects.get(pk=id)
+
+    print("objeto: ", objeto)
+
+    print(type(objeto))
+
+    return render(
+        request,
+        "criar_combinado.html",
+        {
+            "form": form,
+            "objeto": objeto,
+        }
     )

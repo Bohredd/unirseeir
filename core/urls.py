@@ -28,6 +28,7 @@ from core.views import (
     landing_view,
     solicitacao_list,
     esqueci_minha_senha,
+    criar_combinado_view,
 )
 
 urlpatterns = [
@@ -73,4 +74,5 @@ urlpatterns = [
     ),
     path("carona/criar/", criar_minha_carona, name="criarMinhaCarona"),
     path("esqueci/", esqueci_minha_senha, name="esqueciMinhaSenha"),
+    path("criar/combinado/<int:objeto>/<str:tipoativo>/", criar_combinado_view, name="criarCombinado"),
 ]

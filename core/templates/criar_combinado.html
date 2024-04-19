@@ -1,0 +1,16 @@
+{% extends 'header.html' %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="card" style="width: 25rem; margin: 5px">
+        <img class="card-img-top" src="/media/{{ objeto.user.foto }}" alt="Card image cap">
+        <div class="card-body">
+            <h5 class="card-title">{{ objeto.nome }} </h5>
+        </div>
+        <form method="post" style="margin: 9px;">
+            {% csrf_token %}
+            {{ form|crispy }}
+        </form>
+
+    </div>
+{% endblock %}

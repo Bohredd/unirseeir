@@ -1,91 +1,115 @@
-{% extends 'header.html' %}
-{% load crispy_forms_tags %}
-{% load caronas_tags %}
-{% block content %}
-    <title>UNIr-se | Ver Carona {{ carona.id }} </title>
+    {% extends 'header.html' %}
+    {% load crispy_forms_tags %}
+    {% load caronas_tags %}
+    {% block content %}
+        <title>UNIr-se | Ver Carona {{ carona.id }} </title>
 
-    <div class="accordion" id="accordionPanelsStayOpenExample">
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true"
-                        aria-controls="panelsStayOpen-collapseOne">
-                    Informações da Carona
-                </button>
-            </h2>
-            <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show">
-                <div class="accordion-body">
-                    <div class="card" style="margin-bottom: 10px">
-                        <h5 class="card-header">{% if request.user.first_name == carona.motorista.nome %} Sua
-                            Carona {% else %} Carona
-                            do {{ carona.motorista.nome }}{% endif %}</h5>
+        <div class="accordion" id="accordionPanelsStayOpenExample">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true"
+                            aria-controls="panelsStayOpen-collapseOne">
+                        Informações da Carona
+                    </button>
+                </h2>
+                <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show">
+                    <div class="accordion-body">
+                        <div class="card" style="margin-bottom: 10px">
+                            <h5 class="card-header">{% if request.user.first_name == carona.motorista.nome %} Sua
+                                Carona {% else %} Carona
+                                do {{ carona.motorista.nome }}{% endif %}</h5>
+                            <div class="card-body">
+                                <h5 class="card-title">Caroneiros:</h5>
+                                {% for caroneiro in carona.get_caroneiros_nomes %}
+                                    <li><small class="text-body-secondary">
+                                        {{ caroneiro }}</small>
+                                    </li>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ form|crispy }}
+                            <button type="submit" class="btn btn-primary">Salvar Carona</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false"
+                            aria-controls="panelsStayOpen-collapseTwo">
+                        Seu Próximo Compromisso da Carona
+                    </button>
+                </h2>
+                <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse">
+                    <div class="accordion-body">
                         <div class="card-body">
-                            <h5 class="card-title">Caroneiros:</h5>
-                            {% for caroneiro in carona.get_caroneiros_nomes %}
-                                <li><small class="text-body-secondary">
-                                    {{ caroneiro }}</small>
-                                </li>
-                            {% endfor %}
+                            <h5 class="card-title">{% get_proximo_compromisso carona request.user as proximo_compromisso %}</h5>
+                            <p class="card-text">Local: {{ proximo_compromisso.endereco_ponto_encontro }}</p>
+                            <p class="card-text">Horário: {{ proximo_compromisso.horario_encontro_ponto_encontro }}</p>
+                            <p class="card-text">Missão: {% if request.user.tipo_ativo == 'motorista' %}Buscar
+                                {{ proximo_compromisso.caroneiro.nome }} -
+                                {{ proximo_compromisso.deslocamento.dia_semana }}{% else %} Ir para o local de
+                                encontro {% endif %}</p>
                         </div>
                     </div>
-                    <form method="post">
-                        {% csrf_token %}
-                        {{ form|crispy }}
-                        <button type="submit" class="btn btn-primary">Salvar Carona</button>
-                    </form>
                 </div>
             </div>
-        </div>
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false"
-                        aria-controls="panelsStayOpen-collapseTwo">
-                    Seu Próximo Compromisso da Carona
-                </button>
-            </h2>
-            <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse">
-                <div class="accordion-body">
-                    <div class="card-body">
-                        <h5 class="card-title">{% get_proximo_compromisso carona request.user as proximo_compromisso %}</h5>
-                        <p class="card-text">Local: {{ proximo_compromisso.endereco_ponto_encontro }}</p>
-                        <p class="card-text">Horário: {{ proximo_compromisso.horario_encontro_ponto_encontro }}</p>
-                        <p class="card-text">{% if request.user.tipo_ativo == 'motorista' %}Buscar
-                            {{ proximo_compromisso.caroneiro.nome }} - {{ proximo_compromisso.deslocamento.dia_semana }}{% else %} Ir para o local de
-                            encontro {% endif %}</p>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false"
+                            aria-controls="panelsStayOpen-collapseThree">
+                        Ver Combinados com {% if request.user.tipo_ativo == 'motorista' %} Caroneiros {% else %}
+                        Motorista {% endif %}
+                    </button>
+                </h2>
+                <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        {% regroup combinados by caroneiro__user as combinados_por_caroneiro %}
+                        {% for caroneiro in combinados_por_caroneiro %}
+                            <h3>{{ caroneiro.list.0.caroneiro.nome }}</h3>
+                            <ul>
+                                {% for combinado in caroneiro.list %}
+                                    <li>{{ combinado.caroneiro.nome }} {{ combinado.deslocamento.dia_semana }} {{ combinado.deslocamento.horario_saida_ponto_saida }} {{ combinado.deslocamento.ponto_saida_endereco }}
+                                        -> {{ combinado.deslocamento.ponto_destino_endereco }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% empty %}
+                            ADICIONAR POSSIBILIDADE DE CRIAR NOVO COMBINADO AQUI
+                            Sem combinados, gere um imediatamente.
+                        {% endfor %}
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false"
-                        aria-controls="panelsStayOpen-collapseThree">
-                    Ver Combinados com {% if request.user.tipo_ativo == 'motorista' %} Caroneiros {% else %}
-                    Motorista {% endif %}
-                </button>
-            </h2>
-            <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse">
-                <div class="accordion-body">
-                    {% regroup combinados by caroneiro__user as combinados_por_caroneiro %}
-                    {% for caroneiro in combinados_por_caroneiro %}
-                        ADICIONAR POSSIBILIDADE DE CRIAR NOVO COMBINADO AQUI
-                        <h3>{{ caroneiro.list.0.caroneiro.nome }}</h3>
-                        <ul>
-                            {% for combinado in caroneiro.list %}
-                                <li>{{ combinado.caroneiro.nome }} {{ combinado.deslocamento.dia_semana }} {{ combinado.deslocamento.horario_saida_ponto_saida }} {{ combinado.deslocamento.ponto_saida_endereco }}
-                                    -> {{ combinado.deslocamento.ponto_destino_endereco }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% empty %}
-                        ADICIONAR POSSIBILIDADE DE CRIAR NOVO COMBINADO AQUI
-                        Sem combinados, gere um imediatamente.
-                    {% endfor %}
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#panelsStayOpen-collapseFour" aria-expanded="false"
+                            aria-controls="panelsStayOpen-collapseFour">
+                        Criar Combinados com {% if request.user.tipo_ativo == "motorista" %} Caroneiros {% else %}
+                        Motorista {% endif %}
+                    </button>
+                </h2>
+                <div id="panelsStayOpen-collapseFour" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        {% for caroneiro in carona.caroneiros.all %}
+                            <a href="{% url 'criarCombinado' caroneiro.id request.user.tipo_ativo %}">
+                                <div class="card" style="width: 18rem;">
+                                    <img class="card-img-top" src="/media/{{ caroneiro.user.foto }}" alt="Card image cap">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ caroneiro.nome }} </h5>
+                                    </div>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
                 </div>
-
             </div>
-        </div>
-    </div>
 
-{% endblock %}
+        </div>
+
+    {% endblock %}

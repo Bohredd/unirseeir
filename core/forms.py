@@ -257,7 +257,8 @@ class ValidarCaronaForms(forms.ModelForm):
 
     class Meta:
         model = Carona
-        fields = ['ativa']
+        fields = ["ativa"]
+
 
 class MensagemForm(forms.Form):
 
@@ -295,3 +296,11 @@ class FotoPerfilForm(forms.Form):
         allow_empty_file=False,
         required=False,
     )
+
+
+class CriarCombinadoForms(forms.Form):
+
+    deslocamento = forms.CharField()
+    endereco_ponto_encontro = forms.CharField()
+    horario_encontro_ponto_encontro = forms.CharField()
+
