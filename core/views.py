@@ -99,11 +99,9 @@ def login_view(request):
                         home_view,
                     )
                 else:
-                    print(message)
                     if message is not None:
                         messages.error(request, message)
             else:
-                print(message)
                 if message is not None:
                     messages.error(request, message)
     else:
@@ -117,7 +115,6 @@ def register_view(request):
     if request.method == "POST":
         form = CadastroForm(request.POST)
 
-        print(request.FILES)
         if form.is_valid():
             nome = form.cleaned_data["nome"]
             email = form.cleaned_data["email"]
@@ -127,8 +124,6 @@ def register_view(request):
             curso = form.cleaned_data["curso"]
             tipo = form.cleaned_data["tipo"]
 
-            print(request.POST)
-
             cep = request.POST["cep"]
             estado = request.POST["estado"]
             cidade = request.POST["cidade"]
@@ -137,11 +132,7 @@ def register_view(request):
             numero = request.POST["numero"]
             complemento = request.POST["complemento"]
 
-            print(cep, estado, cidade, logradouro, bairro, numero, complemento)
-
             user = User.objects.filter(email=email, username=matricula)
-
-            ##print(endereco)
 
             if not user.exists() and senha == senha_confirmacao:
 
@@ -167,8 +158,6 @@ def register_view(request):
                     complemento=complemento,
                     user=user,
                 )
-
-                print(Endereco.objects.last())
 
                 Extrato.objects.create(
                     usuario=user,
@@ -274,8 +263,6 @@ def register_type_view(request, tipo):
             form = MotoristaForm(request.POST)
             if form.is_valid():
 
-                print("form valido", form.cleaned_data)
-
                 matricula = form.cleaned_data["matricula"]
                 automovel = form.cleaned_data["automovel"]
                 carona_paga = form.cleaned_data["carona_paga"]
@@ -303,14 +290,9 @@ def register_type_view(request, tipo):
                         endereco=endereco,
                     )
 
-                    # registrar_deslocamentos(
-                    #    request.POST, Motorista.objects.get(user=request.user)
-                    # )
-
                     temp.delete()
 
                     if carona_paga:
-                        print("carona paga true")
                         return redirect(
                             "metodoPagamento",
                         )
@@ -499,8 +481,6 @@ def carona_view(request, carona):
             caroneiro__user=request.user,
         )
 
-    print(combinados)
-
     return render(
         request,
         "carona.html",
@@ -520,10 +500,8 @@ def solicitacao_acao(request, situacao, solicitacao):
     solicitacao = Solicitacao.objects.get(id=solicitacao)
 
     if situacao:
-        print("ACEITAR SOLICITACAO")
         solicitacao.aceitar_solicitacao(request)
     else:
-        print("RECUSAR SOLICITACAO")
         solicitacao.negar_solicitacao()
 
     return redirect(
@@ -711,8 +689,6 @@ def find_caroneiro(request):
             ativa=True,
             caroneiros__id=caroneiro.id,
         ).exists():
-            print(caroneiro)
-            print(caroneiro.endereco)
             if caroneiro.endereco:
                 caroneiros_disponiveis.append(caroneiro)
 
@@ -786,7 +762,6 @@ def minha_conta_view(request):
                     automovel = form.cleaned_data["automovel"]
                     carona_paga = form.cleaned_data["carona_paga"]
 
-                    print(request.FILES)
                     if "foto" in request.FILES:
                         foto = request.FILES["foto"]
                         request.user.foto = foto
@@ -1157,9 +1132,10 @@ def criar_combinado_view(request, objeto, tipoativo):
                 tipo=SolicitacaoTipos.combinado,
             )
 
-            print("CRIEI A SOLICITACAO")
-        else:
-            print(form.errors)
+            return redirect(
+                "caronaView",
+                carona.first().id,
+            )
 
     else:
         form = CriarCombinadoForms(request=request)
