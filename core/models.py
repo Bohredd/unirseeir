@@ -561,6 +561,10 @@ User.add_to_class(
     models.FileField(upload_to=get_upload_path, null=True),
 )
 
+class SolicitacaoTipos(TextChoices):
+
+    carona = ("carona", "Carona")
+    combinado = ("combinado", "Combinado")
 
 class Solicitacao(models.Model):
 
@@ -608,12 +612,19 @@ class Solicitacao(models.Model):
         on_delete=models.SET_NULL,
     )
 
-    def aceitar_solicitacao(self, request=None, tipo="Carona"):
+    tipo = models.CharField(
+        choices=SolicitacaoTipos.choices,
+        max_length=50,
+    )
+
+    def aceitar_solicitacao(self, request=None):
         self.aceitar = True
 
         print("aceitar")
 
-        if tipo == "Carona":
+        print(self.tipo)
+
+        if self.tipo == "carona":
             if self.enviado_por_tipo == "motorista":
                 caroneiro = Caroneiro.objects.get(
                     user_id=self.enviado_para.id,
@@ -663,7 +674,7 @@ class Solicitacao(models.Model):
                     )
                     return redirect(reverse("core:home"))
         else:
-            if tipo == "Combinado":
+            if self.tipo == "combinado":
                 caroneiro = None
                 if self.enviado_por_tipo == "motorista":
                     caroneiro = Caroneiro.objects.get(
@@ -674,11 +685,11 @@ class Solicitacao(models.Model):
                         user_id=self.enviado_por.id,
                     )
 
-                ponto_encontro = self.conteudo.split("<")[0].split(">")[0]
-                horario_ponto_encontro = self.conteudo.split("<")[1].split(">")[0]
-
-                print(ponto_encontro)
+                ponto_encontro = self.mensagem.split("em ")[1].split(" às")[0]
+                horario_ponto_encontro = self.mensagem.split("às ")[1].split(" ?")[0]
                 print(horario_ponto_encontro)
+                horario_ponto_encontro = datetime.datetime.strptime(horario_ponto_encontro, "%H:%M:%S").time()
+
                 Combinado.objects.create(
                     caroneiro=caroneiro,
                     deslocamento=self.deslocamento,

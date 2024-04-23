@@ -35,6 +35,7 @@ from core.models import (
     Deslocamento,
     Endereco,
     Combinado,
+    SolicitacaoTipos,
 )
 from core.utils import (
     generate_pdf,
@@ -908,6 +909,7 @@ def criar_solicitacao_popup(request, tipo, id):
                     enviado_para=caroneiro.user,
                     enviado_por=request.user,
                     enviado_por_tipo=request.user.tipo_ativo,
+                    tipo=SolicitacaoTipos.carona,
                 )
 
             return HttpResponse("<script>window.close();</script>")
@@ -1105,30 +1107,62 @@ def esqueci_minha_senha(request):
         {"form": form},
     )
 
+
 def criar_combinado_view(request, objeto, tipoativo):
-
-    print("oii to na view")
-
-    print("id objeto: ", objeto, "tipoativo: ", tipoativo)
-
-
-    if request.method == "POST":
-        form = CriarCombinadoForms()
-        if form.is_valid():
-            print(form.cleaned_data)
-
-    else:
-        form = CriarCombinadoForms()
 
     id = objeto
     from core import models as core_models
+
+    tipos = [
+        "caroneiro",
+        "motorista",
+    ]
+
+    tipos.remove(tipoativo)
+    tipoativo = tipos[0]
+
     objeto = tipoativo.title()
     objeto = getattr(core_models, objeto)
     objeto = objeto.objects.get(pk=id)
 
-    print("objeto: ", objeto)
+    if request.method == "POST":
+        form = CriarCombinadoForms(request.POST, request=request)
+        if form.is_valid():
 
-    print(type(objeto))
+            deslocamento = form.cleaned_data["deslocamento"]
+            horario_encontro_ponto_encontro = form.cleaned_data[
+                "horario_encontro_ponto_encontro"
+            ]
+            endereco_ponto_encontro = form.cleaned_data["endereco_ponto_encontro"]
+
+            mensagem = f"O que achas de nos encontrarmos em {endereco_ponto_encontro} às {horario_encontro_ponto_encontro} ?"
+
+            if request.user.tipo_ativo == "motorista":
+                carona = Carona.objects.filter(
+                    motorista__user=request.user,
+                )
+            else:
+                carona = Carona.objects.filter(
+                    caroneiros__user=request.user,
+                )
+
+            Solicitacao.objects.create(
+                mensagem=mensagem,
+                carona=carona.first(),
+                enviado_por=request.user,
+                enviado_por_tipo=request.user.tipo_ativo,
+                enviado_para=objeto.user,
+                enviado_para_tipo=objeto.user.tipo_ativo,
+                deslocamento=Deslocamento.objects.get(id=deslocamento),
+                tipo=SolicitacaoTipos.combinado,
+            )
+
+            print("CRIEI A SOLICITACAO")
+        else:
+            print(form.errors)
+
+    else:
+        form = CriarCombinadoForms(request=request)
 
     return render(
         request,
@@ -1136,5 +1170,5 @@ def criar_combinado_view(request, objeto, tipoativo):
         {
             "form": form,
             "objeto": objeto,
-        }
+        },
     )
