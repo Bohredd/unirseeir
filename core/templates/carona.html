@@ -68,7 +68,7 @@
                         <p class="card-text">Missão: {% if request.user.tipo_ativo == 'motorista' %}Buscar
                             {{ proximo_compromisso.caroneiro.nome }} -
                             {{ proximo_compromisso.deslocamento.dia_semana }}{% else %} Ir para o local de
-                            encontro {% endif %}</p>
+                            encontro {{ proximo_compromisso.endereco_ponto_encontro }}{% endif %}</p>
                     </div>
                 </div>
             </div>
@@ -86,11 +86,12 @@
                 <div class="accordion-body">
                     {% regroup combinados by caroneiro__user as combinados_por_caroneiro %}
                     {% for caroneiro in combinados_por_caroneiro %}
-                        <h3>{{ caroneiro.list.0.caroneiro.nome }}</h3>
+                        <h3>{% if request.user.first_name == caroneiro.list.0.caroneiro.nome %}Você: {% else %}
+                            {{ caroneiro.list.0.caroneiro.nome }}: {% endif %}</h3>
                         <ul>
                             {% for combinado in caroneiro.list %}
-                                <li>{{ combinado.caroneiro.nome }} {{ combinado.deslocamento.dia_semana }} {{ combinado.deslocamento.horario_saida_ponto_saida }} {{ combinado.deslocamento.ponto_saida_endereco }}
-                                    -> {{ combinado.deslocamento.ponto_destino_endereco }}</li>
+                                <li>{% if request.user.first_name == combinado.caroneiro.nome %}Você: {% else %}{{ combinado.caroneiro.nome }}: {% endif %} {{ combinado.deslocamento.dia_semana.title }}-Feira no local {{ combinado.endereco_ponto_encontro }} às {{ combinado.horario_encontro_ponto_encontro }}
+                                    para ir para o destino {{ combinado.deslocamento.ponto_destino_endereco }}</li>
                             {% endfor %}
                         </ul>
                     {% empty %}

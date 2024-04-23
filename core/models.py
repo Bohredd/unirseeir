@@ -690,12 +690,18 @@ class Solicitacao(models.Model):
 
                 horario_ponto_encontro = datetime.datetime.strptime(horario_ponto_encontro, "%H:%M:%S").time()
 
-                Combinado.objects.create(
+                combinado = Combinado.objects.create(
                     caroneiro=caroneiro,
                     deslocamento=self.deslocamento,
                     endereco_ponto_encontro=ponto_encontro,
                     horario_encontro_ponto_encontro=horario_ponto_encontro,
                 )
+
+                self.carona.combinados.add(
+                    combinado,
+                )
+                self.carona.save()
+
         self.respondida = True
         self.visualizada = True
         self.save()

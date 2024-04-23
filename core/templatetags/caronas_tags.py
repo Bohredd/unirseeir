@@ -122,9 +122,11 @@ def get_proximo_compromisso(carona, user):
             deslocamento__dia_semana=dia_semana_hoje,
             deslocamento__horario_saida_ponto_saida__gte=timezone.now(),
         )
-        .order_by("horario_encontro_ponto_encontro")
+        .order_by("deslocamento__dia_semana", "horario_encontro_ponto_encontro")
         .first()
     )
+
+    print(proximo_compromisso)
 
     if proximo_compromisso:
         return proximo_compromisso
