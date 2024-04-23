@@ -687,7 +687,7 @@ class Solicitacao(models.Model):
 
                 ponto_encontro = self.mensagem.split("em ")[1].split(" às")[0]
                 horario_ponto_encontro = self.mensagem.split("às ")[1].split(" ?")[0]
-                print(horario_ponto_encontro)
+
                 horario_ponto_encontro = datetime.datetime.strptime(horario_ponto_encontro, "%H:%M:%S").time()
 
                 Combinado.objects.create(
