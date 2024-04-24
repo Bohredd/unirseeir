@@ -117,7 +117,7 @@ class CadastroForm(forms.Form):
 
 class CaroneiroForm(forms.Form):
 
-    matricula = forms.CharField()
+    matricula = forms.CharField(widget=forms.TextInput(attrs={"placeholder": "Digite sua matricula"}), label="")
 
 
 class DiasSemana(TextChoices):
@@ -152,8 +152,8 @@ class DeslocamentoForm(forms.ModelForm):
 
 
 class MotoristaForm(forms.Form):
-    matricula = forms.CharField(label="Matrícula")
-    automovel = forms.CharField(label="Automóvel")
+    matricula = forms.CharField(widget=forms.TextInput(attrs={"placeholder": "Digite sua matricula"}), label="")
+    automovel = forms.CharField(widget=forms.TextInput(attrs={"placeholder": "Automovel"}), label="")
 
     carona_paga = forms.BooleanField(required=False)
 

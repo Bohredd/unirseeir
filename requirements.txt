@@ -64,3 +64,7 @@ webencodings==0.5.1
 xhtml2pdf==0.2.15
 zipp==3.18.1
 zopfli==0.2.3
+
+django-crispy-forms~=2.1
+config~=0.5.1
+decouple~=0.0.7
