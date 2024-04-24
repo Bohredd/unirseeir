@@ -29,6 +29,8 @@ from core.views import (
     solicitacao_list,
     esqueci_minha_senha,
     criar_combinado_view,
+    criar_conversa_view,
+    criar_conversa,
 )
 
 urlpatterns = [
@@ -74,5 +76,11 @@ urlpatterns = [
     ),
     path("carona/criar/", criar_minha_carona, name="criarMinhaCarona"),
     path("esqueci/", esqueci_minha_senha, name="esqueciMinhaSenha"),
-    path("criar/combinado/<int:objeto>/<str:tipoativo>/", criar_combinado_view, name="criarCombinado"),
+    path(
+        "criar/combinado/<int:objeto>/<str:tipoativo>/",
+        criar_combinado_view,
+        name="criarCombinado",
+    ),
+    path("criar/conversa/", criar_conversa_view, name="criarConversa"),
+    path("criar/conversa/<int:id>", criar_conversa, name="criarConversaUsuario"),
 ]

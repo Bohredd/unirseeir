@@ -47,7 +47,7 @@ def get_ultimo_enviador_mensagem_e_menssagem(conversa):
 
     mensagem = conversa.mensagens.all().last()
 
-    return f"{mensagem.enviado_por.first_name}: {mensagem.conteudo}"
+    return f"{mensagem.enviado_por.first_name}: {mensagem.conteudo}" if mensagem else ""
 
 
 @register.simple_tag
@@ -73,6 +73,7 @@ def get_carona_membros(carona):
             return string_arrumada
 
     return 0
+
 
 @register.simple_tag
 def get_carona_motorista(request, carona):

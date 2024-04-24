@@ -1,0 +1,26 @@
+{% extends 'header.html' %}
+
+{% block content %}
+
+    <style>        .limpador-href {
+        text-decoration: none;
+        color: #0000EE;
+    }
+
+    .limpador-href:hover {
+        text-decoration: none;
+        color: #FF914D;
+    }</style>
+
+    {% for usuario in usuarios %}
+        <a class="limpador-href" href="{% url 'criarConversaUsuario' usuario.user.id %}">
+            <div class="card" style="width: 18rem;">
+                <img src="/media/{{ usuario.user.foto }}" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <p class="card-text">Criar Conversa com {{ usuario.nome }}</p>
+                </div>
+            </div>
+        </a>
+    {% endfor %}
+
+{% endblock %}

@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.forms import modelformset_factory
 from django.shortcuts import render, redirect, get_object_or_404
@@ -584,6 +585,12 @@ def conversa_view(request, id):
                 conteudo=conteudo,
             )
 
+            conversa = Conversa.objects.get(
+                id=id,
+            )
+            conversa.mensagens.add(mensagem)
+            conversa.save()
+
             conexao, _ = Conexao.objects.get_or_create(
                 usuario=request.user,
             )
@@ -1148,3 +1155,49 @@ def criar_combinado_view(request, objeto, tipoativo):
             "objeto": objeto,
         },
     )
+
+
+def criar_conversa_view(request):
+
+    caronas = Carona.objects.filter(
+        models.Q(caroneiros__user=request.user)
+        | models.Q(caroneiros__user=request.user),
+    )
+
+    usuarios = []
+
+    for carona in caronas:
+
+        caroneiros = carona.caroneiros.all()
+
+        for caroneiro in caroneiros:
+
+            if caroneiro.user != request.user:
+                conversa = Conversa.objects.filter(
+                    models.Q(membros=caroneiro.user) & models.Q(membros=request.user),
+                )
+                if not conversa.exists():
+                    usuarios.append(caroneiro)
+
+        if carona.motorista.user != request.user:
+            usuarios.append(carona.motorista)
+
+    print(usuarios)
+
+    return render(
+        request,
+        "criar_conversa.html",
+        {"usuarios": usuarios},
+    )
+
+
+def criar_conversa(request, id):
+
+    usuario = User.objects.get(pk=id)
+
+    conversa = Conversa.objects.create()
+
+    conversa.membros.add(request.user, usuario)
+    conversa.save()
+
+    return redirect("conversaList")
