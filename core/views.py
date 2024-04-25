@@ -137,15 +137,26 @@ def register_view(request):
 
             if not user.exists() and senha == senha_confirmacao:
 
-                user = User.objects.create_user(
-                    username=matricula,
-                    first_name=nome,
-                    last_name=nome.split(" ")[0],
-                    email=email,
-                    password=senha,
-                    tipo_ativo=tipo,
-                    foto=request.FILES["foto"],
-                )
+                if "foto" in request.FILES:
+                    foto = request.FILES["foto"]
+                    user = User.objects.create_user(
+                        username=matricula,
+                        first_name=nome,
+                        last_name=nome.split(" ")[0],
+                        email=email,
+                        password=senha,
+                        tipo_ativo=tipo,
+                        foto=foto,
+                    )
+                else:
+                    user = User.objects.create_user(
+                        username=matricula,
+                        first_name=nome,
+                        last_name=nome.split(" ")[0],
+                        email=email,
+                        password=senha,
+                        tipo_ativo=tipo,
+                    )
 
                 user.save()
 

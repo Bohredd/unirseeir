@@ -2,18 +2,28 @@
 
 {% load crispy_forms_tags %}
 {% block content %}
+        {% load static %}
     <!DOCTYPE html>
     <html>
-    <head>
+  <head>
     <title>UNIr-se | Cadastro Caroneiro </title>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+          <link rel="stylesheet" href="../static/css/login.css">
     </head>
     <body>
-        <h1>Cadastro Caroneiro</h1>
+    <div class="wrapper">
+        <div class="logo">
+            <img src="{% static 'unirseeir.png' %}" alt="">
+        </div>
+        <div class="text-center mt-4 name">
+            Cadastro Caroneiro
+        </div>
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form|crispy }}
-            <input type="submit" value="Cadastrar">
+            <input type="submit" class="btn mt-3" value="Cadastrar">
         </form>
+    </div>
     </body>
     </html>
 {% endblock %}
