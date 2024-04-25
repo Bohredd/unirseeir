@@ -1,6 +1,8 @@
 from django import template
 from django.db.models import Q
 
+from core.utils import combinar_imagens
+
 register = template.Library()
 
 
@@ -68,7 +70,7 @@ def get_carona_membros(carona):
                 elif index != len(membros) - 1:
                     string_arrumada += f"{usuario}, "
                 else:
-                    string_arrumada += f"{usuario}."
+                    string_arrumada += f"e {usuario}."
 
             return string_arrumada
 
@@ -85,3 +87,20 @@ def get_carona_motorista(request, carona):
         return "Você"
 
     return carona.motorista.nome
+
+
+@register.simple_tag
+def conversa_get_foto_membro(request, conversa):
+
+    if conversa.membros.count() > 2:
+        foto_combinada = combinar_imagens(
+            conversa.membros.all(), largura_quadro=300, altura_quadro=300
+        )
+
+        return foto_combinada
+    else:
+        membros = conversa.membros.all()
+
+        for membro in membros:
+            if membro != request.user:
+                return membro.foto.url

@@ -1,10 +1,10 @@
 {% extends 'header.html' %}
 {% load static %}
 {% block content %}
-    
-        <title>UNIr-se | Home </title>
 
-    
+    <title>UNIr-se | Home </title>
+
+
     <style>
         li.list-group-item:hover {
             border: 1px solid cornflowerblue;
@@ -77,21 +77,22 @@
         {% load conversa_tags %}
         {% for conversa in conversas %}
             <a style="text-decoration: none; margin-bottom: 5px" href="{% url 'conversa' conversa.id %}">
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
-                    <img class="img-thumbnail" style="max-height: 60px; max-width: 60px; margin-right: 10px"
-                         src="{% static 'diogo.png' %}" alt=""/>
-                    <div class="ms-3">
-                        <p class="fw-bold mb-0">{% conversa_get_mensagem_membro request conversa %}</p>
-                        <p class="text-muted mb-0 fs-sm">{% get_ultimo_enviador_mensagem_e_menssagem conversa %}</p>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <img class="img-thumbnail" style="max-height: 60px; max-width: 60px; margin-right: 10px"
+                             src="{% conversa_get_foto_membro request conversa %}" alt=""/>
+                        <div class="ms-3">
+                            <p class="fw-bold mb-0">{% conversa_get_mensagem_membro request conversa %}</p>
+                            <p class="text-muted mb-0 fs-sm">{% get_ultimo_enviador_mensagem_e_menssagem conversa %}</p>
+                        </div>
                     </div>
-                </div>
-                {% conversa_get_mensagens_nao_visualizadas request conversa as count %}
-                {% if count != 0 %}
-                    <span class="badge bg-primary rounded-pill">{% conversa_get_mensagens_nao_visualizadas request conversa %}</span>
-                {% endif %}
-            </li>
-            <a href="{% url 'conversa' conversa.id %}">
+                    {% conversa_get_mensagens_nao_visualizadas request conversa as count %}
+                    {% if count != 0 %}
+                        <span class="badge bg-primary rounded-pill">{% conversa_get_mensagens_nao_visualizadas request conversa %}</span>
+                    {% endif %}
+                </li>
+            </a>
+            <a href="{% url 'conversa' conversa.id %}"></a>
         {% endfor %}
     </ol>
     <p><a href="{% url 'conversaList' %}"

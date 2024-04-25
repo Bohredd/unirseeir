@@ -1,4 +1,6 @@
+import base64
 import io
+import os
 import re
 import requests
 import PyPDF2
@@ -13,7 +15,8 @@ from geopy.distance import geodesic
 from geopy.geocoders import Nominatim
 import random
 import string
-from django.contrib import messages
+from PIL import Image
+import math
 
 
 def generate_pdf(carona, caroneiro, tipo):
@@ -214,3 +217,38 @@ def gerar_senha(tamanho=16):
     caracteres = string.ascii_letters + string.digits + string.punctuation
     senha = "".join(random.choice(caracteres) for _ in range(tamanho))
     return senha
+
+
+def combinar_imagens(membros, largura_quadro=300, altura_quadro=300):
+    lista_imagens = []
+
+    for membro in membros:
+        lista_imagens.append(
+            os.path.abspath(os.path.join(os.getcwd(), membro.foto.url[1:]))
+        )
+
+    num_imagens = len(lista_imagens)
+    colunas = int(math.ceil(math.sqrt(num_imagens)))
+    linhas = int(math.ceil(num_imagens / colunas))
+    largura_nova_imagem = colunas * largura_quadro
+    altura_nova_imagem = linhas * altura_quadro
+
+    nova_imagem = Image.new("RGB", (largura_nova_imagem, altura_nova_imagem))
+
+    for i, imagem_path in enumerate(lista_imagens):
+        imagem = Image.open(imagem_path)
+        imagem_redimensionada = imagem.resize((largura_quadro, altura_quadro))
+        coluna = i % colunas
+        linha = i // colunas
+        nova_imagem.paste(
+            imagem_redimensionada, (coluna * largura_quadro, linha * altura_quadro)
+        )
+        imagem.close()
+
+    buffer = io.BytesIO()
+
+    nova_imagem.save(buffer, "JPEG")
+
+    imagem_data = buffer.getvalue()
+
+    return f"data:image/jpeg;base64,{base64.b64encode(imagem_data).decode()}"
