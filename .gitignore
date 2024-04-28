@@ -4,4 +4,4 @@
 *.iml
 *.idea
 *.pdf
-.env
+*.env
