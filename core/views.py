@@ -363,7 +363,7 @@ def logout_view(request):
 def home_view(request):
 
     minhas_caronas = request.user.get_caronas_ativas()
-    solicitacoes = request.user.verificar_solicitacoes()
+    solicitacoes = request.user.verificar_solicitacoes(por=False, para=True)
 
     conversas = Conversa.objects.filter(
         membros=request.user,
@@ -491,6 +491,16 @@ def carona_view(request, carona):
     if request.user.tipo_ativo == "caroneiro":
         combinados = combinados.filter(
             caroneiro__user=request.user,
+        )
+
+    combinados = carona.combinados.all().order_by(
+        "deslocamento__dia_semana", "horario_encontro_ponto_encontro"
+    )
+
+    for compromisso in combinados:
+        print(
+            compromisso.deslocamento.dia_semana,
+            compromisso.horario_encontro_ponto_encontro,
         )
 
     return render(

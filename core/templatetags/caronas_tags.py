@@ -7,6 +7,7 @@ import folium
 from geopy.exc import GeocoderUnavailable
 from django.utils import timezone
 from core.utils import get_coordinates_from_cep
+from decouple import config
 
 register = template.Library()
 
@@ -15,6 +16,15 @@ register = template.Library()
 def get_distancia_saida(latitude, longitude, carona):
     print(latitude, longitude, carona)
     print("testeee")
+
+    url_api = f'https://api.tomtom.com/routing/1/calculateRoute/\
+        {latitude},{longitude}:52.50274,13.43872/json?\
+        &vehicleHeading=90&sectionType=traffic\
+        &report=effectiveSettings&routeType=eco\
+        &traffic=true&avoid=unpavedRoads\
+        &travelMode={carona.tipo}&vehicleMaxSpeed=60\
+        &vehicleCommercial=false&vehicleEngineType=combustion\
+        &key={config("TOMTOM_ACCESS_KEY")}'
 
     geolocator = Nominatim(user_agent="my_geocoder")
 
@@ -110,33 +120,39 @@ def gerar_mapa(deslocamento):
 def get_proximo_compromisso(carona, user):
     locale.setlocale(locale.LC_ALL, "pt_BR.UTF-8")
 
-    hoje = datetime.datetime.now().date()
-    dia_semana_hoje = hoje.strftime("%A")
+    agora = timezone.localtime(timezone.now())
+    # agora = datetime.datetime.strptime("30/04/2024 14:21", "%d/%m/%Y %H:%M")
 
-    print(hoje)
-    print(dia_semana_hoje)
+    hoje = agora.date()
+    dia_semana_hoje = agora.strftime("%A")
+
+    # print(hoje, "HOJE")
+    # print(dia_semana_hoje, "DIA DA SEMANA DE HOJE")
+    # print(agora.time(), "AGORA HORA")
 
     proximo_compromisso = (
         carona.combinados.all()
         .filter(
             deslocamento__dia_semana=dia_semana_hoje,
-            deslocamento__horario_saida_ponto_saida__gte=timezone.now(),
+            horario_encontro_ponto_encontro__gte=agora.time(),
         )
-        .order_by("deslocamento__dia_semana", "horario_encontro_ponto_encontro")
+        .order_by("horario_encontro_ponto_encontro")
         .first()
     )
-
-    print(proximo_compromisso)
+    # print(proximo_compromisso)
 
     if proximo_compromisso:
+        # print(proximo_compromisso.deslocamento.dia_semana)
+        # print(proximo_compromisso.horario_encontro_ponto_encontro)
         return proximo_compromisso
 
     proximo_compromisso = (
         carona.combinados.all()
+        .exclude(deslocamento__dia_semana=dia_semana_hoje)
         .order_by("deslocamento__dia_semana", "horario_encontro_ponto_encontro")
         .first()
     )
 
-    print(proximo_compromisso)
+    # print(proximo_compromisso)
 
     return proximo_compromisso

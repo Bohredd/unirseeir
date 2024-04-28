@@ -65,6 +65,7 @@
                         <h5 class="card-title">{% get_proximo_compromisso carona request.user as proximo_compromisso %}</h5>
                         <p class="card-text">Local: {{ proximo_compromisso.endereco_ponto_encontro }}</p>
                         <p class="card-text">Horário: {{ proximo_compromisso.horario_encontro_ponto_encontro }}</p>
+                        <p class="card-text">Dia da Semana: {{ proximo_compromisso.deslocamento.dia_semana.title }}</p>
                         <p class="card-text">Missão: {% if request.user.tipo_ativo == 'motorista' %}Buscar
                             {{ proximo_compromisso.caroneiro.nome }} -
                             {{ proximo_compromisso.deslocamento.dia_semana }}{% else %} Ir para o local de

@@ -508,17 +508,39 @@ class Carona(models.Model):
         )
 
 
-def verificar_solicitacoes(self):
-
-    solicitacoes = (
-        Solicitacao.objects.filter(
-            models.Q(enviado_por=self) | models.Q(enviado_para=self),
-            respondida=False,
-            visualizada=False,
+def verificar_solicitacoes(self, por=True, para=True):
+    solicitacoes = []
+    if por and para:
+        solicitacoes = (
+            Solicitacao.objects.filter(
+                models.Q(enviado_por=self) | models.Q(enviado_para=self),
+                respondida=False,
+                visualizada=False,
+            )
+            .distinct()
+            .order_by("enviado_em")
         )
-        .distinct()
-        .order_by("enviado_em")
-    )
+    elif por and not para:
+        solicitacoes = (
+            Solicitacao.objects.filter(
+                models.Q(enviado_por=self),
+                respondida=False,
+                visualizada=False,
+            )
+            .distinct()
+            .order_by("enviado_em")
+        )
+
+    elif not por and para:
+        solicitacoes = (
+            Solicitacao.objects.filter(
+                models.Q(enviado_para=self),
+                respondida=False,
+                visualizada=False,
+            )
+            .distinct()
+            .order_by("enviado_em")
+        )
 
     return solicitacoes
 
@@ -561,10 +583,12 @@ User.add_to_class(
     models.FileField(upload_to=get_upload_path, null=True),
 )
 
+
 class SolicitacaoTipos(TextChoices):
 
     carona = ("carona", "Carona")
     combinado = ("combinado", "Combinado")
+
 
 class Solicitacao(models.Model):
 
@@ -688,7 +712,9 @@ class Solicitacao(models.Model):
                 ponto_encontro = self.mensagem.split("em ")[1].split(" às")[0]
                 horario_ponto_encontro = self.mensagem.split("às ")[1].split(" ?")[0]
 
-                horario_ponto_encontro = datetime.datetime.strptime(horario_ponto_encontro, "%H:%M:%S").time()
+                horario_ponto_encontro = datetime.datetime.strptime(
+                    horario_ponto_encontro, "%H:%M:%S"
+                ).time()
 
                 combinado = Combinado.objects.create(
                     caroneiro=caroneiro,
