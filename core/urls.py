@@ -31,6 +31,7 @@ from core.views import (
     criar_combinado_view,
     criar_conversa_view,
     criar_conversa,
+    remover_solicitacao,
 )
 
 urlpatterns = [
@@ -43,7 +44,11 @@ urlpatterns = [
     path("find/carona/", find_carona, name="findCarona"),
     path("find/caroneiro/", find_caroneiro, name="findCaroneiro"),
     path("conversa/list/", bate_papo_view_list, name="conversaList"),
-    path("carona/gerar/caminho/<int:carona>/", gerar_caminho_view, name="gerarCaminho"),
+    path(
+        "carona/gerar/caminho/<int:carona>/<int:combinado>/",
+        gerar_caminho_view,
+        name="gerarCaminho",
+    ),
     path("account/", minha_conta_view, name="minhaConta"),
     path("cadastro/pagamento/", metodo_pagamento_view, name="metodoPagamento"),
     path(
@@ -83,4 +88,9 @@ urlpatterns = [
     ),
     path("criar/conversa/", criar_conversa_view, name="criarConversa"),
     path("criar/conversa/<int:id>", criar_conversa, name="criarConversaUsuario"),
+    path(
+        "remover/solicitacao/<int:id>",
+        remover_solicitacao,
+        name="removerSolicitacao",
+    ),
 ]

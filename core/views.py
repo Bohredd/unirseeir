@@ -25,6 +25,7 @@ from core.forms import (
     ValidarCaronaForms,
     CriarCombinadoForms,
 )
+from core.map_utils import create_mapa_caminho
 from core.models import (
     Carona,
     Caroneiro,
@@ -752,9 +753,11 @@ def bate_papo_view_list(request):
     )
 
 
-def gerar_caminho_view(request, carona):
+def gerar_caminho_view(request, carona, combinado):
 
     carona = Carona.objects.get(id=carona)
+
+    mapa = create_mapa_caminho(carona, Combinado.objects.get(id=combinado))
 
     return render(
         request,
@@ -1137,8 +1140,10 @@ def criar_combinado_view(request, objeto, tipoativo):
                 "horario_encontro_ponto_encontro"
             ]
             endereco_ponto_encontro = form.cleaned_data["endereco_ponto_encontro"]
+            cidade = form.cleaned_data["cidade"]
+            estado = form.cleaned_data["estado"]
 
-            mensagem = f"O que achas de nos encontrarmos em {endereco_ponto_encontro} às {horario_encontro_ponto_encontro} ?"
+            mensagem = f"O que achas de nos encontrarmos em {endereco_ponto_encontro},{cidade},{estado} às {horario_encontro_ponto_encontro} ?"
 
             if request.user.tipo_ativo == "motorista":
                 carona = Carona.objects.filter(
@@ -1222,3 +1227,16 @@ def criar_conversa(request, id):
     conversa.save()
 
     return redirect("conversaList")
+
+
+def remover_solicitacao(request, id):
+
+    solicitacao = Solicitacao.objects.get(id=id)
+
+    solicitacao.delete()
+
+    messages.success(request, "Solicitacao removida com sucesso")
+
+    return redirect(
+        "solicitacaoList",
+    )

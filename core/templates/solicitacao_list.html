@@ -3,7 +3,7 @@
 
 {% block content %}
 
-        <title>UNIr-se | Minhas Solicitações </title>
+    <title>UNIr-se | Minhas Solicitações </title>
 
 
     <style>
@@ -20,15 +20,18 @@
     <h2>Suas Solicitacoes</h2>
     <ol class="list-group">
         {% for solicitacao in solicitacoes %}
-                <li class="list-group-item d-flex justify-content-between align-items-center" style="margin-bottom: 5px">
-                    <div class="d-flex align-items-center">
-                        <div class="ms-3">
-                            <p class="fw-bold mb-0">Enviado por: {{ solicitacao.enviado_por.first_name }}</p>
-                            <p class="fw-bold mb-0">Enviado para: {{ solicitacao.enviado_para.first_name }}</p>
-                            <p class="fw-light mb-0">Conteudo: {{ solicitacao.mensagem }}</p>
-                        </div>
+            <li class="list-group-item d-flex justify-content-between align-items-center" style="margin-bottom: 5px">
+                <div class="d-flex align-items-center">
+                    <div class="ms-3">
+                        <p class="fw-bold mb-0">Enviado por: {{ solicitacao.enviado_por.first_name }}</p>
+                        <p class="fw-bold mb-0">Enviado para: {{ solicitacao.enviado_para.first_name }}</p>
+                        <p class="fw-light mb-0">Conteudo: {{ solicitacao.mensagem }}</p>
                     </div>
-                </li>
+                    <a href="{% url 'removerSolicitacao' solicitacao.id %}">
+                        <button type="submit" class="btn btn-danger"><i class="bi bi-x-circle"></i></button>
+                    </a>
+                </div>
+            </li>
         {% empty %}
             <li class="list-group-item d-flix justify=content-between align-items-center">
                 Você não possui nenhuma solicitação :(

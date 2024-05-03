@@ -4,7 +4,15 @@ from django.db.models import TextChoices, Q
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout
 from django.forms.models import ModelChoiceIterator
-from core.models import Deslocamento, Endereco, Cursos, Carona, Motorista, Caroneiro
+from core.models import (
+    Deslocamento,
+    Endereco,
+    Cursos,
+    Carona,
+    Motorista,
+    Caroneiro,
+    EstadoChoices,
+)
 
 
 class EnderecoForm(forms.ModelForm):
@@ -117,7 +125,9 @@ class CadastroForm(forms.Form):
 
 class CaroneiroForm(forms.Form):
 
-    matricula = forms.CharField(widget=forms.TextInput(attrs={"placeholder": "Digite sua matricula"}), label="")
+    matricula = forms.CharField(
+        widget=forms.TextInput(attrs={"placeholder": "Digite sua matricula"}), label=""
+    )
 
 
 class DiasSemana(TextChoices):
@@ -152,8 +162,12 @@ class DeslocamentoForm(forms.ModelForm):
 
 
 class MotoristaForm(forms.Form):
-    matricula = forms.CharField(widget=forms.TextInput(attrs={"placeholder": "Digite sua matricula"}), label="")
-    automovel = forms.CharField(widget=forms.TextInput(attrs={"placeholder": "Automovel"}), label="")
+    matricula = forms.CharField(
+        widget=forms.TextInput(attrs={"placeholder": "Digite sua matricula"}), label=""
+    )
+    automovel = forms.CharField(
+        widget=forms.TextInput(attrs={"placeholder": "Automovel"}), label=""
+    )
 
     carona_paga = forms.BooleanField(required=False)
 
@@ -303,7 +317,9 @@ class CriarCombinadoForms(forms.Form):
     horario_encontro_ponto_encontro = forms.TimeField(
         widget=forms.TimeInput(attrs={"type": "time"})
     )
-    deslocamento = forms.ChoiceField(choices=[])  # Definindo as opções no próprio campo
+    deslocamento = forms.ChoiceField(choices=[])
+    estado = forms.ChoiceField(choices=EstadoChoices.choices)
+    cidade = forms.CharField()
 
     def __init__(self, *args, **kwargs):
         request = kwargs.pop("request", None)
@@ -329,7 +345,6 @@ class CriarCombinadoForms(forms.Form):
                 )
                 formatted_deslocamentos = self.format_deslocamentos(deslocamentos)
                 self.fields["deslocamento"].choices = formatted_deslocamentos
-                print(self.fields["deslocamento"].choices)
 
     def format_deslocamentos(self, deslocamentos):
         formatted_list = [("", "Selecione um deslocamento")]
