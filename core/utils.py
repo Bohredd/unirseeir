@@ -204,11 +204,13 @@ def get_address_by_cep(cep):
 def get_coordinates_from_cep(cep):
     url = f"https://nominatim.openstreetmap.org/search?q={cep},br&format=json"
     response = requests.get(url)
-    data = response.json()
-    if data:
-        latitude = float(data[0]["lat"])
-        longitude = float(data[0]["lon"])
-        return latitude, longitude
+    print(response)
+    if response.status_code == 200:
+        data = response.json()
+        if data:
+            latitude = float(data[0]["lat"])
+            longitude = float(data[0]["lon"])
+            return latitude, longitude
     else:
         return None
 

@@ -469,12 +469,13 @@ def ver_deslocamentos_motoristas(request, carona):
 @user_in_carona()
 def carona_view(request, carona):
     carona = Carona.objects.get(id=carona)
-
+    print(carona)
     if request.method == "POST":
 
         form = ValidarCaronaForms(request.POST, instance=carona)
         formulario_combinado = CriarCombinadoForms(request.POST)
-
+        print(form.is_valid())
+        print(form.cleaned_data)
         if form.is_valid():
             form.save()
     else:
@@ -497,12 +498,6 @@ def carona_view(request, carona):
     combinados = carona.combinados.all().order_by(
         "deslocamento__dia_semana", "horario_encontro_ponto_encontro"
     )
-
-    for compromisso in combinados:
-        print(
-            compromisso.deslocamento.dia_semana,
-            compromisso.horario_encontro_ponto_encontro,
-        )
 
     return render(
         request,
