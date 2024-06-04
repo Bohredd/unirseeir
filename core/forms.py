@@ -144,6 +144,7 @@ class DeslocamentoForm(forms.ModelForm):
         label="Horário de Saída no Ponto de Saída",
         widget=forms.TimeInput(attrs={"type": "time"}),
     )
+    cep = forms.CharField(max_length=200, label="CEP do Ponto de Saída")
 
     class Meta:
         model = Deslocamento

@@ -423,22 +423,44 @@ def criar_minha_carona(request):
             "home",
         )
 
+    DeslocamentoFormSet = modelformset_factory(
+        Deslocamento, form=DeslocamentoForm, extra=1
+    )
+
     if request.method == "POST":
-
+        motorista = Motorista.objects.get(user=request.user)
         form = CaronaForm(request.POST)
+        formset = DeslocamentoFormSet(
+            request.POST, queryset=motorista.deslocamentos.all()
+        )
 
-        if form.is_valid():
+        if form.is_valid() and formset.is_valid():
             tipo = form.cleaned_data["tipo"]
 
             carona = Carona.objects.create(
                 tipo=tipo,
-                motorista=Motorista.objects.get(user=request.user),
+                motorista=motorista,
             )
+
+            formset = DeslocamentoFormSet(
+                request.POST, queryset=motorista.deslocamentos.all()
+            )
+            if formset.is_valid():
+                instances = formset.save()
+
+                for instance in instances:
+                    motorista.deslocamentos.add(
+                        instance,
+                    )
+
+                motorista.save()
 
             return redirect("caronaView", carona.id)
 
     else:
         form = CaronaForm()
+        motorista = Motorista.objects.get(user=request.user)
+        formset = DeslocamentoFormSet(queryset=motorista.deslocamentos.all())
 
     return render(
         request,
@@ -446,6 +468,7 @@ def criar_minha_carona(request):
         {
             "request": request,
             "form": form,
+            "formset": formset,
         },
     )
 

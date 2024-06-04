@@ -1,5 +1,5 @@
 {% extends 'header.html' %}
-
+{% load crispy_forms_tags %}
 {% block content %}
 
         <title>UNIr-se | Criar Carona </title>
@@ -9,8 +9,22 @@
         <div class="card-body">
             <h5 class="card-title">Criando sua Carona</h5>
             <h6 class="card-subtitle mb-2 text-body-secondary">Aqui você preenche os dados da sua carona</h6>
-{#            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's#}
-{#                content.</p>#}
+            <div id="form-container">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ formset.management_form }}
+                    {% for form in formset %}
+                        <div class="card">
+                            <h4>Criar um Deslocamento</h4>
+                            <div class="card-body">
+                            {{ form|crispy }}
+                            </div>
+                        </div>
+                        <button class='btn btn-primary' type="submit" style="margin-top: 10px">Salvar deslocamentos</button>
+                        <hr>
+                    {% endfor %}
+                </form>
+            </div>
             <form method="post">
                 {% csrf_token %}
                 {{ form.as_p }}

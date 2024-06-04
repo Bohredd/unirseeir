@@ -59,6 +59,7 @@ def get_distancia_saida(latitude, longitude, carona):
     if not deslocamentos:
         coord2 = get_coordinates_from_cep(carona.motorista.endereco.cep)
         print("PELO CEP!", coord2)
+        print("Coord 1:", coord1, "Coord 2:", coord2)
         menor_distancia = geodesic(coord1, coord2).meters
 
     print("Menor distancia: ", menor_distancia)

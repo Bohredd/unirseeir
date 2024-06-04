@@ -27,6 +27,9 @@
                         <p class="fw-bold mb-0">Enviado para: {{ solicitacao.enviado_para.first_name }}</p>
                         <p class="fw-light mb-0">Conteudo: {{ solicitacao.mensagem }}</p>
                     </div>
+                    <a href="{% url 'solicitacaoAcao' 1 solicitacao.id %}" style="margin: 0 10px">
+                        <button type="submit" class="btn btn-success"><i class="bi bi-check-lg"></i></button>
+                    </a>
                     <a href="{% url 'removerSolicitacao' solicitacao.id %}">
                         <button type="submit" class="btn btn-danger"><i class="bi bi-x-circle"></i></button>
                     </a>

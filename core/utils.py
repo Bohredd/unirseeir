@@ -173,7 +173,6 @@ def get_menor_distancia_deslocamentos(latitude, longitude, carona):
 def get_lat_long_from_cep(cep, request):
 
     coordenadaCEP = CoordenadaCEP.objects.filter(cep=cep, usuario=request.user)
-    print("CoordenadaCEP : ", coordenadaCEP)
     if coordenadaCEP.exists():
         coordenadaCEP = coordenadaCEP.first()
         return coordenadaCEP.latitude, coordenadaCEP.longitude
