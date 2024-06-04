@@ -3,7 +3,7 @@
 {% load caronas_tags %}
 {% block content %}
 
-        <title>UNIr-se | Buscar Carona </title>
+    <title>UNIr-se | Buscar Carona </title>
 
 
     {% for carona in caronas %}
@@ -40,7 +40,9 @@
                                 <hr>
                             {% endif %}
                             {% get_distancia_saida latitude longitude carona as distancia %}
-                                <p class="card-text"> <i class="bi bi-geo-alt"></i> Um dos pontos de saída do usuário está a <span style="color: {% if distancia < 1000 %} green {% else %} red{% endif %}">{{ distancia|floatformat:1 }} metros </span> de você! </p>
+                            <p class="card-text"><i class="bi bi-geo-alt"></i> Um dos pontos de saída do usuário está a
+                                <span style="color: {% if distancia < 1000 %} green {% else %} red{% endif %}">{{ distancia|floatformat:1 }} metros </span>
+                                de você! </p>
                             <hr>
                             <p class="card-text"><span class="text-body-secondary">Deseja participar?</span>
                                 <button type="button" class="btn btn-info"

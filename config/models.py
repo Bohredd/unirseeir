@@ -76,3 +76,13 @@ class Conversa(models.Model):
 
     def get_membros(self):
         return list(self.membros.all().values_list("first_name", flat=True))
+
+
+class CoordenadaCEP(models.Model):
+
+    latitude = models.CharField(max_length=50)
+    longitude = models.CharField(max_length=50)
+
+    cep = models.CharField(max_length=50)
+
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)

@@ -8,7 +8,7 @@ import json
 from django.contrib.auth.hashers import check_password
 from xhtml2pdf import pisa
 from django.http import HttpResponse
-from config.models import Config
+from config.models import Config, CoordenadaCEP
 from core.contrato import get_template_contrato
 from django.contrib.auth.models import User
 from geopy.distance import geodesic
@@ -170,19 +170,36 @@ def get_menor_distancia_deslocamentos(latitude, longitude, carona):
     )
 
 
-def get_lat_long_from_cep(cep):
-    geolocator = Nominatim(user_agent="myGeocoder")
-    location = geolocator.geocode({"postalcode": cep}, exactly_one=True)
-    if location:
-        return location.latitude, location.longitude
+def get_lat_long_from_cep(cep, request):
+
+    coordenadaCEP = CoordenadaCEP.objects.filter(cep=cep, usuario=request.user)
+    print("CoordenadaCEP : ", coordenadaCEP)
+    if coordenadaCEP.exists():
+        coordenadaCEP = coordenadaCEP.first()
+        return coordenadaCEP.latitude, coordenadaCEP.longitude
+    else:
+        geolocator = Nominatim(user_agent="myGeocoder")
+        location = geolocator.geocode({"postalcode": cep}, exactly_one=True)
+        print(
+            location, " location ", location.latitude, " location ", location.longitude
+        )
+        if location:
+            CoordenadaCEP.objects.create(
+                usuario=request.user,
+                cep=cep,
+                latitude=location.latitude,
+                longitude=location.longitude,
+            )
+            return location.latitude, location.longitude
+
     return None, None
 
 
-def get_menor_distancia_cep(latitude, longitude, cep):
-    cep_latitude, cep_longitude = get_lat_long_from_cep(cep)
+def get_menor_distancia_cep(latitude, longitude, cep, request):
+    cep_latitude, cep_longitude = get_lat_long_from_cep(cep, request)
     if cep_latitude is None or cep_longitude is None:
         return None
-
+    print("request: ", request)
     distancia = geodesic((latitude, longitude), (cep_latitude, cep_longitude)).meters
     print("Distancia: ", distancia, " metros")
     return (
