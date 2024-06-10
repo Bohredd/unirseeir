@@ -15,20 +15,22 @@ def get_lat_long_from_cep(cep, request):
         coordenadaCEP = coordenadaCEP.first()
         return coordenadaCEP.latitude, coordenadaCEP.longitude
     else:
-        geolocator = Nominatim(user_agent="myGeocoder")
-        location = geolocator.geocode({"postalcode": cep}, exactly_one=True)
-        print(
-            location, " location ", location.latitude, " location ", location.longitude
-        )
-        if location:
-            CoordenadaCEP.objects.create(
-                usuario=request.user,
-                cep=cep,
-                latitude=location.latitude,
-                longitude=location.longitude,
+        try:
+            geolocator = Nominatim(user_agent="myGeocoder")
+            location = geolocator.geocode({"postalcode": cep}, exactly_one=True)
+            print(
+                location, " location ", location.latitude, " location ", location.longitude
             )
-            return location.latitude, location.longitude
-
+            if location:
+                CoordenadaCEP.objects.create(
+                    usuario=request.user,
+                    cep=cep,
+                    latitude=location.latitude,
+                    longitude=location.longitude,
+                )
+                return location.latitude, location.longitude
+        except Exception as e:
+            return None, None
 
 @register.simple_tag
 def get_menor_distancia_cep(latitude, longitude, cep, request):

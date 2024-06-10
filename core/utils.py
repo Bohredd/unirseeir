@@ -6,6 +6,7 @@ import requests
 import PyPDF2
 import json
 from django.contrib.auth.hashers import check_password
+from geopy.exc import GeocoderUnavailable
 from xhtml2pdf import pisa
 from django.http import HttpResponse
 from config.models import Config, CoordenadaCEP
@@ -177,20 +178,22 @@ def get_lat_long_from_cep(cep, request):
         coordenadaCEP = coordenadaCEP.first()
         return coordenadaCEP.latitude, coordenadaCEP.longitude
     else:
-        geolocator = Nominatim(user_agent="myGeocoder")
-        location = geolocator.geocode({"postalcode": cep}, exactly_one=True)
-        print(
-            location, " location ", location.latitude, " location ", location.longitude
-        )
-        if location:
-            CoordenadaCEP.objects.create(
-                usuario=request.user,
-                cep=cep,
-                latitude=location.latitude,
-                longitude=location.longitude,
-            )
-            return location.latitude, location.longitude
-
+        try:
+            geolocator = Nominatim(user_agent="myGeocoder")
+            location = geolocator.geocode({"postalcode": cep}, exactly_one=True)
+            if location:
+                print(
+                    location, " location ", location.latitude, " location ", location.longitude
+                )
+                CoordenadaCEP.objects.create(
+                    usuario=request.user,
+                    cep=cep,
+                    latitude=location.latitude,
+                    longitude=location.longitude,
+                )
+                return location.latitude, location.longitude
+        except Exception as e:
+            return None, None
     return None, None
 
 
