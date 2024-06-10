@@ -434,6 +434,8 @@ def criar_minha_carona(request):
             request.POST, queryset=motorista.deslocamentos.all()
         )
 
+        print(request.POST)
+
         if form.is_valid() and formset.is_valid():
             tipo = form.cleaned_data["tipo"]
 
@@ -441,19 +443,14 @@ def criar_minha_carona(request):
                 tipo=tipo,
                 motorista=motorista,
             )
+            instances = formset.save()
 
-            formset = DeslocamentoFormSet(
-                request.POST, queryset=motorista.deslocamentos.all()
-            )
-            if formset.is_valid():
-                instances = formset.save()
+            for instance in instances:
+                motorista.deslocamentos.add(
+                    instance,
+                )
 
-                for instance in instances:
-                    motorista.deslocamentos.add(
-                        instance,
-                    )
-
-                motorista.save()
+            motorista.save()
 
             return redirect("caronaView", carona.id)
 

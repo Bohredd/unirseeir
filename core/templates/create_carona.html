@@ -2,9 +2,9 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
-        <title>UNIr-se | Criar Carona </title>
+    <title>UNIr-se | Criar Carona </title>
 
-    
+
     <div class="card w-100" style="width: 18rem;">
         <div class="card-body">
             <h5 class="card-title">Criando sua Carona</h5>
@@ -17,19 +17,17 @@
                         <div class="card">
                             <h4>Criar um Deslocamento</h4>
                             <div class="card-body">
-                            {{ form|crispy }}
+                                {{ form|crispy }}
                             </div>
                         </div>
-                        <button class='btn btn-primary' type="submit" style="margin-top: 10px">Salvar deslocamentos</button>
+                        <button class='btn btn-primary' type="submit" style="margin-top: 10px">Salvar deslocamentos
+                        </button>
                         <hr>
                     {% endfor %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-info"> Criar</button>
                 </form>
             </div>
-            <form method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn btn-info"> Criar </button>
-            </form>
         </div>
     </div>
 {% endblock %}
