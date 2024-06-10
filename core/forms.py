@@ -61,7 +61,6 @@ class EnderecoForm(forms.ModelForm):
 
 
 class CadastroForm(forms.Form):
-
     nome = forms.CharField(
         label="",
         widget=forms.TextInput(attrs={"placeholder": "Digite seu nome"}),
@@ -124,14 +123,12 @@ class CadastroForm(forms.Form):
 
 
 class CaroneiroForm(forms.Form):
-
     matricula = forms.CharField(
         widget=forms.TextInput(attrs={"placeholder": "Digite sua matricula"}), label=""
     )
 
 
 class DiasSemana(TextChoices):
-
     segunda = ("segunda", "Segunda")
     terca = ("terça", "Terça")
     quarta = ("quarta", "Quarta")
@@ -144,7 +141,8 @@ class DeslocamentoForm(forms.ModelForm):
         label="Horário de Saída no Ponto de Saída",
         widget=forms.TimeInput(attrs={"type": "time"}),
     )
-    cep = forms.CharField(max_length=200, label="CEP do Ponto de Saída")
+    cep = forms.CharField(max_length=200, label="CEP do Ponto de Saída", help_text="Digite a Cidade e o Estado Junto*"
+                          )
 
     class Meta:
         model = Deslocamento
@@ -174,7 +172,6 @@ class MotoristaForm(forms.Form):
 
 
 class LoginForm(forms.Form):
-
     matricula = forms.CharField(
         label="", widget=forms.TextInput(attrs={"placeholder": "Matricula"})
     )
@@ -207,7 +204,6 @@ class LoginForm(forms.Form):
 
 
 class MetodoPagamentoForm(forms.Form):
-
     tipo_pagamento = forms.ChoiceField(
         choices=[
             ("", "Tipo de Pagamento"),
@@ -221,12 +217,10 @@ class MetodoPagamentoForm(forms.Form):
 
 
 class SolicitacaoForm(forms.Form):
-
     mensagem = forms.CharField(label="Mensagem", widget=forms.Textarea())
 
 
 class EditCaroneiroForm(forms.Form):
-
     nome = forms.CharField(max_length=200)
     email = forms.EmailField()
 
@@ -246,7 +240,6 @@ class EditCaroneiroForm(forms.Form):
 
 
 class EditMotoristaForm(forms.Form):
-
     nome = forms.CharField(max_length=200)
     email = forms.EmailField()
 
@@ -269,21 +262,18 @@ class EditMotoristaForm(forms.Form):
 
 
 class ValidarCaronaForms(forms.ModelForm):
-
     class Meta:
         model = Carona
         fields = ["ativa"]
 
 
 class MensagemForm(forms.Form):
-
     conteudo = forms.CharField(
         widget=forms.Textarea(), label="Digite sua mensagem aqui"
     )
 
 
 class CaronaForm(forms.Form):
-
     tipo = forms.ChoiceField(
         choices=[
             ("", "Tipo de Automóvel"),
@@ -295,14 +285,12 @@ class CaronaForm(forms.Form):
 
 
 class EsqueciSenha(forms.Form):
-
     matricula = forms.CharField(label="Matricula")
 
     email = forms.EmailField()
 
 
 class FotoPerfilForm(forms.Form):
-
     foto = forms.FileField(
         label="Foto de Perfil",
         widget=forms.FileInput(

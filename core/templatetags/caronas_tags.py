@@ -140,11 +140,11 @@ def get_proximo_compromisso(carona, user):
         .order_by("horario_encontro_ponto_encontro")
         .first()
     )
-    # print(proximo_compromisso)
+    print(proximo_compromisso)
 
     if proximo_compromisso:
-        # print(proximo_compromisso.deslocamento.dia_semana)
-        # print(proximo_compromisso.horario_encontro_ponto_encontro)
+        print(proximo_compromisso.deslocamento.dia_semana)
+        print(proximo_compromisso.horario_encontro_ponto_encontro)
         return proximo_compromisso
 
     proximo_compromisso = (
@@ -154,6 +154,7 @@ def get_proximo_compromisso(carona, user):
         .first()
     )
 
-    # print(proximo_compromisso)
+    if not proximo_compromisso:
+        return carona.combinados.all().first()
 
     return proximo_compromisso

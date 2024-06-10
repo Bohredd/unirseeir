@@ -2,7 +2,7 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
-        <title>UNIr-se | Meus Deslocamentos </title>
+    <title>UNIr-se | Meus Deslocamentos </title>
 
     <h2>Seus deslocamentos registrados</h2>
     <div id="form-container">
@@ -12,12 +12,100 @@
             {% for form in formset %}
                 <div class="card">
                     <div class="card-body">
-                    {{ form|crispy }}
+                        {{ form|crispy }}
                     </div>
+                    <div class="mapa" id="map-{{ forloop.counter }}" style="height: 300px;">
+                    </div>
+                    <input type="hidden" id="id_form-{{ forloop.counter }}-latitude-saida"
+                           name="form-{{ forloop.counter }}-latitude-saida">
+                    <input type="hidden" id="id_form-{{ forloop.counter }}-longitude-saida"
+                           name="form-{{ forloop.counter }}-longitude-saida">
+                    <input type="hidden" id="id_form-{{ forloop.counter }}-latitude-destino"
+                           name="form-{{ forloop.counter }}-latitude-destino">
+                    <input type="hidden" id="id_form-{{ forloop.counter }}-longitude-destino"
+                           name="form-{{ forloop.counter }}-longitude-destino">
                 </div>
                 <hr>
             {% endfor %}
             <button class='btn btn-primary' type="submit">Salvar deslocamentos</button>
         </form>
     </div>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <script>
+        function initMap(mapId, latSaida, lonSaida, latDestino, lonDestino) {
+            console.log("Initializing map:", mapId, latSaida, lonSaida, latDestino, lonDestino);
+            let map = L.map(mapId).setView([latSaida, lonSaida], 12);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            L.marker([latSaida, lonSaida]).addTo(map)
+                .openPopup()
+                .setIcon(L.icon({iconUrl: 'https://leafletjs.com/examples/custom-icons/leaf-green.png'}))
+                .bindTooltip('Saída', {permanent: true, direction: 'top'});
+
+            L.marker([latDestino, lonDestino]).addTo(map)
+                .openPopup()
+                .setIcon(L.icon({iconUrl: 'https://leafletjs.com/examples/custom-icons/leaf-red.png'}))
+                .bindTooltip('Destino', {permanent: true, direction: 'top'});
+        }
+
+        function geocodeAddress(address, callback) {
+            console.log("Endereco: ", address);
+            console.log(encodeURIComponent(address));
+            const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        const lat = parseFloat(data[0].lat);
+                        const lon = parseFloat(data[0].lon);
+                        console.log("Lat: ", lat, "Long: ", lon);
+                        callback(lat, lon);
+                    } else {
+                        alert('Endereço não encontrado');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar coordenadas:', error);
+                });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const forms = document.querySelectorAll('.card');
+            forms.forEach(function (form, index) {
+                const pontoSaidaInput = form.querySelector(`#id_form-${index}-ponto_saida_endereco`);
+                const pontoDestinoInput = form.querySelector(`#id_form-${index}-ponto_destino_endereco`);
+                const latSaidaInput = document.getElementById(`id_form-${index}-latitude-saida`);
+                const lonSaidaInput = document.getElementById(`id_form-${index}-longitude-saida`);
+                const latDestinoInput = document.getElementById(`id_form-${index}-latitude-destino`);
+                const lonDestinoInput = document.getElementById(`id_form-${index}-longitude-destino`);
+
+                const pontoSaida = pontoSaidaInput ? pontoSaidaInput.value : "";
+                const pontoDestino = pontoDestinoInput ? pontoDestinoInput.value : "";
+
+                if (pontoSaida && pontoDestino) {
+                    geocodeAddress(pontoSaida, function (lat, lon) {
+                        if (latSaidaInput && lonSaidaInput) {
+                            latSaidaInput.value = lat;
+                            lonSaidaInput.value = lon;
+                        }
+                        geocodeAddress(pontoDestino, function (latDest, lonDest) {
+                            if (latDestinoInput && lonDestinoInput) {
+                                latDestinoInput.value = latDest;
+                                lonDestinoInput.value = lonDest;
+                            }
+                            initMap(`map-${index + 1}`, lat, lon, latDest, lonDest);
+                        });
+                    });
+                }
+            });
+        });
+    </script>
+
 {% endblock %}

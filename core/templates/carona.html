@@ -52,35 +52,38 @@
                 </div>
             </div>
         </div>
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false"
-                        aria-controls="panelsStayOpen-collapseTwo">
-                    Seu Próximo Compromisso da Carona
-                </button>
-            </h2>
-            <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse">
-                <div class="accordion-body">
-                    <div class="card-body">
-                        <h5 class="card-title">{% get_proximo_compromisso carona request.user as proximo_compromisso %}</h5>
-                        <p class="card-text">Local: {{ proximo_compromisso.endereco_ponto_encontro }}</p>
-                        <p class="card-text">Horário: {{ proximo_compromisso.horario_encontro_ponto_encontro }}</p>
-                        <p class="card-text">Dia da Semana: {{ proximo_compromisso.deslocamento.dia_semana.title }}</p>
-                        <p class="card-text">Missão: {% if request.user.tipo_ativo == 'motorista' %}Buscar
-                            {{ proximo_compromisso.caroneiro.nome }} -
-                            {{ proximo_compromisso.deslocamento.dia_semana }}{% else %} Ir para o local de
-                            encontro {{ proximo_compromisso.endereco_ponto_encontro }}{% endif %}</p>
-                        {% if proximo_compromisso %}
-                            <a href="{% url 'gerarCaminho' carona.id proximo_compromisso.id%}">
-                                <button type="button" class="btn btn-success">Gerar Caminho para o Próximo Compromisso
-                                </button>
-                            </a>
-                        {% endif %}
+        {% get_proximo_compromisso carona request.user as proximo_compromisso %}
+        {% if proximo_compromisso %}
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false"
+                            aria-controls="panelsStayOpen-collapseTwo">
+                        Seu Próximo Compromisso da Carona
+                    </button>
+                </h2>
+                <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ proximo_compromisso }}</h5>
+                            <p class="card-text">Local: {{ proximo_compromisso.endereco_ponto_encontro }}</p>
+                            <p class="card-text">Horário: {{ proximo_compromisso.horario_encontro_ponto_encontro }}</p>
+                            <p class="card-text">Dia da Semana: {{ proximo_compromisso.deslocamento.dia_semana.title }}</p>
+                            <p class="card-text">Missão: {% if request.user.tipo_ativo == 'motorista' %}Buscar
+                                {{ proximo_compromisso.caroneiro.nome }} -
+                                {{ proximo_compromisso.deslocamento.dia_semana }}{% else %} Ir para o local de
+                                encontro {{ proximo_compromisso.endereco_ponto_encontro }}{% endif %}</p>
+                            {% if proximo_compromisso %}
+                                <a href="{% url 'gerarCaminho' carona.id proximo_compromisso.id%}">
+                                    <button type="button" class="btn btn-success">Gerar Caminho para o Próximo Compromisso
+                                    </button>
+                                </a>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        {% endif %}
         <div class="accordion-item">
             <h2 class="accordion-header">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
