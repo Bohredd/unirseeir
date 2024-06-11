@@ -21,18 +21,20 @@ def obter_coordenadas_endereco(endereco):
 def create_mapa_caminho(carona: Carona, combinado: Combinado):
     saida = combinado.deslocamento.ponto_saida_endereco
 
-    print("Saida: ", saida)
+    pontos_encontro = carona.combinados.filter(
+        deslocamento=combinado.deslocamento,
+    )
+
+    pontos_encontro = [
+        ponto.endereco_ponto_encontro for ponto in pontos_encontro
+    ]
 
     destino = combinado.deslocamento.ponto_destino_endereco
 
-    print("Destino: ", destino)
+    pontos_passagem = [saida]
 
-    coordenadas = []
+    pontos_passagem.extend(pontos_encontro)
 
-    # print("For ponto na carona em coordenadas")
-    # for ponto in carona.combinados.all():
-    #    print(ponto.endereco_ponto_encontro)
-    #    coordenadas.append(obter_coordenadas_endereco(ponto.endereco_ponto_encontro))
+    pontos_passagem.append(destino)
 
-    url = f"""
-    https://api.tomtom.com/routing/1/calculateRoute/52.50931,13.42936:52.50274,13.43872/json?key={config("TOMTOM_ACCESS_KEY")}"""
+    return pontos_passagem

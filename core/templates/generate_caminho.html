@@ -1,5 +1,80 @@
 {% extends 'header.html' %}
 
 {% block content %}
-    {{ carona }}
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAq8QY6jKTFtj5kL5j6fi6MbZiK3aED0C8&callback=initMap"
+            async defer></script>
+
+    <h4>Trajeto para a Carona de {{ carona.motorista.nome }}</h4>
+
+    <div id="map" style="height: 400px;"></div>
+
+    <div id="route-info">
+        <ul class="list-group list-group-flush">
+
+            <li class="list-group-item" id="time-info"></li>
+
+            <li class="list-group-item" id="arrival-time"></li>
+
+        </ul>
+    </div>
+    
+    
+    <script>
+        function initMap() {
+            let directionsService = new google.maps.DirectionsService();
+            let directionsRenderer = new google.maps.DirectionsRenderer();
+            let map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 7,
+            });
+            directionsRenderer.setMap(map);
+
+            let waypoints = {{ pontos|safe }};
+            let origin = waypoints[0];
+            let destination = waypoints[waypoints.length - 1];
+            waypoints = waypoints.slice(1, -1).map(function (waypoint) {
+                return {
+                    location: waypoint,
+                    stopover: true
+                };
+            });
+
+            var request = {
+                origin: origin,
+                destination: destination,
+                waypoints: waypoints,
+                travelMode: 'DRIVING'
+            };
+
+            directionsService.route(request, function (result, status) {
+                if (status == 'OK') {
+                    directionsRenderer.setDirections(result);
+                    showRouteInfo(result);
+                }
+            });
+        }
+
+        function showRouteInfo(result) {
+            let route = result.routes[0];
+            let totalTime = 0;
+            route.legs.forEach(function (leg) {
+                totalTime += leg.duration.value;
+            });
+
+            let timeInfoElement = document.getElementById('time-info');
+            timeInfoElement.textContent = 'Tempo estimado: ' + formatTime(totalTime);
+
+            let arrivalTimeElement = document.getElementById('arrival-time');
+            let arrivalTime = new Date();
+            arrivalTime.setSeconds(arrivalTime.getSeconds() + totalTime);
+            arrivalTimeElement.textContent = 'Horário de chegada estimado: ' + arrivalTime.toLocaleTimeString();
+        }
+
+        function formatTime(seconds) {
+            let hours = Math.floor(seconds / 3600);
+            let minutes = Math.floor((seconds % 3600) / 60);
+            return hours + ' horas ' + minutes + ' minutos';
+        }
+    </script>
+
 {% endblock %}

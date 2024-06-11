@@ -774,13 +774,17 @@ def gerar_caminho_view(request, carona, combinado):
 
     carona = Carona.objects.get(id=carona)
 
-    mapa = create_mapa_caminho(carona, Combinado.objects.get(id=combinado))
+    pontos = create_mapa_caminho(carona, Combinado.objects.get(id=combinado))
+
+    print("Pontos a serem passados: ", pontos)
 
     return render(
         request,
         "generate_caminho.html",
         {
+            "combinado": combinado,
             "carona": carona,
+            "pontos": pontos,
         },
     )
 
