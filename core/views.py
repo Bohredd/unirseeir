@@ -1,3 +1,4 @@
+from decouple import config
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.core.paginator import Paginator
@@ -778,10 +779,13 @@ def gerar_caminho_view(request, carona, combinado):
 
     print("Pontos a serem passados: ", pontos)
 
+    apikeygoogle = config("API_GOOGLE_ACCESS_KEY")
+
     return render(
         request,
         "generate_caminho.html",
         {
+            "apikeygoogle": apikeygoogle,
             "combinado": combinado,
             "carona": carona,
             "pontos": pontos,
